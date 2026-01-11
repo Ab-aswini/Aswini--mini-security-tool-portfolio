@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breach Checker - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+            }
+
+            .tool-btn {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 40rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Breach Checker</h1>
+            <p class="tools-subtitle">Securely check if a password has been compromised (k-Anonymity).</p>
+        </header>
+
+        <div class="tool-card">
+
+            <div
+                style="margin-bottom: 1.5rem; opacity: 0.9; line-height: 1.5; font-size: 0.95rem; background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
+                <strong>Why check?</strong> Hackers use lists of millions of stolen passwords to break into accounts.
+                If your password is in this database, it is <strong>unsafe</strong> to use anywhere.
+                <br><br>
+                This tool uses a secure method (k-Anonymity) to check the database <strong>without ever revealing your
+                    password</strong> to us or anyone else.
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="passInput" class="tool-input" placeholder="Enter password to check...">
+                <button id="checkBtn" class="tool-btn">Check Exposure</button>
+            </div>
+            <div style="font-size:0.8rem; color:#6b7280; margin-bottom:1rem;">
+                <i data-lucide="lock" style="width:1em; vertical-align:middle"></i>
+                Privacy First: Your password is <strong>never sent</strong>. Only the first 5 characters of its SHA-1
+                hash are checked against the database.
+            </div>
+            <div id="resultsArea" class="result-box"></div>
+        </div>
+
+        <!-- Deep Search Redirects -->
+        <div class="tool-card" style="margin-top: 1.5rem;">
+            <h3 style="margin-bottom: 0.5rem;">Deep Identity Search</h3>
+            <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;">
+                Want to check if your <strong>Email Address</strong> or <strong>Phone Number</strong> was exposed in a
+                data breach?
+                Use these trusted external platforms for a deep dive.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="https://haveibeenpwned.com/" target="_blank" class="tool-btn"
+                    style="background: #ef4444; border: none; font-weight: bold;">
+                    <i data-lucide="shield-alert" style="vertical-align: middle; margin-right: 5px;"></i>
+                    Check Email (Have I Been Pwned)
+                </a>
+                <a href="https://cybernews.com/personal-data-leak-check/" target="_blank" class="tool-btn"
+                    style="background: transparent; border: 1px solid #4b5563;">
+                    <i data-lucide="search" style="vertical-align: middle; margin-right: 5px;"></i>
+                    CyberNews Leak Check
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('checkBtn').addEventListener('click', async () => {
+            const password = document.getElementById('passInput').value;
+            const resultsArea = document.getElementById('resultsArea');
+            if (!password) return;
+
+            resultsArea.innerHTML = "Hashing securely (SHA-1)...";
+            resultsArea.classList.add('visible');
+
+            // 1. Hash Password (SHA-1)
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+            // 2. Prepare k-Anonymity Request
+            const prefix = hashHex.substring(0, 5);
+            const suffix = hashHex.substring(5);
+
+            resultsArea.innerText = `Hash Prefix: ${prefix}***** (Checking Database...)`;
+
+            try {
+                // 3. Query HIBP API
+                const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+                const text = await res.text();
+
+                // 4. Parse Response (Format: SUFFIX:COUNT)
+                // We look for our specific suffix in the list
+                const regex = new RegExp(`^${suffix}:([0-9]+)`, 'm');
+                const match = text.match(regex);
+
+                if (match) {
+                    const count = parseInt(match[1]);
+                    resultsArea.innerHTML = `
+<div style="color:var(--status-error); font-size:1.2rem; font-weight:bold;">âš ï¸ LEAKED!</div>
+This password appears in <strong>${count.toLocaleString()}</strong> known data breaches.
+<br><br>
+Recommendation: Do not use this password.
+<div style="margin-top:1.5rem; pt:1rem; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; opacity:0.5;">
+    Data source: <a href="https://haveibeenpwned.com/API/v3" target="_blank" style="color:inherit;">Have I Been Pwned API</a> (k-Anonymity Model)
+</div>
+                    `;
+                } else {
+                    resultsArea.innerHTML = `
+<div style="color:var(--status-success); font-size:1.2rem; font-weight:bold;">âœ… Safe (Clean)</div>
+This password was NOT found in the public breach database.
+<div style="margin-top:1.5rem; pt:1rem; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; opacity:0.5;">
+    Data source: <a href="https://haveibeenpwned.com/API/v3" target="_blank" style="color:inherit;">Have I Been Pwned API</a> (k-Anonymity Model)
+</div>
+                    `;
+                }
+
+            } catch (e) {
+                resultsArea.innerText = "Error connecting to Pwned API.";
+            }
+        });
+    </script>
+
+
+    <script src="../assets/js/app.js"></script>
+</body>
+
+</html>

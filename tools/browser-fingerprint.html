@@ -1,0 +1,378 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Browser Recon - Digital Identity</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .data-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .data-label {
+            color: #888;
+        }
+
+        .data-value {
+            color: #ddd;
+            font-family: monospace;
+            text-align: right;
+            word-break: break-all;
+            margin-left: 1rem;
+        }
+
+        .success {
+            color: var(--status-success);
+        }
+
+        .warn {
+            color: var(--status-warn);
+        }
+
+        .error {
+            color: var(--status-error);
+        }
+
+        .hash-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: var(--tool-accent);
+            margin-top: 0.2rem;
+            word-break: break-all;
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .tools-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 65rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Deep Browser Sentinel</h1>
+            <p class="tools-subtitle">Analyze your globally exposed digital fingerprint & hardware leaks.</p>
+        </header>
+
+        <div class="tool-card" style="text-align:center;">
+            <button id="scanBtn" class="tool-btn" style="padding:1rem 3rem; font-size:1.1rem;">
+                <i data-lucide="radar" style="vertical-align:middle; margin-right:0.5rem;"></i> Initiate Deep Scan
+            </button>
+            <div id="loading" style="display:none; margin-top:1rem; color:#888;">
+                <i data-lucide="loader-2" class="spin"></i> Triangulating position & hashing hardware...
+            </div>
+        </div>
+
+        <div id="resultsDashboard" class="dashboard-grid" style="display:none;">
+
+            <!-- 1. NETWORK INTELLIGENCE -->
+            <div class="data-card">
+                <div class="card-header">
+                    <i data-lucide="globe" style="color:#3b82f6;"></i>
+                    <div class="card-title">Global Network Context</div>
+                </div>
+                <div id="networkData">Loading...</div>
+            </div>
+
+            <!-- 2. DIGITAL FINGERPRINT -->
+            <div class="data-card">
+                <div class="card-header">
+                    <i data-lucide="fingerprint" style="color:#ef4444;"></i>
+                    <div class="card-title">Device Fingerprint</div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Canvas Hash</span>
+                    <span class="data-value" id="canvasHash">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">WebGL Hash</span>
+                    <span class="data-value" id="webglHash">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Audio Context</span>
+                    <span class="data-value" id="audioHash">...</span>
+                </div>
+                <div class="data-row"
+                    style="margin-top:1rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:0.5rem;">
+                    <span class="data-label">Estimated Uniqueness</span>
+                    <span class="data-value" id="uniquenessScore" style="font-weight:bold;">TBD</span>
+                </div>
+            </div>
+
+            <!-- 3. HARDWARE REALITY -->
+            <div class="data-card">
+                <div class="card-header">
+                    <i data-lucide="cpu" style="color:#10b981;"></i>
+                    <div class="card-title">Hardware Leakage</div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">CPU Cores</span>
+                    <span class="data-value" id="cpuCores">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Memory (RAM)</span>
+                    <span class="data-value" id="ram">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">GPU Renderer</span>
+                    <span class="data-value" id="gpuInfo">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Screen</span>
+                    <span class="data-value" id="screenInfo">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Battery Level</span>
+                    <span class="data-value" id="battery">...</span>
+                </div>
+            </div>
+
+            <!-- 4. BOT & PRIVACY -->
+            <div class="data-card">
+                <div class="card-header">
+                    <i data-lucide="shield-alert" style="color:#f59e0b;"></i>
+                    <div class="card-title">Bot & Privacy Metrics</div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Bot Automation</span>
+                    <span class="data-value" id="botStatus">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">User Agent</span>
+                    <div class="hash-box" id="uaString">...</div>
+                </div>
+                <div class="data-row" style="margin-top:0.5rem;">
+                    <span class="data-label">Do Not Track</span>
+                    <span class="data-value" id="dntStatus">...</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Cookies</span>
+                    <span class="data-value" id="cookieStatus">...</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        // --- Hashing Utility (Simple Jenkins/DJB2 variant for demo purposes) ---
+        function simpleHash(str) {
+            let hash = 0;
+            if (str.length === 0) return hash;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString(16);
+        }
+
+        document.getElementById('scanBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('scanBtn');
+            const dash = document.getElementById('resultsDashboard');
+            const loading = document.getElementById('loading');
+
+            btn.style.display = 'none';
+            loading.style.display = 'block';
+
+            // --- 1. Canvas Fingerprint ---
+            const getCanvasFingerprint = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.textBaseline = "top";
+                    ctx.font = "14px 'Arial'";
+                    ctx.fillStyle = "#f60";
+                    ctx.fillRect(125, 1, 62, 20);
+                    ctx.fillStyle = "#069";
+                    ctx.fillText("Fingerprint v2.0 <ðŸ˜>", 2, 15);
+                    return simpleHash(canvas.toDataURL());
+                } catch (e) { return "Blocked"; }
+            };
+
+            // --- 2. WebGL Fingerprint ---
+            const getWebGLFingerprint = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+                    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                    if (!gl) return "Not Supported";
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                    return { hash: simpleHash(renderer), renderer: renderer };
+                } catch (e) { return { hash: "Blocked", renderer: "Unknown" }; }
+            };
+
+            // --- 3. Audio Fingerprint (Oscillator) ---
+            const getAudioFingerprint = async () => {
+                try {
+                    const ctx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 44100, 44100);
+                    const osc = ctx.createOscillator();
+                    osc.type = 'triangle';
+                    osc.frequency.value = 10000;
+                    const compressor = ctx.createDynamicsCompressor();
+                    osc.connect(compressor);
+                    compressor.connect(ctx.destination);
+                    osc.start(0);
+                    const buffer = await ctx.startRendering(); // Returns AudioBuffer
+                    // Hash the PCM data
+                    let sum = 0;
+                    for (let i = 0; i < buffer.length; i += 100) sum += buffer.getChannelData(0)[i];
+                    return simpleHash(sum.toString());
+                } catch (e) { return "Blocked/No Audio"; }
+            };
+
+            // --- EXECUTE ---
+            const canvasFP = getCanvasFingerprint();
+            const webGLData = getWebGLFingerprint();
+            const audioFP = await getAudioFingerprint();
+
+            // --- Hardware ---
+            const battery = navigator.getBattery ? await navigator.getBattery() : null;
+            const batText = battery ? `${(battery.level * 100).toFixed(0)}% ${battery.charging ? 'âš¡' : ''}` : 'Unknown';
+
+            // --- Network (IPWho.is) ---
+            let netHTML = `<div style="color:var(--status-error)">Connection Failed</div>`;
+            try {
+                const res = await fetch('https://ipwho.is/');
+                const data = await res.json();
+                if (data.success) {
+                    netHTML = `
+                        <div class="data-row"><span class="data-label">IP Address</span><span class="data-value warn">${data.ip}</span></div>
+                        <div class="data-row"><span class="data-label">ISP / Org</span><span class="data-value">${data.connection.isp}</span></div>
+                        <div class="data-row"><span class="data-label">Location</span><span class="data-value">${data.city}, ${data.country}</span></div>
+                        <div class="data-row"><span class="data-label">Timezone</span><span class="data-value">${data.timezone.id}</span></div>
+                        <div style="margin-top:1rem; text-align:right;">
+                            <img src="${data.flag.img}" style="height:20px; vertical-align:middle; border-radius:2px;">
+                        </div>
+                    `;
+                }
+            } catch (e) { console.error('IP fetch failed', e); }
+
+            // --- Update UI ---
+            document.getElementById('networkData').innerHTML = netHTML;
+            document.getElementById('canvasHash').innerText = canvasFP.substring(0, 12);
+            document.getElementById('webglHash').innerText = webGLData.hash.substring(0, 12);
+            document.getElementById('audioHash').innerText = audioFP.substring(0, 12);
+
+            document.getElementById('cpuCores').innerText = navigator.hardwareConcurrency || 'Unknown';
+            document.getElementById('ram').innerText = navigator.deviceMemory ? `~${navigator.deviceMemory} GB` : 'Unknown';
+            document.getElementById('gpuInfo').innerText = webGLData.renderer;
+            document.getElementById('screenInfo').innerText = `${window.screen.width}x${window.screen.height} (${window.screen.colorDepth}-bit)`;
+            document.getElementById('battery').innerText = batText;
+
+            // Bot Check
+            const isBot = navigator.webdriver || window.callPhantom || window._phantom;
+            document.getElementById('botStatus').innerHTML = isBot
+                ? `<span class="error">ðŸ¤– ROBOT DETECTED</span>`
+                : `<span class="success">ðŸ‘¤ HUMAN</span>`;
+
+            document.getElementById('uaString').innerText = navigator.userAgent;
+            document.getElementById('dntStatus').innerText = navigator.doNotTrack == "1" ? "Enabled" : "Disabled";
+            document.getElementById('cookieStatus').innerText = navigator.cookieEnabled ? "Enabled" : "Disabled";
+
+            // Uniqueness Score (Heuristic)
+            let score = 0;
+            if (navigator.platform.includes('Linux')) score += 20;
+            if ((navigator.deviceMemory || 0) > 16) score += 20;
+            if (window.screen.width > 2000) score += 20;
+            if (webGLData.renderer.includes("NVIDIA") || webGLData.renderer.includes("AMD")) score += 10;
+
+            let uniqueness = "Medium";
+            if (score > 50) uniqueness = "High (Rare Config)";
+            else if (score < 20) uniqueness = "Low (Common)";
+
+            const scoreEl = document.getElementById('uniquenessScore');
+            scoreEl.innerText = uniqueness;
+            if (uniqueness.includes("High")) scoreEl.style.color = "var(--status-warn)";
+
+            // Show Dashboard
+            loading.style.display = 'none';
+            dash.style.display = 'grid';
+            btn.style.display = 'inline-block';
+            btn.innerText = "Re-Scan";
+        });
+    </script>
+
+    <!-- Hover Footer -->
+    <!-- Hover Footer -->
+
+</body>
+
+</html>

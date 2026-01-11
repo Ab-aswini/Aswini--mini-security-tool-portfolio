@@ -1,0 +1,26 @@
+# System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node
+node_modules/
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Python (if any local server stuff)
+__pycache__/
+*.pyc
+
+# Local Config
+.env
+.firebaserc
+firebase.json

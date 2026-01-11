@@ -1,0 +1,443 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Entropy Visualizer - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--tool-accent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .drop-zone p {
+            margin-top: 1rem;
+            color: #888;
+        }
+
+        #heatmapCanvas {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            border: 1px solid #333;
+            cursor: crosshair;
+            image-rendering: pixelated;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #444;
+            padding: 0.5rem;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 0.8rem;
+            display: none;
+            z-index: 100;
+        }
+
+        /* Legend */
+        .legend-bar {
+            height: 10px;
+            width: 100%;
+            background: linear-gradient(to right,
+                    #0000ff 0%,
+                    /* 0: Padding/Zero */
+                    #00ff00 50%,
+                    /* 4: Text/Code */
+                    #ff0000 100%
+                    /* 8: Encrypted/Compressed */
+                );
+            border-radius: 5px;
+            margin-top: 0.5rem;
+        }
+
+        .legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .tools-title {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+    <!-- Theme Data Script -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 60rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">File Entropy Visualizer</h1>
+            <p class="tools-subtitle">Visualize file structure and randomness to detect packing, encryption, or hidden
+                data.</p>
+        </header>
+
+        <div class="tool-card">
+            <!-- File Input -->
+            <div id="dropZone" class="drop-zone">
+                <i data-lucide="upload-cloud" style="width: 48px; height: 48px; color: var(--tool-accent);"></i>
+                <h3>Drag & Drop File Here</h3>
+                <p>or click to browse</p>
+                <input type="file" id="fileInput" style="display: none;">
+            </div>
+
+            <!-- Analysis UI (Hidden by default) -->
+            <div id="analysisUi" style="display: none; margin-top: 2rem;">
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <div id="fileName" style="font-weight:bold;">filename.bin</div>
+                    <button id="resetBtn" class="tool-btn" style="font-size:0.8rem; padding:0.4rem 0.8rem;">Analyze New
+                        File</button>
+                </div>
+
+                <div style="position:relative;">
+                    <canvas id="heatmapCanvas" width="800" height="300"></canvas>
+                    <div id="tooltip" class="tooltip"></div>
+                </div>
+
+                <!-- Legend -->
+                <div style="margin-top: 1rem; margin-bottom: 2rem;">
+                    <div class="legend-bar"></div>
+                    <div class="legend-labels">
+                        <span>0.0 (Zero/Padding)</span>
+                        <span>4.0 (Text/Code)</span>
+                        <span>8.0 (Encrypted/Compressed)</span>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" id="fileSize">0 KB</div>
+                        <div class="stat-label">File Size</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="avgEntropy">0.00</div>
+                        <div class="stat-label">Average Entropy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val" id="highEntropyPerc">0%</div>
+                        <div class="stat-label">% High Entropy (>7.5)</div>
+                    </div>
+                </div>
+
+                <!-- Attribution Footer -->
+                <div
+                    style="margin-top:2rem; text-align:center; font-size:0.75rem; opacity:0.5; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
+                    Analysis performed locally via JavaScript (Client-side)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+
+    <script>
+        lucide.createIcons();
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const analysisUi = document.getElementById('analysisUi');
+        const canvas = document.getElementById('heatmapCanvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+
+        // State
+        let entropyData = []; // Array of { offset, entropy }
+        let chunkSize = 256;  // Bytes per block
+        let fileObj = null;
+
+        // --- Drag & Drop ---
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFile);
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFile();
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            analysisUi.style.display = 'none';
+            dropZone.style.display = 'block';
+            fileInput.value = ''; // Reset input
+        });
+
+        function handleFile() {
+            if (!fileInput.files.length) return;
+            fileObj = fileInput.files[0];
+
+            dropZone.innerText = "Analyzing chunk structure...";
+
+            // Allow UI to update before blocking with math
+            setTimeout(() => {
+                analyzeStructure(fileObj);
+            }, 50);
+        }
+
+        async function analyzeStructure(file) {
+            const buffer = await file.arrayBuffer();
+            const bytes = new Uint8Array(buffer);
+            const totalBytes = bytes.length;
+
+            // Adjust chunk size for visualization based on file size
+            // We want roughly 2000-4000 blocks for a nice density on a width ~800px canvas
+            // If file is 1MB: 256 B -> 4096 blocks (Good)
+            // If file is 10KB: 256 B -> 40 blocks (Too big) -> Reduce chunk size
+            // If file is 100MB: 256 B -> 400,000 blocks (Too slow) -> Increase chunk size
+
+            let optimalChunk = 256;
+            if (totalBytes < 100000) optimalChunk = 64;
+            if (totalBytes > 5000000) optimalChunk = 1024;
+            if (totalBytes > 50000000) optimalChunk = 4096;
+
+            chunkSize = optimalChunk;
+            entropyData = [];
+
+            let sumEntropy = 0;
+            let highCount = 0;
+
+            for (let i = 0; i < totalBytes; i += chunkSize) {
+                const end = Math.min(i + chunkSize, totalBytes);
+                const chunk = bytes.subarray(i, end);
+                const ent = calculateShannon(chunk);
+
+                entropyData.push({ offset: i, entropy: ent });
+                sumEntropy += ent;
+                if (ent > 7.5) highCount++;
+            }
+
+            // UI Updates
+            dropZone.style.display = 'none';
+            dropZone.innerHTML = `<i data-lucide="upload-cloud" style="width:48px;height:48px;"></i><h3>Drag & Drop</h3><p>or click to browse</p>`; // Reset text for next time
+            analysisUi.style.display = 'block';
+            document.getElementById('fileName').innerText = file.name;
+            document.getElementById('fileSize').innerText = formatBytes(totalBytes);
+
+            const avg = sumEntropy / entropyData.length;
+            document.getElementById('avgEntropy').innerText = avg.toFixed(2);
+            document.getElementById('avgEntropy').style.color = getEntropyColor(avg);
+
+            const highPerc = (highCount / entropyData.length) * 100;
+            document.getElementById('highEntropyPerc').innerText = Math.round(highPerc) + "%";
+
+            drawHeatmap();
+        }
+
+        // --- Core Math ---
+        function calculateShannon(data) {
+            if (data.length === 0) return 0;
+
+            const frequencies = new Array(256).fill(0);
+            for (let i = 0; i < data.length; i++) {
+                frequencies[data[i]]++;
+            }
+
+            let entropy = 0;
+            for (let i = 0; i < 256; i++) {
+                if (frequencies[i] > 0) {
+                    const p = frequencies[i] / data.length;
+                    entropy -= p * Math.log2(p);
+                }
+            }
+            return entropy;
+        }
+
+        // --- Visualization ---
+        function drawHeatmap() {
+            // Resize canvas internal buffer to match display width roughly
+            // but keep height small for "ribbon" look or larger for "grid"
+            // Let's do a Grid view (Hilbert curve is cool but standard Grid is easier to read for offsets)
+
+            // We'll wrap rows. Width is fixed 800px.
+            const blockW = 4; // Width of each block in px
+            const blockH = 4;
+            const cols = Math.floor(canvas.width / blockW);
+
+            // Calculate required height
+            const rows = Math.ceil(entropyData.length / cols);
+            canvas.height = rows * blockH; // Adjust height dynamically
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            entropyData.forEach((block, idx) => {
+                const x = (idx % cols) * blockW;
+                const y = Math.floor(idx / cols) * blockH;
+
+                ctx.fillStyle = getEntropyColorHex(block.entropy);
+                ctx.fillRect(x, y, blockW, blockH);
+            });
+        }
+
+        function getEntropyColorHex(e) {
+            // 0 -> Blue (#00f)
+            // 4 -> Green (#0f0)
+            // 8 -> Red (#f00)
+
+            // Simple approach:
+            // 0-4: Blue to Green
+            // 4-8: Green to Red
+
+            let r, g, b;
+
+            if (e < 4) {
+                // 0 -> 0,0,255
+                // 4 -> 0,255,0
+                const t = e / 4;
+                r = 0;
+                g = Math.round(255 * t);
+                b = Math.round(255 * (1 - t));
+            } else {
+                // 4 -> 0,255,0
+                // 8 -> 255,0,0
+                const t = (e - 4) / 4;
+                r = Math.round(255 * t);
+                g = Math.round(255 * (1 - t));
+                b = 0;
+            }
+
+            return `rgb(${r},${g},${b})`;
+        }
+
+        function getEntropyColor(e) {
+            if (e > 7.5) return 'var(--status-error)'; // Red
+            if (e > 6.0) return 'var(--status-warn)';  // Yellow/Orange
+            if (e < 2.0) return '#3b82f6'; // Blue
+            return 'var(--status-success)'; // Green
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        // --- Interaction ---
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Map x,y back to index
+            const blockW = 4;
+            const blockH = 4;
+            const cols = Math.floor(canvas.width / blockW);
+
+            const col = Math.floor(x / blockW);
+            const row = Math.floor(y / blockH);
+            const idx = (row * cols) + col;
+
+            if (idx >= 0 && idx < entropyData.length) {
+                const data = entropyData[idx];
+
+                tooltip.style.display = 'block';
+                tooltip.style.left = (e.pageX + 15) + 'px';
+                tooltip.style.top = (e.pageY + 15) + 'px';
+
+                tooltip.innerHTML = `
+                    <div style="font-weight:bold;">Entropy: ${data.entropy.toFixed(3)}</div>
+                    <div style="color:#aaa;">Offset: 0x${data.offset.toString(16).toUpperCase()}</div>
+                    <div style="color:#aaa;">Chunk: ${chunkSize} bytes</div>
+                `;
+            } else {
+                tooltip.style.display = 'none';
+            }
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            tooltip.style.display = 'none';
+        });
+
+    </script>
+
+
+</body>
+
+</html>

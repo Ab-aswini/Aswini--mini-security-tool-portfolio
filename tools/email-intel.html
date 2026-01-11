@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Intelligence - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+            }
+
+            .tool-btn {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 40rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Email Intelligence</h1>
+            <p class="tools-subtitle">Deep analysis of email addresses: Validation, SMTP check, and Deliverability.</p>
+        </header>
+
+        <div class="tool-card">
+            <div class="input-group">
+                <input type="email" id="emailInput" class="tool-input" placeholder="Enter email (e.g. test@gmail.com)">
+                <button id="scanBtn" class="tool-btn">Analyze</button>
+            </div>
+            <div id="resultsArea" class="result-box"></div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        /*
+          * JavaScript MD5 (Minified for inline)
+          * https://github.com/blueimp/JavaScript-MD5
+          */
+        !function (n) { "use strict"; function t(n, t) { var r = (65535 & n) + (65535 & t); return (n >> 16) + (t >> 16) + (r >> 16) << 16 | 65535 & r } function r(n, t) { return n << t | n >>> 32 - t } function e(n, e, o, u, c, f) { return t(r(t(t(e, n), t(u, f)), c), o) } function o(n, t, r, o, u, c, f) { return e(t & r | ~t & o, n, t, u, c, f) } function u(n, t, r, o, u, c, f) { return e(t & o | r & ~o, n, t, u, c, f) } function c(n, t, r, o, u, c, f) { return e(t ^ r ^ o, n, t, u, c, f) } function f(n, t, r, o, u, c, f) { return e(r ^ (t | ~o), n, t, u, c, f) } function i(n, r) { var e, i, a, d, h; n[r >> 5] |= 128 << r % 32, n[14 + (r + 64 >>> 9 << 4)] = r; var l = 1732584193, v = -271733879, g = -1732584194, m = 271733878; for (e = 0; e < n.length; e += 16)i = l, a = v, d = g, h = m, l = o(l, v, g, m, n[e], 7, -680876936), m = o(m, l, v, g, n[e + 1], 12, -389564586), g = o(g, m, l, v, n[e + 2], 17, 606105819), v = o(v, g, m, l, n[e + 3], 22, -1044525330), l = o(l, v, g, m, n[e + 4], 7, -176418897), m = o(m, l, v, g, n[e + 5], 12, 1200080426), g = o(g, m, l, v, n[e + 6], 17, -1473231341), v = o(v, g, m, l, n[e + 7], 22, -45705983), l = o(l, v, g, m, n[e + 8], 7, 1770035416), m = o(m, l, v, g, n[e + 9], 12, -1958414417), g = o(g, m, l, v, n[e + 10], 17, -42063), v = o(v, g, m, l, n[e + 11], 22, -1990404162), l = o(l, v, g, m, n[e + 12], 7, 1804603682), m = o(m, l, v, g, n[e + 13], 12, -40341101), g = o(g, m, l, v, n[e + 14], 17, -1502002290), v = o(v, g, m, l, n[e + 15], 22, 1236535329), l = u(l, v, g, m, n[e + 1], 5, -165796510), m = u(m, l, v, g, n[e + 6], 9, -1069501632), g = u(g, m, l, v, n[e + 11], 14, 643717713), v = u(v, g, m, l, n[e], 20, -373897302), l = u(l, v, g, m, n[e + 5], 5, -701558691), m = u(m, l, v, g, n[e + 10], 9, 38016083), g = u(g, m, l, v, n[e + 15], 14, -660478335), v = u(v, g, m, l, n[e + 4], 20, -405537848), l = u(l, v, g, m, n[e + 9], 5, 568446438), m = u(m, l, v, g, n[e + 14], 9, -1019803690), g = u(g, m, l, v, n[e + 3], 14, -187363961), v = u(v, g, m, l, n[e + 8], 20, 1163531501), l = u(l, v, g, m, n[e + 13], 5, -1444681467), m = u(m, l, v, g, n[e + 2], 9, -51403784), g = u(g, m, l, v, n[e + 7], 14, 1735328473), v = u(v, g, m, l, n[e + 12], 20, -1926607734), l = c(l, v, g, m, n[e + 5], 4, -378558), m = c(m, l, v, g, n[e + 8], 11, -2022574463), g = c(g, m, l, v, n[e + 11], 16, 1839030562), v = c(v, g, m, l, n[e + 14], 23, -35309556), l = c(l, v, g, m, n[e + 1], 4, -1530992060), m = c(m, l, v, g, n[e + 4], 11, 1272893353), g = c(g, m, l, v, n[e + 7], 16, -155497632), v = c(v, g, m, l, n[e + 10], 23, -1094730640), l = c(l, v, g, m, n[e + 13], 4, 681279174), m = c(m, l, v, g, n[e], 11, -358537222), g = c(g, m, l, v, n[e + 3], 16, -722521979), v = c(v, g, m, l, n[e + 6], 23, 76029189), l = c(l, v, g, m, n[e + 9], 4, -640364487), m = c(m, l, v, g, n[e + 12], 11, -421815835), g = c(g, m, l, v, n[e + 15], 16, 530742520), v = c(v, g, m, l, n[e + 2], 23, -995338651), l = f(l, v, g, m, n[e], 6, -198630844), m = f(m, l, v, g, n[e + 7], 10, 1126891415), g = f(g, m, l, v, n[e + 14], 15, -1416354905), v = f(v, g, m, l, n[e + 5], 21, -57434055), l = f(l, v, g, m, n[e + 12], 6, 1700485571), m = f(m, l, v, g, n[e + 3], 10, -1894986606), g = f(g, m, l, v, n[e + 10], 15, -1051523), v = f(v, g, m, l, n[e + 1], 21, -2054922799), l = f(l, v, g, m, n[e + 8], 6, 1873313359), m = f(m, l, v, g, n[e + 15], 10, -30611744), g = f(g, m, l, v, n[e + 6], 15, -1560198380), v = f(v, g, m, l, n[e + 13], 21, 1309151649), l = f(l, v, g, m, n[e + 4], 6, -145523070), m = f(m, l, v, g, n[e + 11], 10, -1120210379), g = f(g, m, l, v, n[e + 2], 15, 718787259), v = f(v, g, m, l, n[e + 9], 21, -343485551), l = t(l, i), v = t(v, a), g = t(g, d), m = t(m, h); return [l, v, g, m] } function a(n) { var t, r = "", e = 32 * n.length; for (t = 0; t < e; t += 8)r += String.fromCharCode(n[t >> 5] >>> t % 32 & 255); return r } function d(n) { var t, r = []; for (r[(n.length >> 2) - 1] = void 0, t = 0; t < r.length; t += 1)r[t] = 0; var e = 8 * n.length; for (t = 0; t < e; t += 8)r[t >> 5] |= (255 & n.charCodeAt(t / 8)) << t % 32; return r } function h(n) { var t, r, e = "0123456789abcdef", o = ""; for (r = 0; r < n.length; r += 1)t = n.charCodeAt(r), o += e.charAt(t >>> 4 & 15) + e.charAt(15 & t); return o } function l(n) { return unescape(encodeURIComponent(n)) } function v(n) { return a(i(d(n = l(n)), 8 * n.length)) } function g(n, t) { return function (n) { return h(v(n)) }(n) } window.md5 = g }(this);
+
+        const FREE_PROVIDERS = new Set([
+            'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com', 'zoho.com', 'yandex.com', 'mail.com', 'gmx.com', 'live.com', 'msn.com', 'me.com'
+        ]);
+
+        const ROLE_BASED = new Set([
+            'admin', 'info', 'support', 'sales', 'contact', 'help', 'webmaster', 'editor', 'billing', 'jobs', 'hr', 'marketing'
+        ]);
+
+        document.getElementById('scanBtn').addEventListener('click', async () => {
+            const email = document.getElementById('emailInput').value.trim().toLowerCase();
+            const resultsArea = document.getElementById('resultsArea');
+            if (!email) return;
+
+            resultsArea.innerHTML = "Analyzing email (Gravatar, Format, MX, Type)...";
+            resultsArea.classList.add('visible');
+
+            // 1. Basic Regex Format Check
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                resultsArea.innerHTML = `<span style="color:var(--status-error)">Invalid Email Format</span>`;
+                return;
+            }
+
+            const [user, domain] = email.split('@');
+
+            try {
+                // 2. Parallel Fetch: MX Records (Cloudflare DoH) & Disposable Status
+                const [mxRes, disposeRes] = await Promise.all([
+                    fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=MX`, {
+                        headers: { 'accept': 'application/dns-json' }
+                    }).then(r => r.json()),
+
+                    // Simple disposable check
+                    fetch(`https://disposable.debounce.io/?email=${email}`)
+                        .then(r => r.json())
+                        .catch(() => ({ disposable: "unknown" }))
+                ]);
+
+                // Process MX
+                const mxRecords = mxRes.Answer ? mxRes.Answer.map(rec => rec.data) : [];
+                const mxFound = mxRecords.length > 0;
+
+                // Process Disposable
+                const isDisposable = disposeRes.disposable === "true";
+
+                // Type Classification
+                const isFree = FREE_PROVIDERS.has(domain);
+                const isRole = ROLE_BASED.has(user);
+
+                // Gravatar Check (Image Load)
+                const hash = window.md5(email);
+                const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?d=404&s=200`;
+
+                let hasGravatar = false;
+                try {
+                    // We try to fetch with 'no-cors' just to see if it doesn't fail network-wise, 
+                    // but accurate 404 detection for image usually requires loading it in an Image object.
+                    // For simplicitly, we'll assume if we display it and it's not the default unique generated 'retro'/'identicon', it's valid.
+                    // Actually, appending d=404 makes it return 404 if no image.
+                    const gRes = await fetch(gravatarUrl);
+                    if (gRes.ok) hasGravatar = true;
+                } catch (e) { }
+
+                // 3. Additional Security Checks (SPF & DMARC) via TXT Records
+                const [txtRes, dmarcRes] = await Promise.all([
+                    fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=TXT`, {
+                        headers: { 'accept': 'application/dns-json' }
+                    }).then(r => r.json()),
+                    fetch(`https://cloudflare-dns.com/dns-query?name=_dmarc.${domain}&type=TXT`, {
+                        headers: { 'accept': 'application/dns-json' }
+                    }).then(r => r.json())
+                ]);
+
+                // Parse SPF
+                const txtRecords = txtRes.Answer ? txtRes.Answer.map(rec => rec.data.replace(/"/g, '')) : [];
+                const spfRecord = txtRecords.find(t => t.startsWith('v=spf1'));
+                const hasSPF = !!spfRecord;
+
+                // Parse DMARC
+                const dmarcRecords = dmarcRes.Answer ? dmarcRes.Answer.map(rec => rec.data.replace(/"/g, '')) : [];
+                const dmarcRecord = dmarcRecords.find(t => t.startsWith('v=DMARC1'));
+                const hasDMARC = !!dmarcRecord;
+
+                // Scoring
+                let score = 0;
+                if (mxFound) score += 30; // Critical
+                if (!isDisposable) score += 20;
+                if (hasGravatar) score += 10;
+                if (!isRole) score += 5;
+                if (hasSPF) score += 15;
+                if (hasDMARC) score += 20;
+
+                let typeLabel = isFree ? "Personal (Free Provider)" : "Professional / Custom";
+                if (isRole) typeLabel += " (Role-Based)";
+
+                const color = score >= 80 ? 'var(--status-success)' : (score >= 50 ? 'var(--status-warn)' : 'var(--status-error)');
+
+                resultsArea.innerHTML = `
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+    <div style="display:flex; align-items:center;">
+        ${hasGravatar ? `<img src="${gravatarUrl}" alt="Gravatar Profile" style="width:40px; height:40px; border-radius:50%; margin-right:10px; border:2px solid var(--tool-accent);">` :
+                        `<div style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.1); margin-right:10px; display:flex; align-items:center; justify-content:center; color:#888; border:1px solid #444;">?</div>`}
+        <div>
+            <div style="font-weight:bold; font-size:1.1rem;">${email}</div>
+            <div style="font-size:0.8rem; color:#888;">${typeLabel}</div>
+        </div>
+    </div>
+    <span style="background:${color}; color:#000; padding:2px 8px; border-radius:4px; font-weight:bold;">Score: ${score}/100</span>
+</div>
+
+[Analysis]
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom:1rem;">
+    <div>Format: <strong style="color:var(--status-success)">Valid</strong></div>
+    <div>Disposable: ${isDisposable ? '<strong style="color:var(--status-error)">YES</strong>' : '<strong style="color:var(--status-success)">NO</strong>'}</div>
+    <div>MX Records: ${mxFound ? '<strong style="color:var(--status-success)">Found</strong>' : '<strong style="color:var(--status-error)">Missing</strong>'}</div>
+    <div>Profile: ${hasGravatar ? '<strong style="color:var(--status-success)">Gravatar Found</strong>' : '<span style="color:#666">Not Found</span>'}</div>
+</div>
+
+[Security Protocols]
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-bottom:1rem; font-size:0.9rem;">
+    <div>DMARC: ${hasDMARC ? '<span style="color:var(--status-success)">Active</span>' : '<span style="color:var(--status-warn)">Missing</span>'}</div>
+    <div>SPF: ${hasSPF ? '<span style="color:var(--status-success)">Active</span>' : '<span style="color:var(--status-warn)">Missing</span>'}</div>
+</div>
+
+<div style="margin-bottom:1rem;">
+    <a href="https://haveibeenpwned.com/account/${email}" target="_blank" class="tool-btn" style="display:block; text-align:center; text-decoration:none; padding:0.5rem; font-size:0.9rem;">
+        Check Data Breaches (HIBP) &rarr;
+    </a>
+</div>
+
+[Technical Data]
+<div style="font-family:monospace; font-size:0.85rem; color:#aaa; max-height:150px; overflow-y:auto;">
+    ${mxRecords.length > 0 ? `<div style="color:#fff; margin-bottom:4px;">MX Records:</div>` + mxRecords.map(r => `<div>${r}</div>`).join('') : ''}
+    ${hasSPF ? `<div style="color:#fff; margin-top:8px; margin-bottom:4px;">SPF Record:</div><div>${spfRecord}</div>` : ''}
+    ${hasDMARC ? `<div style="color:#fff; margin-top:8px; margin-bottom:4px;">DMARC Record:</div><div>${dmarcRecord}</div>` : ''}
+</div>
+                `.trim();
+
+                resultsArea.innerHTML += `
+                    <div style="margin-top:2rem; text-align:center; font-size:0.75rem; opacity:0.5; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
+                        Data sources: <a href="https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/" target="_blank" style="color:inherit; text-decoration:underline;">Cloudflare DoH</a>, 
+                        <a href="https://debounce.io" target="_blank" style="color:inherit; text-decoration:underline;">Debounce.io</a>, 
+                        <a href="https://gravatar.com" target="_blank" style="color:inherit; text-decoration:underline;">Gravatar</a>
+                    </div>
+                `;
+
+            } catch (e) {
+                console.error(e);
+                resultsArea.innerText = `Error contacting analysis APIs. Check console or internet connection.`;
+            }
+        });
+    </script>
+
+    <!-- Hover Footer -->
+    <!-- Hover Footer -->
+
+</body>
+
+</html>

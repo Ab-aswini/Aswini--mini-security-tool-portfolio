@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS History & Intelligence - Deep Search</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        :root {
+            --tool-accent: #8b5cf6;
+            /* Violet */
+            --tool-bg: #0f0e17;
+            --panel-bg: rgba(20, 20, 30, 0.6);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--tool-bg);
+            color: #e0e0e0;
+        }
+
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .dns-record-card {
+            background: var(--panel-bg);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .dns-record-card:hover {
+            border-color: var(--tool-accent);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.1);
+        }
+
+        .record-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-right: 0.5rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .type-A {
+            background: #3b82f6;
+        }
+
+        .type-MX {
+            background: #f59e0b;
+        }
+
+        .type-NS {
+            background: #10b981;
+        }
+
+        .type-TXT {
+            background: #64748b;
+        }
+
+        .type-CNAME {
+            background: #8b5cf6;
+        }
+
+        .history-timeline {
+            position: relative;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            margin-left: 10px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            background: var(--tool-accent);
+            border-radius: 50%;
+            border: 2px solid var(--tool-bg);
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+                max-width: 100% !important;
+            }
+
+            .tools-title {
+                font-size: 2rem !important;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="tools-page">
+    <div style="padding: 1.5rem;">
+        <a href="../tools/lab-architecture.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Lab Architecture
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 65rem;">
+        <header class="tools-header" style="margin-top:1rem;">
+            <h1 class="tools-title" style="color:white;"><span style="color:var(--tool-accent);">DNS</span> History &
+                Intel</h1>
+            <p class="tools-subtitle">
+                Temporal analysis of Domain Name System records. Investigate past hosting, mail servers, and
+                infrastructure changes.
+            </p>
+        </header>
+
+        <div class="tool-card" style="border-top: 3px solid var(--tool-accent);">
+            <div class="input-group">
+                <input type="text" id="domainInput" class="tool-input" placeholder="e.g. google.com"
+                    style="font-family:'JetBrains Mono', monospace;">
+                <button id="scanBtn" class="tool-btn" style="background:var(--tool-accent); color:white;">
+                    <i data-lucide="search" style="width:16px;"></i> Investigate
+                </button>
+            </div>
+
+            <div id="loading" style="display:none; text-align:center; padding:2rem; color:var(--tool-accent);">
+                <i data-lucide="loader-2" class="spin" style="width:2rem; height:2rem;"></i>
+                <div style="margin-top:0.5rem; font-size:0.9rem;">Querying global nameservers...</div>
+            </div>
+
+            <div id="resultsArea" style="display:none; margin-top:2rem;">
+                <!-- Quick Stats -->
+                <div
+                    style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:2rem;">
+                    <div class="dns-record-card" style="text-align:center;">
+                        <div style="font-size:0.8rem; color:#888;">Current IP</div>
+                        <div id="statIP" class="mono-font" style="font-size:1.2rem; font-weight:bold; color:white;">-
+                        </div>
+                    </div>
+                    <div class="dns-record-card" style="text-align:center;">
+                        <div style="font-size:0.8rem; color:#888;">Mail Servers</div>
+                        <div id="statMX" class="mono-font" style="font-size:1.2rem; font-weight:bold; color:white;">-
+                        </div>
+                    </div>
+                    <div class="dns-record-card" style="text-align:center;">
+                        <div style="font-size:0.8rem; color:#888;">Nameservers</div>
+                        <div id="statNS" class="mono-font" style="font-size:1.2rem; font-weight:bold; color:white;">-
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Records -->
+                <h3 style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:0.5rem; margin-bottom:1rem;">
+                    <i data-lucide="activity" style="width:18px; vertical-align:middle; color:var(--tool-accent);"></i>
+                    Active Records
+                </h3>
+                <div id="activeRecordsList"></div>
+
+                <!-- External Intel (History) -->
+                <h3
+                    style="border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:0.5rem; margin-top:3rem; margin-bottom:1rem;">
+                    <i data-lucide="history" style="width:18px; vertical-align:middle; color:#f59e0b;"></i> Historical
+                    Intel & Archives
+                </h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                    <div class="dns-record-card">
+                        <div style="font-weight:bold; margin-bottom:0.5rem;">Wayback Machine</div>
+                        <p style="font-size:0.85rem; color:#aaa; margin-bottom:1rem;">View snapshots of this domain's
+                            content over time.</p>
+                        <a id="linkWayback" href="#" target="_blank" class="tool-btn"
+                            style="width:100%; text-align:center; background:rgba(255,255,255,0.1);">
+                            <i data-lucide="camera"></i> View Archives
+                        </a>
+                    </div>
+                    <div class="dns-record-card">
+                        <div style="font-weight:bold; margin-bottom:0.5rem;">SecurityTrails (Deep History)</div>
+                        <p style="font-size:0.85rem; color:#aaa; margin-bottom:1rem;">Detailed historical DNS data
+                            (Requires Account).</p>
+                        <a id="linkSecurityTrails" href="#" target="_blank" class="tool-btn"
+                            style="width:100%; text-align:center; background:rgba(255,255,255,0.1);">
+                            <i data-lucide="database"></i> Search Database
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorArea" style="display:none; text-align:center; padding:2rem; color:#ef4444;">
+                <i data-lucide="alert-circle" style="width:2rem; height:2rem;"></i>
+                <div id="errorMsg" style="margin-top:0.5rem;"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        lucide.createIcons();
+
+        // Using HackerTarget API (Free, CORS friendly usually, or via Proxy)
+        // Alternate: Google DNS over HTTPS
+
+        document.getElementById('scanBtn').addEventListener('click', async () => {
+            const domain = document.getElementById('domainInput').value.trim();
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('resultsArea');
+            const errorArea = document.getElementById('errorArea');
+
+            if (!domain) return;
+
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            errorArea.style.display = 'none';
+
+            try {
+                // 1. Fetch DNS Records via Google DoH (Reliable, Cross-Origin allowed)
+                const types = [
+                    { name: 'A', type: 1 },
+                    { name: 'AAAA', type: 28 },
+                    { name: 'MX', type: 15 },
+                    { name: 'TXT', type: 16 },
+                    { name: 'NS', type: 2 },
+                    { name: 'CNAME', type: 5 }
+                ];
+
+                const allRecords = [];
+
+                for (const t of types) {
+                    try {
+                        const res = await fetch(`https://dns.google/resolve?name=${domain}&type=${t.type}`);
+                        const data = await res.json();
+                        if (data.Answer) {
+                            data.Answer.forEach(rec => {
+                                allRecords.push({ type: t.name, data: rec.data, ttl: rec.TTL });
+                            });
+                        }
+                    } catch (e) { console.error(e); }
+                }
+
+                if (allRecords.length === 0) throw new Error("No DNS records found. Domain might be invalid.");
+
+                // Render Stats
+                const aRecords = allRecords.filter(r => r.type === 'A').map(r => r.data);
+                const mxRecords = allRecords.filter(r => r.type === 'MX').length;
+                const nsRecords = allRecords.filter(r => r.type === 'NS').length;
+
+                document.getElementById('statIP').innerText = aRecords[0] || 'N/A';
+                document.getElementById('statMX').innerText = mxRecords;
+                document.getElementById('statNS').innerText = nsRecords;
+
+                // Render List
+                const list = document.getElementById('activeRecordsList');
+                list.innerHTML = '';
+
+                allRecords.sort((a, b) => a.type.localeCompare(b.type));
+
+                allRecords.forEach(rec => {
+                    const div = document.createElement('div');
+                    div.className = 'dns-record-card';
+                    div.style.padding = '0.75rem';
+                    div.style.marginBottom = '0.5rem';
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <span class="record-type type-${rec.type}">${rec.type}</span>
+                                <span class="mono-font" style="word-break:break-all;">${rec.data}</span>
+                            </div>
+                            <div style="font-size:0.75rem; opacity:0.6;">TTL: ${rec.ttl}</div>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+
+                // Update Links
+                document.getElementById('linkWayback').href = `https://web.archive.org/web/*/${domain}`;
+                document.getElementById('linkSecurityTrails').href = `https://securitytrails.com/domain/${domain}/dns`;
+
+                results.style.display = 'block';
+
+            } catch (err) {
+                errorArea.style.display = 'block';
+                document.getElementById('errorMsg').innerText = err.message;
+            } finally {
+                loading.style.display = 'none';
+                lucide.createIcons();
+            }
+        });
+
+        // Enter key to search
+        document.getElementById('domainInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('scanBtn').click();
+        });
+    </script>
+</body>
+
+</html>

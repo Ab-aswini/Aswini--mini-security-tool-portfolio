@@ -1,0 +1,242 @@
+/* assets/css/projects.css - Universe Theme Alignment */
+
+:root {
+    /* Light Mode */
+    --project-bg: #f8f9fa;
+    --project-text: #1a1a1a;
+    --project-subtext: #555555;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --accent-color: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.2);
+    --tag-bg: rgba(37, 99, 235, 0.1);
+    --tag-text: #2563eb;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode (Universe Base - Variant: Amber) */
+    --project-bg: #0E0E13;
+    --project-text: #ffffff;
+    --project-subtext: #a1a1aa;
+    --card-bg: rgba(20, 20, 25, 0.6);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --accent-color: #f59e0b;
+    /* Amber */
+    --accent-glow: rgba(245, 158, 11, 0.25);
+    --tag-bg: rgba(245, 158, 11, 0.15);
+    --tag-text: #fbbf24;
+}
+
+body {
+    background-color: var(--project-bg);
+    /* Ensure body takes bg */
+    color: var(--project-text);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* --- Section Layout --- */
+.projects-section {
+    position: relative;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Add Glow to First Section if needed, or rely on Header Glow via JS/HTML tweak if not present. 
+   Since projects.html has a specific header section with style block, we can target it 
+   but since we can't easily rely on a class there without editing HTML, 
+   we'll add a generic glow to the first section-header found? 
+   Better: Project cards themselves provide enough vibe, but let's try to add a global hero glow.
+*/
+
+/* --- Header Section (Targeting the one in HTML) --- */
+/* We'll add a class in HTML to be safe, but for now let's hope the body/main glow is enough if we added it? 
+   Actually projects.html has inline styles. Let's fix that in HTML step.
+   For now, define .projects-hero class usage.
+*/
+.projects-hero {
+    position: relative;
+    padding: 6rem 2rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.projects-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    height: 60vh;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.hero-title {
+    /* Override inline styles if we move them to class */
+    font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--project-text) 0%, var(--project-subtext) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtext {
+    color: var(--project-subtext);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.section-header {
+    margin-bottom: 3rem;
+    border-left: 4px solid var(--accent-color);
+    padding-left: 1rem;
+}
+
+.section-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: 0.5rem;
+    color: var(--project-text);
+    /* Remove old gradient */
+    background: none;
+    -webkit-text-fill-color: initial;
+}
+
+/* --- Grid System --- */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* --- Card Styles --- */
+.project-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.project-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+}
+
+/* Glow Effect on Hover (Card Internal) */
+.project-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.project-card:hover::after {
+    opacity: 0.4;
+}
+
+.card-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Typography */
+.project-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--project-text);
+}
+
+.project-overview {
+    font-size: 0.95rem;
+    color: var(--project-subtext);
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.project-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--project-subtext);
+    margin-bottom: 1.5rem;
+}
+
+/* --- Tags --- */
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* --- CTA Button --- */
+.project-cta {
+    align-self: flex-start;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-decoration: none;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.project-cta:hover {
+    border-color: var(--accent-color);
+    color: #fff;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.project-cta i {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s;
+}
+
+.project-cta:hover i {
+    transform: translateX(3px);
+}

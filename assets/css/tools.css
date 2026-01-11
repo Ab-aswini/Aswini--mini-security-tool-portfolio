@@ -1,0 +1,241 @@
+/* =========================================
+   Digital Tools - Universe Theme Theme
+   ========================================= */
+
+:root {
+    /* Light Mode (Universe Base) */
+    --tool-bg: #f8f9fa;
+    --tool-text: #1a1a1a;
+    --tool-subtext: #555555;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --accent-color: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="dark"] {
+    /* Dark Mode (Universe Base - Variant: Emerald) */
+    --tool-bg: #0E0E13;
+    --tool-text: #ffffff;
+    --tool-subtext: #a1a1aa;
+    --card-bg: rgba(20, 20, 25, 0.6);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --accent-color: #10b981;
+    /* Emerald Green */
+    --accent-glow: rgba(16, 185, 129, 0.25);
+}
+
+body.tools-page {
+    background-color: var(--tool-bg);
+    color: var(--tool-text);
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+}
+
+/* --- Layout --- */
+.tools-container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+}
+
+/* Header with Glow */
+.tools-header {
+    position: relative;
+    margin-top: 8rem;
+    margin-bottom: 4rem;
+    text-align: center;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cosmic Glow */
+.tools-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    height: 60vh;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--tool-text) 0%, var(--tool-subtext) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtext {
+    font-size: 1.125rem;
+    color: var(--tool-subtext);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- Grid & Cards --- */
+.tools-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .tools-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.tool-card {
+    display: block;
+    text-decoration: none;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.tool-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
+    /* Purple tint glow */
+}
+
+.tool-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    transition: transform 0.3s;
+}
+
+.tool-card:hover .tool-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 5px var(--accent-glow));
+}
+
+.tool-name {
+    font-size: clamp(1.1rem, 2vw, 1.25rem);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--tool-text);
+}
+
+.tool-desc {
+    font-size: 0.875rem;
+    color: var(--tool-subtext);
+}
+
+/* Badge (for New/Creative tools) */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: var(--accent-glow);
+    color: var(--accent-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    box-shadow: 0 0 5px var(--accent-glow);
+}
+
+/* --- Input Utilities (if used inside cards) --- */
+.input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.tool-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--card-border);
+    background: var(--tool-bg);
+    color: var(--tool-text);
+    font-family: 'Space Grotesk', monospace;
+}
+
+[data-theme="dark"] .tool-input {
+    background: #000;
+}
+
+.tool-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    background: var(--accent-color);
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
+    opacity: 0.9;
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.result-box {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    font-family: 'Space Grotesk', monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    display: none;
+}
+
+[data-theme="dark"] .result-box {
+    background: #000;
+    border-color: #333;
+    color: #10b981;
+}
+
+.result-box.visible {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,899 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Vulnerability Scanner - Archive</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        body {
+            background: #09090b;
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tool-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ef4444, #f87171);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .url-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        .scan-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0 2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scan-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Scoreboard UI */
+        .scoreboard {
+            display: none;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .scoreboard-flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .score-left {
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 8px solid #333;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Space Grotesk', sans-serif;
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        .score-val {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #71717a;
+            margin-top: 5px;
+        }
+
+        .score-right {
+            flex: 1;
+            max-width: 400px;
+            border-left: 1px solid #333;
+            padding-left: 3rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #a1a1aa;
+        }
+
+        .detail-row.total {
+            border-top: 1px solid #333;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .penalty {
+            color: #ef4444;
+        }
+
+        .bonus {
+            color: #10b981;
+        }
+
+        @media (max-width: 768px) {
+            .scoreboard-flex {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .score-right {
+                border-left: none;
+                padding-left: 0;
+                width: 100%;
+                border-top: 1px solid #333;
+                padding-top: 1.5rem;
+            }
+        }
+
+        /* Manifest UI */
+        .manifest-box {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .manifest-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .asset-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .asset-table th {
+            text-align: left;
+            color: #71717a;
+            padding: 0.5rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .asset-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #222;
+            color: #a1a1aa;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .status-clean {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .status-warn {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .status-vuln {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: #18181b;
+            border-radius: 4px;
+            height: 24px;
+            width: 100%;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            display: none;
+            border: 1px solid #333;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #f87171);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        /* Process Indicator Effect */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: linear-gradient(45deg,
+                    rgba(255, 255, 255, 0.15) 25%,
+                    transparent 25%,
+                    transparent 50%,
+                    rgba(255, 255, 255, 0.15) 50%,
+                    rgba(255, 255, 255, 0.15) 75%,
+                    transparent 75%,
+                    transparent);
+            background-size: 1rem 1rem;
+            animation: progress-stripe 1s linear infinite;
+        }
+
+        @keyframes progress-stripe {
+            0% {
+                background-position: 1rem 0;
+            }
+
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        .status-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.8rem;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            font-weight: bold;
+            font-family: monospace;
+            z-index: 2;
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+            .tool-container {
+                padding: 1rem;
+            }
+
+            .tool-title {
+                font-size: 1.75rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .url-input,
+            .scan-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <!-- Theme Script -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="tool-container">
+        <div class="top-nav">
+            <a href="../tools/lab-architecture.html" class="tool-btn" style="color:#a1a1aa; text-decoration:none;">
+                <i data-lucide="arrow-left" style="height:1em;"></i> Back to Archives
+            </a>
+        </div>
+
+        <div class="tool-header">
+            <h1 class="tool-title">JS Vulnerability Mapper</h1>
+            <p style="color:#a1a1aa;">Deep Scan client-side bundles & source maps for CVEs.</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="targetUrl" class="url-input" placeholder="https://example.com">
+            <button class="scan-btn" id="scanBtn" onclick="startScan()">SCAN TARGET</button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progress" class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="status-text" id="statusText">Initializing scanner...</div>
+        </div>
+
+        <!-- Review Scoreboard -->
+        <div class="scoreboard" id="scoreContainer">
+            <div class="scoreboard-flex">
+                <div class="score-left">
+                    <div class="score-circle" id="scoreCircle">
+                        <div class="score-val" id="scoreVal">100</div>
+                        <div class="score-label">Health</div>
+                    </div>
+                </div>
+                <div class="score-right" id="scoreDetails">
+                    <!-- Injected details -->
+                </div>
+            </div>
+        </div>
+
+        <div class="console-box" id="console"></div>
+
+        <div class="vuln-grid" id="results">
+            <!-- Results injected here -->
+        </div>
+
+        <!-- Asset Manifest -->
+        <div class="manifest-box" id="manifestBox">
+            <div class="manifest-title">
+                <span>ðŸ“¦ Scan Manifest</span>
+                <span style="font-size:0.8rem; color:#71717a;" id="manifestStats">0 Assets Scanned</span>
+            </div>
+            <table class="asset-table">
+                <thead>
+                    <tr>
+                        <th>Asset URL</th>
+                        <th>Size</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="manifestBody">
+                    <!-- Rows injected here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <script src="../assets/js/app.js"></script>
+
+    <script>
+        lucide.createIcons();
+
+        // 1. Regex Dictionary (Precise)
+        const LIB_PATTERNS = [
+            { name: 'jquery', regex: /jquery[.-](\d+\.\d+\.\d+)/i },
+            { name: 'bootstrap', regex: /bootstrap[.-](\d+\.\d+\.\d+)/i },
+            { name: 'react', regex: /react[.-](\d+\.\d+\.\d+)/i },
+            { name: 'react-dom', regex: /react-dom[.-](\d+\.\d+\.\d+)/i },
+            { name: 'vue', regex: /vue[.-](\d+\.\d+\.\d+)/i },
+            { name: 'angular', regex: /angular[.-](\d+\.\d+\.\d+)/i },
+            { name: 'lodash', regex: /lodash[.-](\d+\.\d+\.\d+)/i },
+            { name: 'moment', regex: /moment[.-](\d+\.\d+\.\d+)/i },
+            { name: 'axios', regex: /axios[.-](\d+\.\d+\.\d+)/i },
+            { name: 'font-awesome', regex: /font-awesome[.-](\d+\.\d+\.\d+)/i }
+        ];
+
+        // 2. Signature Dictionary (Fuzzy Fallback)
+        const LIB_SIGNATURES = [
+            { name: 'jquery', sig: 'fn.jquery' },
+            { name: 'react', sig: 'React.createElement' },
+            { name: 'vue', sig: '__VUE_DEVTOOLS_GLOBAL_HOOK__' },
+            { name: 'angular', sig: 'ng.coreTokens' },
+            { name: 'bootstrap', sig: 'bootstrap.Tooltip' },
+            { name: 'lodash', sig: 'lodash.template' },
+            { name: 'axios', sig: 'axios.isCancel' }
+        ];
+
+        // 3. Global State
+        let foundLibs = new Map();
+        let currentScore = 100;
+        let scoreLog = []; // Log for layout
+        let scannedAssetsCount = 0;
+
+        async function startScan() {
+            const urlInput = document.getElementById('targetUrl').value;
+            const domain = urlInput.replace(/^https?:\/\//, '').replace(/\/$/, '');
+            if (!domain) return;
+
+            // UI Reset
+            resetUI();
+            log('info', `ðŸš€ Initializing Deep Scan on: ${domain}`);
+
+            try {
+                updateProgress(10, 'Fetching HTML source...');
+
+                // Phase 1: Fetch HTML
+                // Using 2 different proxies for redundancy/bypass
+                let proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://' + domain)}`;
+                let res = await fetch(proxyUrl);
+
+                if (!res.ok) throw new Error(`Proxy error: ${res.status}`);
+                let data;
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    throw new Error("Proxy returned invalid JSON (likely a block page or rate limit).");
+                }
+
+                // Fallback proxy if empty
+                if (!data.contents || data.contents.length < 50) {
+                    log('warn', 'Primary proxy failed. Trying backup proxy (corsproxy)...');
+                    proxyUrl = `https://corsproxy.io/?` + encodeURIComponent('https://' + domain);
+                    res = await fetch(proxyUrl);
+                    const text = await res.text();
+                    data = { contents: text };
+                }
+
+                if (!data.contents || data.contents.length < 50) throw new Error("Could not fetch target content. Protection active?");
+                const html = data.contents;
+
+                updateProgress(30, `HTML Fetched. Analyzing Scripts...`);
+                // Add HTML to Manifest
+                addManifestEntry(domain + " (Index)", formatBytes(html.length), "Analyzed");
+                scanContentForLibs(html, 'HTML Source');
+
+                const scriptUrls = extractScriptUrls(html, 'https://' + domain);
+                log('info', `Found ${scriptUrls.length} external scripts.`);
+
+                // Phase 2: Analyze Bundles
+                const totalAssets = scriptUrls.length;
+                let processed = 0;
+
+                if (totalAssets > 0) {
+                    await Promise.allSettled(scriptUrls.map(async (url) => {
+                        await analyzeScript(url);
+                        processed++;
+                        const percent = 30 + Math.floor((processed / totalAssets) * 40); // 30% -> 70%
+                        updateProgress(percent, `Analyzing Bundle ${processed}/${totalAssets}: ${url.split('/').pop()}`);
+                    }));
+                } else {
+                    updateProgress(70, 'No external scripts found.');
+                }
+
+                // Phase 3: Vulnerability Checks
+                updateProgress(80, `Querying CVE Database...`);
+                await displayFinalResults();
+                updateProgress(100, 'Scan Complete.');
+
+                // Phase 4: Show Score & Stats
+                renderScore();
+                document.getElementById('manifestStats').innerText = `${scannedAssetsCount} Assets Scanned`;
+
+            } catch (e) {
+                log('error', `CRITICAL ERROR: ${e.message}`);
+                handleFailure(domain);
+            }
+        }
+
+        function handleFailure(domain) {
+            updateProgress(0, 'Scan Failed. Target might be blocking proxies.');
+
+            // 1. Visual Failure State
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.backgroundColor = '#ef4444'; // Red
+            progressFill.style.width = '100%';
+
+            // 2. Direct Link / Retry UI
+            const container = document.getElementById('results');
+            container.innerHTML = `
+                <div style="text-align:center; padding:2rem; background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:8px; margin-top:1rem;">
+                    <div style="font-size:1.2rem; font-weight:bold; color:#ef4444; margin-bottom:1rem;">
+                        <i data-lucide="alert-triangle" style="vertical-align:middle; margin-right:5px;"></i> Scan Failed to Retrieve Content
+                    </div>
+                    <p style="color:#a1a1aa; margin-bottom:1.5rem;">
+                        The target site (${domain}) may have strong anti-bot protection or is unreachable via our public proxies.
+                    </p>
+                    <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+                        <a href="https://${domain}" target="_blank" class="scan-btn" style="background:#333; border:1px solid #555; text-decoration:none; display:inline-block; line-height:3;">
+                            <i data-lucide="external-link" style="vertical-align:middle; width:16px;"></i> Visit Site Directly
+                        </a>
+                        <button onclick="retryScan()" class="scan-btn" style="background:#ef4444;">
+                            <i data-lucide="refresh-cw" style="vertical-align:middle; width:16px;"></i> Retry Scan
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // 3. Reset Button State
+            document.getElementById('scanBtn').disabled = false;
+            document.getElementById('scanBtn').style.opacity = '1';
+            document.getElementById('scanBtn').innerText = "RETRY SCAN";
+            document.getElementById('scanBtn').style.backgroundColor = "#ef4444";
+
+            lucide.createIcons();
+        }
+
+        function retryScan() {
+            // Reset and focus
+            document.getElementById('targetUrl').focus();
+            document.getElementById('scanBtn').innerText = "SCAN TARGET";
+            // Optional: Auto-trigger? Better to let user adjust URL if needed.
+            resetUI();
+            startScan();
+        }
+
+        function resetUI() {
+            foundLibs.clear();
+            currentScore = 100;
+            scoreLog = [];
+            scannedAssetsCount = 0;
+            document.getElementById('console').style.display = 'block';
+            document.getElementById('console').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('scoreContainer').style.display = 'none';
+            document.getElementById('progress').style.display = 'block';
+            document.getElementById('scanBtn').disabled = true;
+            document.getElementById('scanBtn').style.opacity = '0.7';
+            document.getElementById('manifestBox').style.display = 'block';
+            document.getElementById('manifestBody').innerHTML = '';
+        }
+
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('statusText').innerText = text;
+        }
+
+        function extractScriptUrls(html, baseUrl) {
+            const urls = [];
+            const regex = /<script[^>]+src=["']([^"']+)["']/g;
+            let match;
+            while ((match = regex.exec(html)) !== null) {
+                let src = match[1];
+                if (src.startsWith('//')) src = 'https:' + src;
+                else if (src.startsWith('/')) src = baseUrl + src;
+                else if (!src.startsWith('http')) src = baseUrl + '/' + src;
+                urls.push(src);
+            }
+            return [...new Set(urls)];
+        }
+
+        async function analyzeScript(url) {
+            scannedAssetsCount++;
+            try {
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                const res = await fetch(proxyUrl);
+                const data = await res.json();
+
+                if (!data.contents) {
+                    addManifestEntry(url, '0B', 'Failed');
+                    return;
+                }
+
+                const content = data.contents;
+                const findings = scanContentForLibs(content, `Bundle: ${url.split('/').pop()}`);
+
+                let status = "Clean";
+                if (findings.length > 0) status = `Found: ${findings.join(', ')}`;
+
+                // Source Map Check
+                const mapMatch = content.match(/\/\/# sourceMappingURL=(.+)$/m) || content.match(/\/\*# sourceMappingURL=(.+) \*\//);
+                if (mapMatch) {
+                    let mapUrl = mapMatch[1].trim();
+                    const basePath = url.substring(0, url.lastIndexOf('/') + 1);
+                    if (!mapUrl.startsWith('http')) mapUrl = basePath + mapUrl;
+
+                    log('warn', `ðŸ—ºï¸ Map Detected: ${mapUrl.split('/').pop()}`);
+                    status += " + Source Map";
+                    await analyzeSourceMap(mapUrl, url.split('/').pop());
+                }
+
+                addManifestEntry(url, formatBytes(content.length), status);
+            } catch (e) {
+                addManifestEntry(url, 'Error', 'Failed');
+            }
+        }
+
+        function addManifestEntry(url, size, status) {
+            const tbody = document.getElementById('manifestBody');
+            const row = document.createElement('tr');
+
+            const fileName = url.split('/').pop() || url;
+            const shortName = fileName.length > 40 ? fileName.substring(0, 37) + '...' : fileName;
+
+            let statusClass = 'status-clean';
+            if (status === 'Failed') statusClass = 'status-vuln';
+            else if (status.includes('Found') || status.includes('Map')) statusClass = 'status-warn';
+
+            row.innerHTML = `
+                <td title="${url}">${shortName}</td>
+                <td>${size}</td>
+                <td><span class="status-pill ${statusClass}">${status}</span></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        async function analyzeSourceMap(mapUrl, originalFile) {
+            try {
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(mapUrl)}`;
+                const res = await fetch(proxyUrl);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                if (!data.contents) return;
+
+                let map;
+                try {
+                    map = JSON.parse(data.contents);
+                } catch (e) {
+                    return; // Fail silently for map
+                }
+
+                if (!map.sources) return;
+
+                map.sources.forEach(sourcePath => {
+                    if (sourcePath.includes('node_modules/')) {
+                        const match = sourcePath.match(/node_modules\/((?:@[^/]+\/)?[^/]+)/);
+                        if (match) {
+                            const libName = match[1];
+                            const key = `${libName}@unknown`;
+                            if (!hasLib(libName)) {
+                                foundLibs.set(key, {
+                                    name: libName,
+                                    version: 'detected-in-map',
+                                    source: `Source Map (${originalFile})`
+                                });
+                                // Penalty for blind spot
+                                currentScore -= 5;
+                                scoreLog.push({ text: `Blind Spot (${libName})`, pts: -5 });
+                            }
+                        }
+                    }
+                });
+            } catch (e) { }
+        }
+
+        function scanContentForLibs(content, sourceLabel) {
+            let hits = [];
+            // 1. Precise Regex Scan (Best)
+            LIB_PATTERNS.forEach(lib => {
+                const match = content.match(lib.regex);
+                if (match && match[1]) {
+                    const key = `${lib.name}@${match[1]}`;
+                    if (!foundLibs.has(key)) {
+                        foundLibs.set(key, { name: lib.name, version: match[1], source: sourceLabel });
+                        log('success', `âœ¨ Detected ${lib.name} v${match[1]}`);
+                        hits.push(lib.name);
+                    }
+                }
+            });
+
+            // 2. Fuzzy Signature Scan (Fallback)
+            LIB_SIGNATURES.forEach(lib => {
+                if (content.includes(lib.sig)) {
+                    // Only add if not already found (prefer versioned)
+                    if (!hasLib(lib.name)) {
+                        const key = `${lib.name}@unknown`;
+                        if (!foundLibs.has(key)) {
+                            foundLibs.set(key, {
+                                name: lib.name,
+                                version: 'unknown',
+                                source: `Heuristic (${sourceLabel})`
+                            });
+                            currentScore -= 10;
+                            scoreLog.push({ text: `Unknown Version (${lib.name})`, pts: -10 });
+                            log('warn', `âš ï¸ Fuzzy Match: ${lib.name} (Version Unknown)`);
+                            hits.push(lib.name + "(?)");
+                        }
+                    }
+                }
+            });
+            return hits;
+        }
+
+        function hasLib(name) {
+            for (let [key, val] of foundLibs) {
+                if (val.name === name) return true;
+            }
+            return false;
+        }
+
+        async function displayFinalResults() {
+            const container = document.getElementById('results');
+            if (foundLibs.size === 0) {
+                container.innerHTML = '<div class="safe-badge">No known signatures found.</div>';
+                return;
+            }
+
+            for (let [key, lib] of foundLibs) {
+                await checkOSV(lib, container);
+            }
+        }
+
+        async function checkOSV(lib, container) {
+            const vulnCard = document.createElement('div');
+            vulnCard.className = 'lib-card';
+            let vulnHtml = '';
+            let riskColor = '#10b981';
+
+            if (lib.version === 'detected-in-map' || lib.version === 'unknown') {
+                const reason = lib.version === 'detected-in-map' ? 'Source Map' : 'Fuzzy Logic';
+                vulnHtml = `<div class="vuln-item" style="border-left-color:#f59e0b; background:rgba(245,158,11,0.1);"><div class="vuln-desc">Precise version unavailable (${reason}). Cannot query CVEs.</div></div>`;
+                riskColor = '#f59e0b';
+            } else {
+                try {
+                    const res = await fetch('https://api.osv.dev/v1/query', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ version: lib.version, package: { name: lib.name, ecosystem: 'npm' } })
+                    });
+                    const data = await res.json();
+
+                    if (data.vulns && data.vulns.length > 0) {
+                        riskColor = '#ef4444';
+                        // Score Penalty
+                        const penalty = (data.vulns.length * 15);
+                        currentScore -= penalty;
+                        scoreLog.push({ text: `Vulnerabilities (${lib.name})`, pts: -penalty });
+
+                        data.vulns.slice(0, 3).forEach(v => {
+                            vulnHtml += `
+                                <div class="vuln-item">
+                                    <a href="https://osv.dev/vulnerability/${v.id}" target="_blank" class="vuln-id">${v.id}</a>
+                                    <div class="vuln-desc">${v.summary || 'Details unavailable'}</div>
+                                </div>`;
+                        });
+                        if (data.vulns.length > 3) vulnHtml += `<div style="text-align:center; padding-top:0.5rem; color:#ef4444;">+${data.vulns.length - 3} more</div>`;
+                    } else {
+                        vulnHtml = '<div class="safe-badge" style="padding:0.5rem; margin-top:0.5rem;">No known CVEs.</div>';
+                    }
+                } catch (e) {
+                    vulnHtml = `<div class="vuln-desc" style="color:#ef4444;">API Error</div>`;
+                }
+            }
+
+            vulnCard.style.borderColor = riskColor;
+            vulnCard.innerHTML = `
+                <div class="lib-header" style="border-bottom-color:${riskColor}40;">
+                    <div><span class="lib-name">${lib.name}</span> <span class="lib-version">v${lib.version}</span></div>
+                    <span style="font-size:0.75rem; color:#a1a1aa;">${lib.source}</span>
+                </div>
+                ${vulnHtml}
+            `;
+            container.appendChild(vulnCard);
+            lucide.createIcons();
+        }
+
+        function renderScore() {
+            // Cap score
+            currentScore = Math.max(0, Math.min(100, currentScore));
+
+            const circle = document.getElementById('scoreCircle');
+            const val = document.getElementById('scoreVal');
+            const box = document.getElementById('scoreContainer');
+            const details = document.getElementById('scoreDetails');
+
+            // Render Circle
+            val.textContent = currentScore;
+
+            let color = '#10b981'; // Green
+            if (currentScore < 50) color = '#ef4444'; // Red
+            else if (currentScore < 80) color = '#f59e0b'; // Yellow
+
+            circle.style.borderColor = color;
+            circle.style.color = color;
+            circle.style.boxShadow = `0 0 30px ${color}40`;
+
+            // Render Breakdown
+            let detailsHtml = `
+                <div class="detail-row">
+                    <span>Base Health Score</span>
+                    <span class="bonus">100</span>
+                </div>
+            `;
+
+            if (scoreLog.length === 0) {
+                detailsHtml += `
+                    <div class="detail-row">
+                        <span>No Issues Detected</span>
+                        <span class="bonus">--</span>
+                    </div>`;
+            } else {
+                scoreLog.forEach(log => {
+                    detailsHtml += `
+                        <div class="detail-row">
+                            <span>${log.text}</span>
+                            <span class="penalty">${log.pts}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            detailsHtml += `
+                <div class="detail-row total">
+                    <span>Final Security Score</span>
+                    <span style="color:${color}">${currentScore}</span>
+                </div>
+            `;
+
+            details.innerHTML = detailsHtml;
+
+            box.style.display = 'block';
+            document.getElementById('scanBtn').disabled = false;
+            document.getElementById('scanBtn').style.opacity = '1';
+
+            // Auto scroll to score
+            box.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function log(type, msg) {
+            const box = document.getElementById('console');
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            line.innerHTML = `<span>${msg}</span>`;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        document.getElementById('targetUrl').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startScan();
+        });
+    </script>
+</body>
+
+</html>

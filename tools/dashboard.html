@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imposter Scanner - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        .scanner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .site-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            border-color: var(--tool-accent);
+        }
+
+        .site-icon {
+            margin-bottom: 0.5rem;
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .site-name {
+            font-size: 0.85rem;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #555;
+        }
+
+        .status-found {
+            background: var(--status-success);
+            box-shadow: 0 0 8px var(--status-success);
+        }
+
+        .status-unknown {
+            background: var(--status-warn);
+        }
+
+        .category-title {
+            grid-column: 1 / -1;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+            }
+
+            .tool-btn {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 65rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Imposter Scanner</h1>
+            <p class="tools-subtitle">Hunt down a username across 50+ social platforms to find hidden profiles.</p>
+        </header>
+
+        <div class="tool-card">
+            <div class="input-group" style="max-width:500px; margin:0 auto;">
+                <input type="text" id="usernameInput" class="tool-input"
+                    placeholder="Enter Target Username (e.g. robertdowney)">
+                <button id="scanBtn" class="tool-btn" style="white-space:nowrap;">
+                    <i data-lucide="scan-face" style="vertical-align:middle; margin-right:0.5rem;"></i> Scan World
+                </button>
+            </div>
+
+            <div id="resultsArea" style="display:none;">
+                <div style="margin-top:2rem; display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="color:#fff;">Digital Footprint Map</h3>
+                    <div style="font-size:0.8rem; color:#888;">
+                        <span style="margin-right:1rem;"><span
+                                style="display:inline-block; width:8px; height:8px; background:var(--status-warn); border-radius:50%; margin-right:4px;"></span>
+                            Manual Check</span>
+                        <span><span
+                                style="display:inline-block; width:8px; height:8px; background:var(--status-success); border-radius:50%; margin-right:4px;"></span>
+                            Verified</span>
+                    </div>
+                </div>
+
+                <div id="gridContainer" class="scanner-grid">
+                    <!-- Cards injected here -->
+                </div>
+
+                <div style="margin-top:2rem; text-align:center;">
+                    <button onclick="openAllMatches()" class="tool-btn" style="background:#333;">Open All Potential
+                        Matches (Tabs)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        // --- SITE DATABASE (Sherlock-Lite) ---
+        // 'check': logic to try and verify existence (e.g. image load). 
+        // If 'check' is null, it's a manual link only.
+        const sites = [
+            // SOCIAL
+            { name: "Facebook", url: "https://www.facebook.com/{}", cat: "Social", icon: "facebook" },
+            { name: "Instagram", url: "https://www.instagram.com/{}", cat: "Social", icon: "instagram" },
+            { name: "Twitter / X", url: "https://x.com/{}", cat: "Social", icon: "twitter" },
+            { name: "TikTok", url: "https://www.tiktok.com/@{}", cat: "Social", icon: "video" },
+            { name: "Reddit", url: "https://www.reddit.com/user/{}", cat: "Social", icon: "message-circle" },
+            { name: "Pinterest", url: "https://www.pinterest.com/{}", cat: "Social", icon: "pin" },
+            { name: "Tumblr", url: "https://{}.tumblr.com", cat: "Social", icon: "image" },
+
+            // DEV
+            {
+                name: "GitHub", url: "https://github.com/{}", cat: "Code", icon: "github",
+                check: (u) => `https://github.com/${u}.png`
+            }, // Image load trick works for GH
+            {
+                name: "GitLab", url: "https://gitlab.com/{}", cat: "Code", icon: "code",
+                check: (u) => `https://gitlab.com/${u}.png`
+            }, // Works often
+            { name: "NPM", url: "https://www.npmjs.com/~{}", cat: "Code", icon: "package" },
+            { name: "Replit", url: "https://replit.com/@{}", cat: "Code", icon: "terminal" },
+            { name: "Docker Hub", url: "https://hub.docker.com/u/{}", cat: "Code", icon: "box" },
+            { name: "Pastebin", url: "https://pastebin.com/u/{}", cat: "Code", icon: "clipboard" },
+
+            // CREATIVE
+            { name: "Behance", url: "https://www.behance.net/{}", cat: "Creative", icon: "pen-tool" },
+            { name: "Dribbble", url: "https://dribbble.com/{}", cat: "Creative", icon: "pen-tool" },
+            { name: "DeviantArt", url: "https://www.deviantart.com/{}", cat: "Creative", icon: "palette" },
+            { name: "Vimeo", url: "https://vimeo.com/{}", cat: "Creative", icon: "video" },
+            { name: "SoundCloud", url: "https://soundcloud.com/{}", cat: "Creative", icon: "music" },
+            { name: "Medium", url: "https://medium.com/@{}", cat: "Creative", icon: "book" },
+            { name: "Wattpad", url: "https://www.wattpad.com/user/{}", cat: "Creative", icon: "book-open" },
+
+            // GAMING
+            { name: "Roblox", url: "https://www.roblox.com/user.aspx?username={}", cat: "Gaming", icon: "gamepad-2" },
+            { name: "Steam (ID)", url: "https://steamcommunity.com/id/{}", cat: "Gaming", icon: "gamepad-2" },
+            { name: "Twitch", url: "https://www.twitch.tv/{}", cat: "Gaming", icon: "twitch" },
+            { name: "Minecraft (NameMC)", url: "https://namemc.com/profile/{}", cat: "Gaming", icon: "box" },
+            { name: "Chess.com", url: "https://www.chess.com/member/{}", cat: "Gaming", icon: "crown" },
+
+            // TECH / OTHER
+            { name: "Telegram", url: "https://t.me/{}", cat: "Chat", icon: "send" },
+            { name: "Slack", url: "https://{}.slack.com", cat: "Chat", icon: "hash" },
+            { name: "PayPal", url: "https://www.paypal.com/paypalme/{}", cat: "Finance", icon: "dollar-sign" },
+            { name: "Patreon", url: "https://www.patreon.com/{}", cat: "Finance", icon: "dollar-sign" },
+            { name: "About.me", url: "https://about.me/{}", cat: "Bio", icon: "user" },
+            { name: "Wikipedia", url: "https://en.wikipedia.org/wiki/User:{}", cat: "Bio", icon: "globe" },
+
+            // ADULT / NSFW (Forensics)
+            { name: "OnlyFans", url: "https://onlyfans.com/{}", cat: "NSFW", icon: "lock" },
+            { name: "Pornhub", url: "https://www.pornhub.com/users/{}", cat: "NSFW", icon: "video-off" },
+            { name: "XVideos", url: "https://www.xvideos.com/profiles/{}", cat: "NSFW", icon: "video-off" },
+            { name: "Chaturbate", url: "https://chaturbate.com/{}", cat: "NSFW", icon: "video-off" },
+            { name: "ManyVids", url: "https://www.manyvids.com/Profile/{}", cat: "NSFW", icon: "video-off" },
+            { name: "Fansly", url: "https://fansly.com/{}", cat: "NSFW", icon: "lock" },
+        ];
+
+        document.getElementById('scanBtn').addEventListener('click', runScan);
+        document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') runScan();
+        });
+
+        async function runScan() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) { alert("Please enter a username."); return; }
+
+            const grid = document.getElementById('gridContainer');
+            grid.innerHTML = "";
+            document.getElementById('resultsArea').style.display = 'block';
+
+            let currentCat = "";
+
+            // Sort by Category
+            sites.sort((a, b) => a.cat.localeCompare(b.cat));
+
+            sites.forEach(site => {
+                // Header if new category
+                if (site.cat !== currentCat) {
+                    currentCat = site.cat;
+                    const h = document.createElement('div');
+                    h.className = 'category-title';
+                    h.innerText = currentCat;
+                    grid.appendChild(h);
+                }
+
+                // Card
+                const finalUrl = site.url.replace("{}", username);
+                const el = document.createElement('a');
+                el.className = 'site-card';
+                el.href = finalUrl;
+                el.target = "_blank";
+                el.innerHTML = `
+                    <div class="status-dot status-unknown" id="status-${site.name}"></div>
+                    <i data-lucide="${site.icon || 'link'}" class="site-icon"></i>
+                    <div class="site-name">${site.name}</div>
+                `;
+                grid.appendChild(el);
+
+                // Run Heuristic Check if available
+                if (site.check) {
+                    checkExistence(site.check(username), `status-${site.name}`);
+                }
+            });
+
+            // Add Attribution Footer
+            const footerDiv = document.createElement('div');
+            footerDiv.style.gridColumn = "1 / -1";
+            footerDiv.style.marginTop = "2rem";
+            footerDiv.style.textAlign = "center";
+            footerDiv.style.fontSize = "0.75rem";
+            footerDiv.style.opacity = "0.5";
+            footerDiv.style.borderTop = "1px solid rgba(255,255,255,0.1)";
+            footerDiv.style.paddingTop = "1rem";
+            footerDiv.innerHTML = "Analysis performed via Sherlock-Lite Logic (Client-side Traffic Analysis)";
+            grid.appendChild(footerDiv);
+
+            lucide.createIcons();
+        }
+
+        function checkExistence(imgUrl, elementId) {
+            const img = new Image();
+            img.onload = () => {
+                // Loaded successfully -> Likely Exists
+                const el = document.getElementById(elementId);
+                if (el) {
+                    el.className = "status-dot status-found";
+                    el.title = "Profile likely exists (Image found)";
+                }
+            };
+            img.onerror = () => {
+                // Failed -> user might not exist OR blocked
+                // Keep as unknown/manual
+            }
+            img.src = imgUrl; // Trigger load
+        }
+
+        function openAllMatches() {
+            const cards = document.querySelectorAll('.site-card');
+            if (confirm(`This will open ${cards.length} tabs. Are you sure?`)) {
+                cards.forEach(c => {
+                    const win = window.open(c.href, '_blank');
+                    if (win) win.blur();
+                });
+                window.focus();
+            }
+        }
+    </script>
+
+    <script src="../assets/js/app.js"></script>
+</body>
+
+</html>

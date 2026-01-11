@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Deep Intel | Manifest & Backend Scanner</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Library 1: Manifest Parser (For Metadata/Permissions) -->
+    <script src="https://cdn.jsdelivr.net/npm/app-info-parser/dist/app-info-parser.min.js"></script>
+    <!-- Library 2: JSZip (For Binary Code Scanning) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        body {
+            background: #09090b;
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .tool-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .drop-zone {
+            border: 2px dashed #3f3f46;
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #3ca2fa;
+            background: rgba(60, 162, 250, 0.05);
+            transform: scale(1.01);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .card {
+            background: rgba(24, 24, 27, 0.6);
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #27272a;
+            color: #a1a1aa;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+        }
+
+        /* METADATA */
+        .app-header {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: #27272a;
+            object-fit: cover;
+            border: 1px solid #3f3f46;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #27272a;
+            font-size: 0.9rem;
+        }
+
+        .metric-val {
+            font-family: monospace;
+            color: #fff;
+        }
+
+        /* PERMISSIONS */
+        .perm-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            margin: 0.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #3f3f46;
+        }
+
+        .perm-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* URL LIST */
+        .url-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .url-item {
+            font-family: monospace;
+            font-size: 0.85rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid #27272a;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .url-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tag-api {
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .tag-track {
+            color: #f59e0b;
+        }
+
+        /* STATUS */
+        .scan-status {
+            display: none;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            max-width: 400px;
+            height: 4px;
+            background: #27272a;
+            margin: 1rem auto;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #3ca2fa;
+            transition: width 0.2s;
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+            .tool-container {
+                padding: 1rem;
+            }
+
+            .tool-title {
+                font-size: 1.75rem !important;
+            }
+
+            .drop-zone {
+                padding: 2rem 1rem;
+            }
+
+            .app-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tool-container">
+        <div class="top-nav">
+            <a href="../tools.html" class="tool-btn">
+                <i data-lucide="arrow-left"></i> Back to Tools
+            </a>
+        </div>
+
+        <div class="tool-header" style="text-align:center; margin-bottom: 3rem;">
+            <h1 class="tool-title"
+                style="font-size: 2.5rem; background: linear-gradient(to right, #fff, #9ca3af); -webkit-background-clip: text; color: transparent;">
+                APK Deep Intel</h1>
+            <p style="color:#a1a1aa;">Unified Manifest Analysis & Backend URL Scanner</p>
+        </div>
+
+        <!-- DROP ZONE -->
+        <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" class="file-input" accept=".apk">
+            <i data-lucide="package-search" style="width: 48px; height: 48px; color: #3ca2fa; margin-bottom: 1rem;"></i>
+            <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Drag & Drop APK File</h3>
+            <p style="color: #71717a;">Processes Manifest, Permissions, and Binary Code (dex) in browser.</p>
+        </div>
+
+        <!-- SCAN STATUS -->
+        <div class="scan-status" id="scanStatus">
+            <i data-lucide="loader-2" class="spin" style="width: 32px; height: 32px; color: #3ca2fa;"></i>
+            <h3 id="statusText" style="margin: 1rem 0 0.5rem 0;">Analyzing Package...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <p id="statusDetail" style="font-family:monospace; color:#52525b; font-size:0.8rem;">Reading headers...</p>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard-grid" id="dashboard">
+
+            <!-- 1. Metadata Card -->
+            <div class="card" style="grid-column: span 1;">
+                <div class="app-header">
+                    <img id="appIcon" class="app-icon"
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3C/svg%3E">
+                    <div>
+                        <h2 id="appName" style="margin:0; font-size:1.25rem;">Unknown App</h2>
+                        <div id="pkgName" style="color:#71717a; font-family:monospace; font-size:0.9rem;">
+                            com.example.app</div>
+                    </div>
+                </div>
+                <div class="metric-row">
+                    <span style="color:#a1a1aa;">Version</span>
+                    <span class="metric-val" id="appVer">-</span>
+                </div>
+                <div class="metric-row">
+                    <span style="color:#a1a1aa;">Target SDK</span>
+                    <span class="metric-val" id="appSdk">-</span>
+                </div>
+                <div class="metric-row">
+                    <span style="color:#a1a1aa;">DEX Files</span>
+                    <span class="metric-val" id="dexCount">-</span>
+                </div>
+            </div>
+
+            <!-- 2. Permissions Card -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-header"><i data-lucide="shield"></i> Permissions Intelligence</div>
+                <div id="permContainer" style="max-height:200px; overflow-y:auto;">
+                    <!-- Tags Injected -->
+                </div>
+                <div
+                    style="margin-top:1rem; font-size:0.8rem; color:#52525b; border-top:1px solid #27272a; padding-top:0.5rem;">
+                    Red tags indicate dangerous capabilities (Camera, Mic, GPS, SMS).
+                </div>
+            </div>
+
+            <!-- 3. Backend Scan Card -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <i data-lucide="network"></i> Detected Backend Infrastructure
+                    <span id="urlCount"
+                        style="margin-left:auto; font-size:0.8rem; background:#27272a; padding:0.2rem 0.5rem; border-radius:4px;">0
+                        URLs</span>
+                </div>
+                <div class="url-list" id="urlList">
+                    <!-- URLs Injected -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) runFullScan(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) runFullScan(e.target.files[0]);
+        });
+
+        async function runFullScan(file) {
+            if (!file.name.endsWith('.apk')) { alert("Invalid APK file"); return; }
+
+            // UI Toggle
+            dropZone.style.display = 'none';
+            document.getElementById('scanStatus').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+
+            try {
+                // PHASE 1: PARSE MANIFEST (Metadata)
+                updateStatus("Parsing Manifest...", 10);
+                const parser = new AppInfoParser(file);
+                const info = await parser.parse();
+
+                // Render Metadata
+                document.getElementById('appName').textContent = info.application.label || "Unknown";
+                document.getElementById('pkgName').textContent = info.package;
+                document.getElementById('appVer').textContent = info.versionName;
+                document.getElementById('appSdk').textContent = info.usesSdk?.targetSdkVersion || "?";
+                if (info.icon) document.getElementById('appIcon').src = info.icon;
+
+                // Render Permissions
+                const perms = info.usesPermission || [];
+                renderPermissions(perms);
+
+                // PHASE 2: SCAN BINARIES (URLs)
+                updateStatus("Unpacking Binaries...", 30);
+                const zip = new JSZip();
+                const contents = await zip.loadAsync(file);
+                const files = Object.keys(contents.files);
+                const dexFiles = files.filter(f => f.endsWith('.dex'));
+                document.getElementById('dexCount').textContent = dexFiles.length;
+
+                updateStatus(`Scanning ${dexFiles.length} DEX files for URLs...`, 40);
+
+                let foundUrls = new Set();
+                const urlRegex = /https?:\/\/[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+(?:\:[0-9]{1,5})?(?:[\/a-zA-Z0-9\-._~%!$&'()*+,;=:@?#]*)?/g;
+
+                for (let i = 0; i < dexFiles.length; i++) {
+                    const fname = dexFiles[i];
+                    updateStatus(`Scanning: ${fname}`, 40 + ((i / dexFiles.length) * 50));
+
+                    const content = await contents.files[fname].async("uint8array");
+                    const text = new TextDecoder("utf-8", { fatal: false, ignoreBOM: true }).decode(content);
+                    const matches = text.match(urlRegex);
+                    if (matches) matches.forEach(m => foundUrls.add(m));
+
+                    // Yield
+                    if (i % 2 === 0) await new Promise(r => setTimeout(r, 1));
+                }
+
+                // DONE
+                renderUrls(foundUrls);
+                updateStatus("Complete!", 100);
+                setTimeout(() => {
+                    document.getElementById('scanStatus').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'grid';
+                }, 500);
+
+            } catch (e) {
+                console.error(e);
+                alert("Scan Error: " + e.message);
+                location.reload();
+            }
+        }
+
+        function renderPermissions(perms) {
+            const container = document.getElementById('permContainer');
+            container.innerHTML = '';
+
+            const dangerous = ['CAMERA', 'RECORD_AUDIO', 'READ_CONTACTS', 'READ_SMS', 'ACCESS_FINE_LOCATION', 'WRITE_EXTERNAL_STORAGE', 'READ_PHONE_STATE', 'GET_ACCOUNTS'];
+
+            perms.forEach(p => {
+                const name = (typeof p === 'string' ? p : p.name).split('.').pop();
+                const isRisk = dangerous.some(d => name.toUpperCase().includes(d));
+
+                const span = document.createElement('span');
+                span.className = `perm-tag ${isRisk ? 'perm-danger' : ''}`;
+                span.innerHTML = isRisk ? `<i data-lucide="alert-triangle" style="width:12px;"></i> ${name}` : name;
+                container.appendChild(span);
+            });
+            lucide.createIcons();
+        }
+
+        function renderUrls(urlSet) {
+            const list = document.getElementById('urlList');
+            list.innerHTML = '';
+            let urls = Array.from(urlSet).filter(u => !u.includes('schemas.android.com') && !u.includes('w3.org')).sort();
+
+            document.getElementById('urlCount').textContent = `${urls.length} URLs`;
+
+            if (urls.length === 0) {
+                list.innerHTML = '<div style="padding:1rem; text-align:center; color:#52525b;">No URLs found in dex files. Code might be obfuscated.</div>';
+                return;
+            }
+
+            urls.forEach(u => {
+                let type = '';
+                if (u.includes('api.')) type = '<span class="tag-api">API</span>';
+                else if (u.includes('firebase') || u.includes('google')) type = '<span class="tag-track">Tracker</span>';
+
+                const div = document.createElement('div');
+                div.className = 'url-item';
+                div.innerHTML = `
+                    <span style="color:#d4d4d8;">${u}</span>
+                    ${type}
+                 `;
+
+                // Deep Link to Site Dossier
+                div.style.cursor = 'pointer';
+                div.onclick = () => {
+                    try {
+                        const d = new URL(u).hostname;
+                        window.open(`site-dossier.html?scan=${d}`, '_blank');
+                    } catch (err) { }
+                };
+
+                list.appendChild(div);
+            });
+        }
+
+        function updateStatus(msg, pct) {
+            document.getElementById('statusText').textContent = msg;
+            document.getElementById('progressBar').style.width = pct + '%';
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,570 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Intelligence - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        /* --- Bento Grid Layout --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .bento-grid {
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: auto auto;
+                grid-template-areas:
+                    "risk risk map map"
+                    "main main map map"
+                    "tech tech loc loc";
+            }
+        }
+
+        .bento-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .bento-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.6;
+            margin-bottom: 0.25rem;
+        }
+
+        .bento-val {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .bento-lg-val {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* Area Assignments */
+        #risk-area {
+            grid-area: risk;
+        }
+
+        #map-area {
+            grid-area: map;
+            height: 100%;
+            min-height: 200px;
+        }
+
+        #main-info-area {
+            grid-area: main;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        #tech-area {
+            grid-area: tech;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        #loc-area {
+            grid-area: loc;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .source-badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-left: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .link-hover:hover {
+            text-decoration: underline;
+            color: var(--accent);
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="nav-spacer"></div>
+    <div class="tools-container" style="max-width: 900px;"> <!-- Compact Width -->
+        <!-- 1. HEADER -->
+        <header class="tools-header">
+            <h1 class="tools-title">IP Intelligence</h1>
+            <p class="tools-subtitle">Geolocation, ISP, and network data lookup.</p>
+        </header>
+
+        <!-- 2. INPUT AREA -->
+        <div class="tool-card" style="margin-bottom: 2rem; border-color: var(--tool-accent);">
+            <div class="input-group">
+                <input type="text" id="ipInput" class="tool-input" placeholder="Enter IP address (e.g., 8.8.8.8)">
+                <button id="lookupBtn" class="tool-btn">
+                    <i data-lucide="search" style="vertical-align: middle; margin-right: 0.5rem; height: 1.2em;"></i>
+                    Analyze IP
+                </button>
+            </div>
+            <p class="text-muted italic" style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.7;">
+                Leave empty to scan your own current IP address.
+            </p>
+            <div id="errorBox"
+                style="display:none; margin-top:1rem; padding:1rem; background:rgba(255,0,0,0.1); border:1px solid var(--status-error); color:var(--status-error); border-radius:6px;">
+            </div>
+        </div>
+
+        <!-- 3. RESULTS (BENTO GRID) -->
+        <div id="resultContainer" class="bento-grid" style="display:none;">
+
+            <!-- A. Risk / Type (Top Left) -->
+            <div id="risk-area" class="bento-card"
+                style="background: rgba(16, 185, 129, 0.1); border-color: var(--status-success);">
+                <div class="bento-label" style="color: inherit;">Connection Type Estimate</div>
+                <div class="bento-lg-val" id="d-type" style="margin-bottom: 0.25rem;">--</div>
+                <div style="font-size: 0.8rem; opacity: 0.8;" id="d-risk-desc">--</div>
+            </div>
+
+            <!-- B. Map (Right Side) -->
+            <div id="map-area" class="bento-card" style="padding: 0; overflow:hidden; position:relative;">
+                <div id="ipMap" style="width:100%; height:100%; min-height: 250px;"></div>
+                <a id="gmaps-link" href="#" target="_blank"
+                    style="position:absolute; bottom:10px; right:10px; z-index:400; background:var(--background); padding:4px 8px; border-radius:4px; font-size:0.7rem; text-decoration:none; opacity:0.9;">
+                    Open in Google Maps ?
+                </a>
+            </div>
+
+            <!-- C. Main Info (Middle Left) -->
+            <div id="main-info-area">
+                <div class="bento-card">
+                    <div class="bento-label">Target IP <span id="data-source-badge" class="source-badge"></span></div>
+                    <div class="bento-lg-val" id="d-ip">--</div>
+                </div>
+                <div class="bento-card">
+                    <div class="bento-label">Provider (ISP)</div>
+                    <div class="bento-val" id="d-isp">--</div>
+                </div>
+            </div>
+
+            <!-- D. Tech / Network (Bottom Left) -->
+            <div id="tech-area">
+                <div class="bento-card">
+                    <div class="bento-label">Organization</div>
+                    <div class="bento-val" id="d-org" style="font-size: 0.85rem;">--</div>
+                </div>
+                <div class="bento-card">
+                    <div class="bento-label">ASN (Network)</div>
+                    <div class="bento-val" id="d-asn">--</div>
+                    <!-- ASN Links -->
+                    <div id="asn-links" style="margin-top:0.5rem; display:none; gap:0.5rem; font-size: 0.75rem;">
+                        <a id="bgp-link" href="#" target="_blank" class="link-hover">BGP</a>
+                        <a id="peering-link" href="#" target="_blank" class="link-hover">Peering</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- E. Location & Time (Bottom Right) -->
+            <div id="loc-area">
+                <div class="bento-card">
+                    <div class="bento-label">Location</div>
+                    <div class="bento-val" id="d-loc">--</div>
+                    <div class="bento-val" id="d-country" style="opacity: 0.7; font-size: 0.8rem;">--</div>
+                </div>
+                <div class="bento-card">
+                    <div class="bento-label">Local Time / Cur</div>
+                    <div class="bento-val" id="d-time" style="color: var(--accent);">--:--</div>
+                    <div class="bento-val" id="d-currency" style="font-size:0.8rem; opacity:0.7;">--</div>
+                </div>
+                <!-- Attribution Footer -->
+                <div
+                    style="grid-column: 1 / -1; margin-top:0.5rem; text-align:center; font-size:0.75rem; opacity:0.5; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
+                    Data provided by <strong id="footer-provider">FreeIPAPI</strong> (or fallback)
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .tools-header h1 {
+                font-size: 2rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input {
+                width: 100%;
+                border-radius: 8px;
+            }
+
+            .tool-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .bento-grid {
+                grid-template-columns: 1fr !important;
+                grid-template-areas:
+                    "risk"
+                    "main"
+                    "tech"
+                    "loc"
+                    "map" !important;
+            }
+
+            #map-area {
+                min-height: 250px;
+            }
+        }
+    </style>
+    <script>
+        // --- 1. Safety Checks ---
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        } else {
+            console.warn("Lucide icons library not loaded.");
+        }
+
+        let mapInstance = null;
+
+        // --- 2. Proxy Router ---
+        const proxyList = [
+            (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+            (url) => `https://thingproxy.freeboard.io/fetch/${url}`
+        ];
+
+        async function fetchViaProxyRouter(targetUrl) {
+            for (const proxyFn of proxyList) {
+                const proxyUrl = proxyFn(targetUrl);
+                try {
+                    console.log(`[IP Tool] Trying proxy: ${proxyUrl}`);
+                    const response = await fetch(proxyUrl);
+                    if (response.ok) return await response.json();
+                } catch (error) {
+                    console.warn(`[IP Tool] Proxy failed: ${error.message}`);
+                }
+            }
+            throw new Error("All proxies failed.");
+        }
+
+        // --- 3. JSONP Helper (Nuclear Option) ---
+        function jsonp(url) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'ip_jsonp_' + Math.round(100000 * Math.random());
+                const script = document.createElement('script');
+
+                window[callbackName] = function (data) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(data);
+                };
+
+                script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+                script.onerror = () => {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject(new Error('JSONP load failed'));
+                };
+
+                document.body.appendChild(script);
+            });
+        }
+
+        // --- 4. Main Logic ---
+        document.getElementById('lookupBtn').addEventListener('click', async () => {
+            const inputIp = document.getElementById('ipInput').value.trim();
+            const resultContainer = document.getElementById('resultContainer');
+            const errorContainer = document.getElementById('errorBox');
+            const scanButton = document.getElementById('lookupBtn');
+
+            // Reset UI
+            resultContainer.style.display = 'none';
+            errorContainer.style.display = 'none';
+            errorContainer.innerText = '';
+
+            const originalButtonText = scanButton.innerHTML;
+            scanButton.innerText = "Scanning...";
+            scanButton.disabled = true;
+
+            const ipDataProviders = [
+                {
+                    name: 'IPWhoIs',
+                    url: inputIp ? `https://ipwho.is/${inputIp}` : `https://ipwho.is/`,
+                    map: (rawApiResponse) => ({
+                        ip: rawApiResponse.ip,
+                        city: rawApiResponse.city,
+                        region: rawApiResponse.region,
+                        country: rawApiResponse.country,
+                        country_code: rawApiResponse.country_code,
+                        latitude: rawApiResponse.latitude,
+                        longitude: rawApiResponse.longitude,
+                        asn: rawApiResponse.connection ? rawApiResponse.connection.asn : null,
+                        org: rawApiResponse.connection ? rawApiResponse.connection.org : null,
+                        isp: rawApiResponse.connection ? rawApiResponse.connection.isp : null,
+                        postal: rawApiResponse.postal,
+                        timeZone: rawApiResponse.timezone ? rawApiResponse.timezone.id : null,
+                        currency: rawApiResponse.currency ? rawApiResponse.currency.code : null
+                    })
+                },
+                {
+                    name: 'FreeIPAPI',
+                    url: inputIp ? `https://freeipapi.com/api/json/${inputIp}` : `https://freeipapi.com/api/json`,
+                    map: (rawApiResponse) => ({
+                        ip: rawApiResponse.ipAddress,
+                        city: rawApiResponse.cityName,
+                        region: rawApiResponse.regionName,
+                        country: rawApiResponse.countryName,
+                        country_code: rawApiResponse.countryCode,
+                        latitude: rawApiResponse.latitude,
+                        longitude: rawApiResponse.longitude,
+                        asn: rawApiResponse.asn,
+                        org: rawApiResponse.asnOrganization,
+                        isp: rawApiResponse.asnOrganization,
+                        postal: rawApiResponse.zipCode,
+                        timeZone: rawApiResponse.timeZones ? rawApiResponse.timeZones[0] : null,
+                        currency: rawApiResponse.currencies ? rawApiResponse.currencies[0] : null
+                    })
+                },
+                {
+                    name: 'DB-IP',
+                    url: inputIp ? `https://api.db-ip.com/v2/free/${inputIp}` : `https://api.db-ip.com/v2/free/self`,
+                    map: (rawApiResponse) => ({
+                        ip: rawApiResponse.ipAddress,
+                        city: rawApiResponse.city,
+                        region: rawApiResponse.stateProv,
+                        country: rawApiResponse.countryName,
+                        country_code: rawApiResponse.countryCode,
+                        latitude: null, // Not provided free
+                        longitude: null,
+                        asn: null,
+                        org: null,
+                        isp: null,
+                        timeZone: null,
+                        currency: null
+                    })
+                }
+            ];
+
+            let consolidatedIpIntelligence = null;
+            let successfulProviderName = null;
+
+            async function fetchIpDataFromProvider(provider) {
+                // 1. Direct Fetch
+                try {
+                    const fetchResponse = await fetch(provider.url, { referrerPolicy: 'no-referrer' });
+                    if (fetchResponse.ok) {
+                        const parsedJson = await fetchResponse.json();
+                        if (parsedJson.ip || parsedJson.ipAddress) return provider.map(parsedJson);
+                    }
+                } catch (error) { console.warn("Direct fetch failed, trying proxy..."); }
+
+                // 2. Proxy Fetch
+                try {
+                    const proxyJson = await fetchViaProxyRouter(provider.url);
+                    if (proxyJson.ip || proxyJson.ipAddress) return provider.map(proxyJson);
+                } catch (proxyError) { return null; }
+            }
+
+            try {
+                // --- GREEDY FETCH LOGIC ---
+                // Goal: Don't stop at first success if data is "sparse" (missing coords/ISP).
+
+                // 1. Try FreeIPAPI (Primary)
+                try {
+                    const primaryProvider = ipDataProviders[0];
+                    consolidatedIpIntelligence = await fetchIpDataFromProvider(primaryProvider);
+                    if (consolidatedIpIntelligence) successfulProviderName = primaryProvider.name;
+                } catch (e) { }
+
+                // Check 1: Is the data rich enough?
+                const hasRichGeoData = (dataset) => dataset && dataset.latitude && dataset.longitude && dataset.isp;
+
+                if (!hasRichGeoData(consolidatedIpIntelligence)) {
+                    console.log("[IP Tool] Data is sparse or null. Trying secondary source...");
+                    // 2. Try DB-IP (Backup)
+                    try {
+                        const secondaryProvider = ipDataProviders[1];
+                        const secondaryData = await fetchIpDataFromProvider(secondaryProvider);
+                        if (secondaryData) {
+                            // If we had nothing, take this.
+                            if (!consolidatedIpIntelligence) {
+                                consolidatedIpIntelligence = secondaryData;
+                                successfulProviderName = secondaryProvider.name;
+                            }
+                        }
+                    } catch (e) { }
+                }
+
+                // Check 2: Still not rich?
+                // 3. NUCLEAR OPTION: IPWhoIs (JSONP)
+                // Always try this if we lack critical data (Coords for Map)
+                if (!hasRichGeoData(consolidatedIpIntelligence)) {
+                    console.log("[IP Tool] Still sparse. Switching to JSONP Strategy (IPWhoIs)...");
+                    try {
+                        const fallbackProvider = ipDataProviders[2];
+                        const rawJsonpData = await jsonp(fallbackProvider.url);
+                        if (rawJsonpData && rawJsonpData.success !== false) {
+                            const fallbackData = fallbackProvider.map(rawJsonpData);
+                            console.log("[IP Tool] JSONP delivered rich data. Overwriting.");
+                            consolidatedIpIntelligence = fallbackData;
+                            successfulProviderName = fallbackProvider.name;
+                        }
+                    } catch (jsonpError) { console.error("JSONP Failed:", jsonpError); }
+                }
+
+                if (!consolidatedIpIntelligence) throw new Error("All data providers failed. Please check your internet connection.");
+
+                console.log(`[IP Tool] Success via ${successfulProviderName}`, consolidatedIpIntelligence);
+
+                // --- UI POPULATION ---
+                document.getElementById('data-source-badge').innerText = `Source: ${successfulProviderName}`;
+                document.getElementById('footer-provider').innerText = successfulProviderName;
+                document.getElementById('d-ip').innerText = consolidatedIpIntelligence.ip;
+                document.getElementById('d-loc').innerText = consolidatedIpIntelligence.city || 'Unknown';
+                document.getElementById('d-country').innerText = `${consolidatedIpIntelligence.region || ''}, ${consolidatedIpIntelligence.country}`;
+
+                document.getElementById('d-isp').innerText = consolidatedIpIntelligence.isp || 'N/A';
+                document.getElementById('d-org').innerText = consolidatedIpIntelligence.org || 'N/A';
+
+                document.getElementById('d-asn').innerText = consolidatedIpIntelligence.asn ? `AS${consolidatedIpIntelligence.asn}` : 'N/A';
+                const asnLinksContainer = document.getElementById('asn-links');
+                if (consolidatedIpIntelligence.asn) {
+                    const asnClean = String(consolidatedIpIntelligence.asn).replace("AS", "");
+                    asnLinksContainer.style.display = 'flex';
+                    document.getElementById('bgp-link').href = `https://bgp.he.net/AS${asnClean}`;
+                    document.getElementById('peering-link').href = `https://www.peeringdb.com/search?q=AS${asnClean}`;
+                } else {
+                    asnLinksContainer.style.display = 'none';
+                }
+
+                if (consolidatedIpIntelligence.timeZone) {
+                    try {
+                        const timeString = new Date().toLocaleTimeString('en-US', { timeZone: consolidatedIpIntelligence.timeZone, hour: '2-digit', minute: '2-digit' });
+                        document.getElementById('d-time').innerText = "?? " + timeString;
+                    } catch (e) { document.getElementById('d-time').innerText = consolidatedIpIntelligence.timeZone; }
+                } else {
+                    document.getElementById('d-time').innerText = "--:--";
+                }
+                document.getElementById('d-currency').innerText = consolidatedIpIntelligence.currency ? `Currency: ${consolidatedIpIntelligence.currency}` : '';
+
+                // Risk Heuristics
+                const combinedInfo = (consolidatedIpIntelligence.org || "") + " " + (consolidatedIpIntelligence.isp || "");
+                const orgUpper = combinedInfo.toUpperCase();
+                const hostingKeywords = ["AMAZON", "AWS", "GOOGLE CLOUD", "AZURE", "DIGITALOCEAN", "HETZNER", "OVH", "LINODE", "VULTR", "DATACENTER", "HOSTING", "VPN", "PROXY", "CLOUDFLARE", "AKAMAI", "FASTLY", "DATACAMP"];
+                const cellularKeywords = ["JIO", "AIRTEL", "VODAFONE", "VERIZON", "AT&T", "T-MOBILE", "ORANGE", "TELEFONICA", "MOBILE", "CELLULAR", "GSM", "LTE"];
+
+                const riskCard = document.getElementById('risk-area');
+                const typeElement = document.getElementById('d-type');
+                const descElement = document.getElementById('d-risk-desc');
+
+                let isHosting = hostingKeywords.some(keyword => orgUpper.includes(keyword));
+                let isCellular = cellularKeywords.some(keyword => orgUpper.includes(keyword));
+
+                if (isHosting) {
+                    typeElement.innerText = "?? Hosting / VPN";
+                    descElement.innerText = "Potential Masked Location";
+                    riskCard.style.cssText = "background: rgba(239, 68, 68, 0.1); border-color: var(--status-error); color: var(--status-error); grid-area: risk;";
+                } else if (isCellular) {
+                    typeElement.innerText = "?? Mobile / Cellular";
+                    descElement.innerText = "Low Location Accuracy";
+                    riskCard.style.cssText = "background: rgba(245, 158, 11, 0.1); border-color: var(--status-warn); color: var(--status-warn); grid-area: risk;";
+                } else {
+                    typeElement.innerText = "?? Residential";
+                    descElement.innerText = "Standard Connection";
+                    riskCard.style.cssText = "background: rgba(16, 185, 129, 0.1); border-color: var(--status-success); color: var(--status-success); grid-area: risk;";
+                }
+
+                resultContainer.style.display = 'grid';
+
+                // Map Logic
+                if (typeof L !== 'undefined' && consolidatedIpIntelligence.latitude && consolidatedIpIntelligence.longitude) {
+                    document.getElementById('map-area').style.display = 'block';
+                    document.getElementById('gmaps-link').href = `https://www.google.com/maps?q=${consolidatedIpIntelligence.latitude},${consolidatedIpIntelligence.longitude}`;
+
+                    if (mapInstance) mapInstance.remove();
+                    mapInstance = L.map('ipMap').setView([consolidatedIpIntelligence.latitude, consolidatedIpIntelligence.longitude], 13);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; OSM &copy; CARTO',
+                        subdomains: 'abcd',
+                        maxZoom: 19
+                    }).addTo(mapInstance);
+                    L.marker([consolidatedIpIntelligence.latitude, consolidatedIpIntelligence.longitude]).addTo(mapInstance);
+                } else {
+                    document.getElementById('map-area').style.display = 'none';
+                }
+
+            } catch (fatalError) {
+                console.error("IP Tool Fatal Error:", fatalError);
+                errorContainer.style.display = 'block';
+                errorContainer.innerHTML = `<strong>Scan Failed:</strong> ${fatalError.message}<br><small>We tried multiple sources but all failed. Please check your connection.</small>`;
+            } finally {
+                scanButton.innerHTML = originalButtonText;
+                scanButton.disabled = false;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        });
+    </script>
+
+
+    <!-- Hover Footer -->
+
+</body>
+
+</html>

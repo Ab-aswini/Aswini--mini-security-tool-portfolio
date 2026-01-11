@@ -1,0 +1,380 @@
+/* Cosmic Hero Section */
+/* Cosmic Hero Section */
+#hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+    /* Desktop: Row */
+    justify-content: space-between;
+    /* Push apart */
+    align-items: center;
+    text-align: left;
+    /* Text aligns left */
+    padding: 2rem 5%;
+    /* Side padding */
+    overflow: hidden;
+    background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+    color: #ffffff;
+}
+
+[data-theme="light"] #hero {
+    background: radial-gradient(circle at center, #f0f4f8 0%, #ffffff 100%);
+    color: #1a1a2e;
+}
+
+#hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+.hero-content {
+    z-index: 2;
+    max-width: 600px;
+    flex: 1;
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+    /* Larger title */
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #00f0ff, #ff0055);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    to {
+        text-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    }
+}
+
+.hero-sub {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+.hero-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    /* Align buttons left */
+    margin-bottom: 3rem;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(79, 124, 255, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+[data-theme="light"] .btn-secondary {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 3D Sphere Container - Right Corner Shift */
+/* 3D Sphere Container - Right Corner Shift */
+.hero-visual-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#sphere-container {
+    width: 50%;
+    /* Take up right half */
+    max-width: 600px;
+    height: 600px;
+    /* Taller for better fit */
+    position: relative;
+    margin-right: -10px;
+    /* Reduced shift to keep it visible but corner-aligned */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sphere-caption {
+    margin-top: -1rem;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-right: 0;
+    font-family: monospace;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+/* Responsive Layout Updates */
+
+/* Tablet / Small Laptop / Large Mobile (Max 1024px) */
+@media (max-width: 1024px) {
+    #hero {
+        flex-direction: column;
+        /* Stack vertically */
+        text-align: center;
+        justify-content: center;
+        padding-top: 4rem;
+    }
+
+    .hero-content {
+        max-width: 100%;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .hero-btns {
+        justify-content: center;
+    }
+
+    /* Reset Wrapper & Sphere for Center Layout */
+    .hero-visual-wrapper {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 2rem;
+    }
+
+    #sphere-container {
+        width: 100%;
+        height: 500px;
+        margin-right: 0;
+        /* Reset desktop shift */
+        margin: 0 auto;
+    }
+
+    .sphere-caption {
+        margin-right: 0;
+        margin-top: 1rem;
+    }
+}
+
+/* Mobile (Max 768px) */
+@media (max-width: 768px) {
+    #hero {
+        padding: 6rem 1.5rem 2rem 1.5rem;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        /* Smaller title */
+    }
+
+    #sphere-container {
+        height: 350px;
+        /* Smaller sphere area */
+    }
+}
+
+/* Icon Cloud Items */
+.sphere-item {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    transform-origin: center center;
+    will-change: transform, opacity;
+    pointer-events: none;
+    /* Let mouse pass through for rotation control */
+}
+
+.sphere-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--text);
+    transition: color 0.3s;
+}
+
+.sphere-icon svg {
+    width: 32px !important;
+    height: 32px !important;
+    object-fit: contain;
+}
+
+/* Light/Dark Mode handling for icons via currentColor */
+/* Light/Dark Mode handling for icons */
+/* Removed specific color overrides to allow Original Brand Colors */
+
+
+/* Sphere Title (Restored) */
+.sphere-title {
+    margin-top: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.9;
+    color: var(--text);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+[data-theme="light"] .sphere-title {
+    text-shadow: none;
+    color: #111;
+    font-weight: 700;
+}
+
+
+
+/* Navbar Scroll Behavior */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: transform 0.3s ease, background 0.3s ease;
+    /* Hidden initially logic handled by JS class 'scrolled' */
+    transform: translateY(-100%);
+    background: transparent;
+    border-bottom: none;
+}
+
+header.visible {
+    transform: translateY(0);
+}
+
+header.scrolled {
+    background: rgba(13, 13, 13, 0.8);
+    /* Dark default */
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] header.scrolled {
+    background: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+
+/* Common Section Styles */
+section {
+    padding: 4rem 2rem;
+    opacity: 0;
+    /* For scroll animation */
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.section-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Grids */
+.grid-6 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    /* Matches smaller mobile cards */
+    gap: 1rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .grid-6 {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        /* restore larger sizes for desktop */
+        gap: 1.5rem;
+    }
+}
+
+/* Cards */
+.card {
+    background: var(--card);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent);
+}
+
+.card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+}
+
+.card p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* About Strip */
+#about-strip {
+    text-align: center;
+    background: var(--card);
+    border-radius: 20px;
+    margin: 2rem auto;
+    max-width: 1000px;
+}
+
+/* CTA Block */
+#cta {
+    text-align: center;
+    padding: 6rem 2rem;
+}

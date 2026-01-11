@@ -1,0 +1,448 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subresource Discovery - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <!-- Chart.js for Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            #processLog {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+
+    <!-- Theme Data Script -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 65rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Subresource Discovery Visualizer</h1>
+            <p class="tools-subtitle">Static analysis of external scripts, CDNs, and trackers embedded in HTML source.
+            </p>
+        </header>
+
+        <div class="tool-card">
+            <div class="input-group">
+                <input type="text" id="urlInput" class="tool-input"
+                    placeholder="Enter URL (e.g. https://stackoverflow.com)">
+                <button id="scanBtn" class="tool-btn">Scan Source</button>
+            </div>
+
+            <div
+                style="margin-top:0.75rem; display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; color:var(--text-muted);">
+                <input type="checkbox" id="corsProxy" style="accent-color:var(--tool-accent);">
+                <label for="corsProxy">Use CORS Proxy (Allows scanning most external sites)</label>
+            </div>
+
+            <div id="processLog"
+                style="display:none; margin-top:2rem; background:rgba(0,0,0,0.3); padding:1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.1); font-family:monospace; font-size:0.85rem;">
+                <div
+                    style="color:var(--tool-accent); margin-bottom:0.8rem; font-weight:bold; letter-spacing:1px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:0.5rem;">
+                    <i data-lucide="terminal" style="width:16px; vertical-align:middle;"></i> SYSTEM LOG
+                </div>
+                <div id="logContent"
+                    style="display:flex; flex-direction:column; gap:0.5rem; color:#a1a1aa; max-height:200px; overflow-y:auto;">
+                </div>
+            </div>
+
+            <div id="resultsArea" class="result-box" style="display:none;"></div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+
+        const corsProxyServices = [
+            (targetUrl) => `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+            (targetUrl) => `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
+            (targetUrl) => `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(targetUrl)}`
+        ];
+
+        const logContainer = document.getElementById('processLog');
+        const logContent = document.getElementById('logContent');
+
+        function addLog(msg, type = 'info') {
+            const row = document.createElement('div');
+            let color = '#a1a1aa';
+            let icon = 'arrow-right';
+
+            if (type === 'success') { color = '#10b981'; icon = 'check'; }
+            if (type === 'error') { color = '#ef4444'; icon = 'x'; }
+            if (type === 'warn') { color = '#facc15'; icon = 'alert-triangle'; }
+            if (type === 'step') { color = '#3b82f6'; icon = 'loader-2'; }
+
+            row.style.color = color;
+            row.innerHTML = `<i data-lucide="${icon}" style="width:14px; height:14px; vertical-align:middle; margin-right:8px;"></i>${msg}`;
+            logContent.appendChild(row);
+            lucide.createIcons();
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        document.getElementById('scanBtn').addEventListener('click', async () => {
+            let inputUrl = document.getElementById('urlInput').value.trim();
+            const useCorsProxy = document.getElementById('corsProxy').checked;
+            const resultsContainer = document.getElementById('resultsArea');
+
+            if (!inputUrl) return;
+            if (!inputUrl.startsWith('http')) inputUrl = 'https://' + inputUrl;
+
+            // Reset UI
+            resultsContainer.innerHTML = '';
+            resultsContainer.style.display = 'none';
+            logContainer.style.display = 'block';
+            logContent.innerHTML = '';
+
+            addLog(`Initializing scan for: ${inputUrl}`);
+
+            let headers = {};
+
+            try {
+                let fetchedHtmlContent = null;
+                const startTime = performance.now();
+
+                if (useCorsProxy) {
+                    addLog("Mode: CORS Proxy (Active)", 'warn');
+                    let isFetchSuccessful = false;
+
+                    for (const proxyFn of corsProxyServices) {
+                        try {
+                            const proxyUrl = proxyFn(inputUrl);
+                            // Simple hack to extract domain from the proxy URL for logging
+                            const proxyDomain = new URL(proxyUrl).hostname;
+
+                            addLog(`Connecting via ${proxyDomain}...`, 'step');
+
+                            const controller = new AbortController();
+                            const id = setTimeout(() => controller.abort(), 10000);
+
+                            const fetchResponse = await fetch(proxyUrl, { signal: controller.signal });
+                            clearTimeout(id);
+
+                            if (fetchResponse.ok) {
+                                addLog(`Connection established.`, 'success');
+                                fetchedHtmlContent = await fetchResponse.text();
+
+                                fetchResponse.headers.forEach((val, key) => headers[key.toLowerCase()] = val);
+
+                                if (!fetchedHtmlContent || fetchedHtmlContent.length < 50) {
+                                    addLog(`Response empty via ${proxyDomain}`, 'warn');
+                                    continue;
+                                }
+                                addLog(`Received ${fetchedHtmlContent.length} bytes.`, 'info');
+                                isFetchSuccessful = true;
+                                break;
+                            } else {
+                                addLog(`Proxy returned ${fetchResponse.status}`, 'error');
+                            }
+                        } catch (proxyError) {
+                            addLog(`Proxy failed: ${proxyError.message}`, 'error');
+                        }
+                    }
+                    if (!isFetchSuccessful) throw new Error("All CORS proxies failed.");
+                } else {
+                    addLog("Mode: Direct Fetch", 'warn');
+                    const fetchResponse = await fetch(inputUrl);
+                    if (!fetchResponse.ok) throw new Error(`HTTP Error ${fetchResponse.status}`);
+                    fetchedHtmlContent = await fetchResponse.text();
+                    fetchResponse.headers.forEach((val, key) => headers[key.toLowerCase()] = val);
+                    addLog("Direct fetch successful.", 'success');
+                }
+
+                if (!fetchedHtmlContent) throw new Error("No HTML content received.");
+
+                addLog("Analyzing Security Headers (CSP)...", 'step');
+                await new Promise(r => setTimeout(r, 400)); // Visual delay
+
+                addLog("Parsing dependency graph...", 'step');
+
+                await analyzeHtmlSource(fetchedHtmlContent, inputUrl, headers);
+                addLog("Analysis Complete.", 'success');
+
+            } catch (error) {
+                addLog(`CRITICAL FAILURE: ${error.message}`, 'error');
+                resultsContainer.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--status-error); border-top:1px solid #333; margin-top:1rem;">
+                    <i data-lucide="alert-triangle" style="width:2rem; height:2rem;"></i><br>
+                    <strong>Scan Terminated</strong><br>${error.message}
+                </div>`;
+                resultsContainer.style.display = 'block';
+                lucide.createIcons();
+            }
+        });
+
+        async function analyzeHtmlSource(rawHtml, baseUrl, headers = {}) {
+            const resultsContainer = document.getElementById('resultsArea');
+            const selfHostname = new URL(baseUrl).hostname;
+
+            // --- CSP ANALYSIS (New) ---
+            const cspHeader = headers['content-security-policy'] || headers['Content-Security-Policy'] || "";
+            let cspScore = 0;
+            let cspIssues = [];
+
+            if (cspHeader) {
+                cspScore = 100;
+                if (cspHeader.includes("'unsafe-inline'")) { cspScore -= 30; cspIssues.push("Unsafe Inline Scripts allowed"); }
+                if (cspHeader.includes("'unsafe-eval'")) { cspScore -= 20; cspIssues.push("Unsafe Eval allowed"); }
+                if (cspHeader.includes("data:")) { cspScore -= 10; cspIssues.push("Data URI schemes allowed"); }
+                if (!cspHeader.includes("default-src") && !cspHeader.includes("script-src")) { cspScore -= 20; cspIssues.push("Missing default/script-src"); }
+            } else {
+                cspIssues.push("No CSP Header Found (Critical Risk)");
+            }
+
+            // 1. Extraction
+            const resourceExtractionRegex = /(?:src|href)=["']([^"']+)["']/g;
+            const extractedResourceUrls = [];
+            let regexMatch;
+            while ((regexMatch = resourceExtractionRegex.exec(rawHtml)) !== null) {
+                try {
+                    extractedResourceUrls.push(new URL(regexMatch[1], baseUrl).href);
+                } catch (e) { }
+            }
+
+            // 2. Analysis
+            const domainReferenceCounts = {};
+            const domainResources = {};
+            const resourceTypeCounts = { script: 0, image: 0, css: 0, other: 0 };
+
+            extractedResourceUrls.forEach(resourceUrl => {
+                try {
+                    const parsedUrl = new URL(resourceUrl);
+                    const hostname = parsedUrl.hostname;
+                    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') return;
+
+                    domainReferenceCounts[hostname] = (domainReferenceCounts[hostname] || 0) + 1;
+
+                    if (!domainResources[hostname]) domainResources[hostname] = [];
+                    if (!domainResources[hostname].includes(resourceUrl)) {
+                        domainResources[hostname].push(resourceUrl);
+                    }
+
+                    if (resourceUrl.match(/\.(js|jsx|ts)$/i)) resourceTypeCounts.script++;
+                    else if (resourceUrl.match(/\.(png|jpg|jpeg|gif|webp|svg|ico)$/i)) resourceTypeCounts.image++;
+                    else if (resourceUrl.match(/\.css$/i)) resourceTypeCounts.css++;
+                    else resourceTypeCounts.other++;
+                } catch (e) { }
+            });
+
+            // Calculate Risk Score
+            const externalCount = Object.keys(domainReferenceCounts).length;
+            const thirdPartyDomains = Object.keys(domainReferenceCounts).filter(h => !h.includes(selfHostname) && !selfHostname.includes(h));
+            let finalRisk = 100 - (thirdPartyDomains.length * 2); // -2 per external domain
+            if (!cspHeader) finalRisk -= 40;
+            else finalRisk = (finalRisk + cspScore) / 2;
+
+            finalRisk = Math.max(0, Math.min(100, Math.round(finalRisk)));
+
+            // 3. Render HTML
+            const sortedDomains = Object.entries(domainReferenceCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 50);
+
+            // Generate Layout
+            let generatedUiHtml = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; margin-bottom:2rem; margin-top:2rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:2rem;">
+                    <!-- Risk Score -->
+                    <div class="tool-card" style="text-align:center; padding:2rem; background:rgba(0,0,0,0.3); border:1px solid #333;">
+                        <div style="font-size:3rem; font-weight:800; color:${finalRisk > 70 ? '#10b981' : finalRisk > 40 ? '#facc15' : '#ef4444'};">${finalRisk}</div>
+                        <div style="text-transform:uppercase; letter-spacing:1px; color:#888; font-size:0.8rem;">Supply Chain Security Score</div>
+                    </div>
+                    
+                    <!-- CSP Status -->
+                    <div class="tool-card" style="padding:1.5rem; background:rgba(0,0,0,0.3); border:1px solid #333;">
+                        <h3 style="margin-top:0;"><i data-lucide="shield"></i> CSP Analysis</h3>
+                        ${cspHeader
+                    ? `<div style="color:#10b981; margin-bottom:0.5rem;">Active</div>`
+                    : `<div style="color:#ef4444; margin-bottom:0.5rem;">Missing</div>`}
+                        <div style="font-size:0.85rem; color:#888;">
+                            ${cspIssues.map(i => `<div>â€¢ ${i}</div>`).join('') || "No obvious weaknesses found."}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="height: 300px; margin-bottom: 2rem; position:relative;">
+                    <canvas id="domainChart"></canvas>
+                </div>
+
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-bottom:2rem;">
+                    <div class="data-item" style="border-left: 3px solid var(--tool-accent);">
+                        <div class="data-label">Total Resources</div>
+                        <div class="data-val">${extractedResourceUrls.length}</div>
+                    </div>
+                    <div class="data-item" style="border-left: 3px solid #facc15;">
+                        <div class="data-label">External Domains</div>
+                        <div class="data-val">${Object.keys(domainReferenceCounts).length}</div>
+                    </div>
+                    <div class="data-item" style="border-left: 3px solid #ef4444;">
+                        <div class="data-label">Scripts Found</div>
+                        <div class="data-val">${resourceTypeCounts.script}</div>
+                    </div>
+                </div>
+
+                <h3>Domain Breakdown</h3>
+                <div id="domainList" style="display:grid; grid-template-columns: 1fr; gap:0.5rem; max-height:400px; overflow-y:auto;">
+            `;
+
+            sortedDomains.forEach(([host, count]) => {
+                const isThirdParty = !host.includes(selfHostname) && !selfHostname.includes(host);
+                generatedUiHtml += `
+                    <div class="data-item" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-weight:bold; color:${isThirdParty ? 'var(--text-main)' : 'var(--status-success)'};">${host}</span>
+                            ${isThirdParty ? '<span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; margin-left:8px;">External</span>' : ''}
+                        </div>
+                        <div style="font-family:monospace; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px;">${count} refs</div>
+                    </div>
+                `;
+            });
+            generatedUiHtml += `</div>
+            
+            </div>
+            
+            <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h3 style="margin:0;">ðŸ“‹ Scan Report</h3>
+                    <button onclick="copyReport()" class="tool-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                        <i data-lucide="copy" style="height:14px; margin-right:5px;"></i> Copy Report
+                    </button>
+                </div>
+                <textarea id="scanReportText" style="width:100%; height:150px; background:rgba(0,0,0,0.3); border:1px solid #333; color:#a1a1aa; font-family:monospace; padding:0.5rem; border-radius:4px; font-size:0.8rem;" readonly></textarea>
+            </div>
+
+            <div style="margin-top:2rem; text-align:right; font-size:0.8rem; color:#666;">
+                Proxy Network provided by <a href="https://corsproxy.io/" target="_blank" style="color:#888; text-decoration:underline;">corsproxy.io</a> & <a href="https://allorigins.win/" target="_blank" style="color:#888; text-decoration:underline;">allorigins.win</a>
+            </div>`;
+
+            resultsContainer.innerHTML = generatedUiHtml;
+
+            // Generate Text Report
+            const reportText = generateReportText(
+                baseUrl, finalRisk, cspHeader ? 'Active' : '',
+                extractedResourceUrls.length, sortedDomains, resourceTypeCounts.script,
+                domainResources
+            );
+            document.getElementById('scanReportText').value = reportText;
+
+            // 4. Initialize Chart
+            renderChart(sortedDomains.slice(0, 10));
+
+            resultsContainer.style.display = 'block';
+            lucide.createIcons();
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('domainChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d[0]),
+                    datasets: [{
+                        label: 'Resource References',
+                        data: data.map(d => d[1]),
+                        backgroundColor: '#3b82f6',
+                        borderColor: '#2563eb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function generateReportText(url, risk, cspScore, resources, domains, scripts, domainResources) {
+            const date = new Date().toLocaleString();
+            let text = `SUBRESOURCE SCAN REPORT\n`;
+            text += `=======================\n`;
+            text += `Target: ${url}\n`;
+            text += `Time:   ${date}\n`;
+            text += `Risk Score: ${risk}/100\n`;
+            text += `CSP Status: ${cspScore ? 'Active' : 'Missing (Critical)'}\n`;
+            text += `-----------------------\n`;
+            text += `Total Resources:  ${resources}\n`;
+            text += `External Domains: ${domains.length}\n`;
+            text += `Scripts Found:    ${scripts}\n`;
+            text += `-----------------------\n`;
+            text += `DOMAIN BREAKDOWN:\n`;
+            domains.forEach(d => {
+                const hostname = d[0];
+                text += `- ${hostname.padEnd(30)} : ${d[1]} refs\n`;
+                if (domainResources && domainResources[hostname]) {
+                    domainResources[hostname].forEach(resUrl => {
+                        text += `   * ${resUrl}\n`;
+                    });
+                }
+            });
+            return text;
+        }
+
+        function copyReport() {
+            const copyText = document.getElementById("scanReportText");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+
+            const btn = document.querySelector('button[onclick="copyReport()"]');
+            const original = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="check" style="height:14px; margin-right:5px;"></i> Copied!`;
+            setTimeout(() => { btn.innerHTML = original; lucide.createIcons(); }, 2000);
+        }
+    </script>
+
+
+</body>
+
+</html>

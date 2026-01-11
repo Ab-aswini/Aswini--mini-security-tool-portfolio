@@ -1,0 +1,536 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Search (OSINT) - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        .dork-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .dork-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.25rem;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .dork-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--tool-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .dork-icon {
+            color: var(--tool-accent);
+            margin-bottom: 0.25rem;
+        }
+
+        .dork-title {
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .dork-desc {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            line-height: 1.4;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--tool-accent);
+            color: #000;
+        }
+
+        .dork-section {
+            display: none;
+        }
+
+        .dork-section.active {
+            display: grid;
+        }
+
+        #generatedDorkBox {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            color: #4ade80;
+            word-break: break-all;
+        }
+
+        /* Scan Dashboard Styles */
+        .scan-dashboard {
+            margin-top: 2rem;
+            border-top: 1px solid #333;
+            padding-top: 2rem;
+            display: none;
+        }
+
+        .scan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .scan-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            transition: 0.2s;
+        }
+
+        .scan-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .scan-status-ready {
+            color: var(--tool-accent);
+            font-size: 0.8rem;
+            background: rgba(0, 255, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .deep-scan-btn {
+            background: linear-gradient(45deg, var(--tool-accent), #4f46e5);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            transition: 0.2s;
+        }
+
+        .deep-scan-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .deep-scan-btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .dork-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-tabs {
+                flex-wrap: wrap;
+                /* allow wrapping if needed, or keep scroll */
+            }
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 60rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Public Search Intelligence</h1>
+            <p class="tools-subtitle">Advanced Google Dorking: Uncover exposed files, cloud buckets, cameras, and code.
+            </p>
+        </header>
+
+        <div class="tool-card">
+            <h3 style="margin-bottom:0.5rem;">Target Scope</h3>
+            <div class="input-group" style="margin-bottom:1rem; display:flex; gap:1rem;">
+                <input type="text" id="targetInput" class="tool-input" style="flex:1;"
+                    placeholder="Enter Keyword, Domain, or Name (e.g. example.com)">
+                <button class="deep-scan-btn" onclick="startDeepScan()">
+                    <i data-lucide="radar" style="vertical-align:middle; margin-right:5px;"></i> Deep Auto-Recon
+                </button>
+            </div>
+
+            <div class="category-tabs">
+                <button class="tab-btn active" onclick="switchTab('general')">General</button>
+                <button class="tab-btn" onclick="switchTab('files')">Files & Docs</button>
+                <button class="tab-btn" onclick="switchTab('cloud')">Cloud & Configs</button>
+                <button class="tab-btn" onclick="switchTab('code')">Code & Repos</button>
+                <button class="tab-btn" onclick="switchTab('infrastructure')">Infrastructure</button>
+                <button class="tab-btn" onclick="switchTab('social')">Social & Email</button>
+            </div>
+
+            <!-- General / Broad Search -->
+            <div id="general" class="dork-grid dork-section active">
+                <button class="dork-btn" onclick="runDork('site')">
+                    <i data-lucide="globe" class="dork-icon"></i>
+                    <div class="dork-title">Site Search</div>
+                    <div class="dork-desc">Search EVERYTHING indexed for this domain (site:target.com).</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('related')">
+                    <i data-lucide="link" class="dork-icon"></i>
+                    <div class="dork-title">Related Sites</div>
+                    <div class="dork-desc">Find similar websites or competitors (related:target.com).</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('cache')">
+                    <i data-lucide="history" class="dork-icon"></i>
+                    <div class="dork-title">Cached Version</div>
+                    <div class="dork-desc">View Google's cached copy of the site (cache:target.com).</div>
+                </button>
+            </div>
+
+            <!-- Existing Sections (Hidden by default) -->
+            <div id="files" class="dork-grid dork-section">
+                <!-- ... files content ... -->
+                <button class="dork-btn" onclick="runDork('docs')">
+                    <i data-lucide="file-text" class="dork-icon"></i>
+                    <div class="dork-title">Public Documents</div>
+                    <div class="dork-desc">PDF, DOCX, XLSX, TXT files containing the target name/domain.</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('db')">
+                    <i data-lucide="database" class="dork-icon"></i>
+                    <div class="dork-title">Database Exports</div>
+                    <div class="dork-desc">Find leaked SQL dumps and database backups (.sql, .db).</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('logs')">
+                    <i data-lucide="scroll" class="dork-icon"></i>
+                    <div class="dork-title">Log Files</div>
+                    <div class="dork-desc">Exposed server logs (.log) which may contain passwords or errors.</div>
+                </button>
+            </div>
+            <!-- ... other sections remain unchanged structure-wise, just changing class ... -->
+
+            <div id="cloud" class="dork-grid dork-section">
+                <button class="dork-btn" onclick="runDork('config')">
+                    <i data-lucide="settings" class="dork-icon"></i>
+                    <div class="dork-title">Exposed Configs</div>
+                    <div class="dork-desc">Find .env, .xml, .yml files often hiding API keys/secrets.</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('s3')">
+                    <i data-lucide="cloud" class="dork-icon"></i>
+                    <div class="dork-title">S3 Buckets</div>
+                    <div class="dork-desc">Search for open Amazon S3 buckets related to the target.</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('drive')">
+                    <i data-lucide="hard-drive" class="dork-icon"></i>
+                    <div class="dork-title">Google Drive/Docs</div>
+                    <div class="dork-desc">Find public Google Drive folders and Docs.</div>
+                </button>
+            </div>
+
+            <div id="code" class="dork-grid dork-section">
+                <button class="dork-btn" onclick="runDork('git')">
+                    <i data-lucide="git-branch" class="dork-icon"></i>
+                    <div class="dork-title">Git Exposure</div>
+                    <div class="dork-desc">Find exposed .git folders or index listings.</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('github')">
+                    <i data-lucide="code" class="dork-icon"></i>
+                    <div class="dork-title">GitHub Leaks</div>
+                    <div class="dork-desc">Search GitHub for "API_KEY" or secrets related to target.</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('paste')">
+                    <i data-lucide="clipboard" class="dork-icon"></i>
+                    <div class="dork-title">Pastebin Dumps</div>
+                    <div class="dork-desc">Check Pastebin-like sites for dumped credentials/code.</div>
+                </button>
+            </div>
+
+            <div id="infrastructure" class="dork-grid dork-section">
+                <button class="dork-btn" onclick="runDork('login')">
+                    <i data-lucide="key" class="dork-icon"></i>
+                    <div class="dork-title">Login Portals</div>
+                    <div class="dork-desc">Admin panels, portals, and login pages (inurl:login).</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('dir')">
+                    <i data-lucide="folder-open" class="dork-icon"></i>
+                    <div class="dork-title">Open Directories</div>
+                    <div class="dork-desc">"Index of /" pages exposing raw file directories.</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('iot')">
+                    <i data-lucide="camera" class="dork-icon"></i>
+                    <div class="dork-title">IoT / Cameras</div>
+                    <div class="dork-desc">Exposed webcams or dashboards (generic dorks).</div>
+                </button>
+            </div>
+
+            <div id="social" class="dork-grid dork-section">
+                <button class="dork-btn" onclick="runDork('social')">
+                    <i data-lucide="users" class="dork-icon"></i>
+                    <div class="dork-title">Social Profiles</div>
+                    <div class="dork-desc">Broad search across LinkedIn, Twitter, Instagram, etc.</div>
+                </button>
+                <button class="dork-btn" onclick="runDork('email')">
+                    <i data-lucide="mail" class="dork-icon"></i>
+                    <div class="dork-title">Email Discovery</div>
+                    <div class="dork-desc">Find email addresses (gmail/yahoo/corporate) in text.</div>
+                </button>
+            </div>
+
+            <!-- Single Result Box -->
+            <div id="generatedDorkBox">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                    <div style="font-weight:bold; color:#fff;">Generated Dork</div>
+                    <button onclick="copyDork()"
+                        style="background:transparent; border:none; color:var(--tool-accent); cursor:pointer; font-size:0.8rem;">
+                        <i data-lucide="copy" style="height:1em; vertical-align:middle;"></i> Copy
+                    </button>
+                </div>
+                <code id="dorkCode"></code>
+                <div style="margin-top:1rem; text-align:right;">
+                    <a id="dorkLink" href="#" target="_blank" class="tool-btn"
+                        style="text-decoration:none; display:inline-block;">
+                        Open in Google &rarr;
+                    </a>
+                </div>
+            </div>
+
+            <!-- Deep Scan Dashboard (Hidden by default) -->
+            <div id="scanDashboard" class="scan-dashboard">
+                <div class="scan-header">
+                    <h3 style="margin:0;">Target Analysis Report</h3>
+                    <div id="scanStatus" style="color:#888; font-size:0.9rem;">Initializing...</div>
+                </div>
+
+                <div id="scanList"></div>
+
+                <div style="margin-top:2rem; text-align:center;">
+                    <button onclick="openAllLinks()" class="tool-btn"
+                        style="background:var(--tool-card-light); border:1px solid #555;">
+                        <i data-lucide="external-link" style="vertical-align:middle;"></i> Open All Tabs (Enable Popups)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.dork-section').forEach(s => s.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            // Hide deep scan if switching tabs
+            document.getElementById('scanDashboard').style.display = 'none';
+        }
+
+        // --- Core Dork Generator ---
+        function generateDork(type, target) {
+            target = target.replace('https://', '').replace('http://', '').replace(/\/$/, '');
+            const isDomain = target.includes('.');
+            let safeTarget = `"${target}"`;
+
+            switch (type) {
+                // General
+                case 'site': return `site:${target}`;
+                case 'related': return `related:${target}`;
+                case 'cache': return `cache:${target}`;
+
+                // Specific
+                case 'docs': return `${safeTarget} (filetype:pdf OR filetype:docx OR filetype:xlsx OR filetype:pptx OR filetype:txt)`;
+                case 'db': return `${safeTarget} (filetype:sql OR filetype:db OR filetype:dbf OR filetype:mdb)`;
+                case 'logs': return `${safeTarget} (filetype:log OR intitle:"index of" "log")`;
+                case 'config': return `${safeTarget} (ext:env OR ext:yml OR ext:xml OR ext:conf OR ext:ini)`;
+                case 's3': return `site:s3.amazonaws.com ${safeTarget}`;
+                case 'drive': return `site:docs.google.com OR site:drive.google.com ${safeTarget}`;
+                case 'git': return `intitle:"index of" ".git" ${safeTarget}`;
+                case 'github': return `site:github.com ${safeTarget} "API_KEY" OR "password" OR "secret"`;
+                case 'paste': return `site:pastebin.com OR site:ghostbin.com ${safeTarget}`;
+                case 'login': return isDomain ? `site:${target} inurl:login OR inurl:admin` : `${safeTarget} inurl:login OR inurl:admin`;
+                case 'dir': return isDomain ? `site:${target} intitle:"index of /"` : `${safeTarget} intitle:"index of /"`;
+                case 'iot': return `${safeTarget} (intitle:"webcam 7" OR inurl:"/view.shtml" OR intitle:"Network Camera")`;
+                case 'social': return `${safeTarget} (site:linkedin.com OR site:twitter.com OR site:facebook.com OR site:instagram.com)`;
+                case 'email': return `${safeTarget} ("gmail.com" OR "yahoo.com" OR "hotmail.com" OR "email")`;
+                default: return "";
+            }
+        }
+
+        function runDork(type) {
+            const target = document.getElementById('targetInput').value.trim();
+            if (!target) { alert("Please enter a target first."); return; }
+
+            const query = generateDork(type, target);
+            document.getElementById('dorkCode').innerText = query;
+            document.getElementById('dorkLink').href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            document.getElementById('generatedDorkBox').style.display = 'block';
+            document.getElementById('scanDashboard').style.display = 'none'; // Hide deep scan
+            lucide.createIcons();
+        }
+
+        function copyDork() {
+            const text = document.getElementById('dorkCode').innerText;
+            navigator.clipboard.writeText(text).then(() => { alert("Dork copied to clipboard!"); });
+        }
+
+        // --- Deep Scan Logic ---
+        let generatedLinks = [];
+
+        function startDeepScan() {
+            const target = document.getElementById('targetInput').value.trim();
+            if (!target) { alert("Please enter a target first."); return; }
+
+            const dashboard = document.getElementById('scanDashboard');
+            const list = document.getElementById('scanList');
+            const status = document.getElementById('scanStatus');
+
+            // Reset
+            list.innerHTML = '';
+            generatedLinks = [];
+            document.getElementById('generatedDorkBox').style.display = 'none';
+            dashboard.style.display = 'block';
+            status.innerText = "Analyzing Target Surface...";
+
+            // Categories to scan
+            const scanTypes = [
+                { id: 'docs', name: 'Public Documents', icon: 'file-text' },
+                { id: 'config', name: 'Exposed Configuration', icon: 'settings' },
+                { id: 'git', name: 'Git Repositories', icon: 'git-branch' },
+                { id: 's3', name: 'Cloud Storage Objects', icon: 'cloud' },
+                { id: 'login', name: 'Admin Portals', icon: 'key' },
+                { id: 'social', name: 'Social Footprint', icon: 'users' }
+            ];
+
+            // Simulate scanning effect
+            let delay = 0;
+            scanTypes.forEach(type => {
+                setTimeout(() => {
+                    const query = generateDork(type.id, target);
+                    const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                    generatedLinks.push(url);
+
+                    const div = document.createElement('div');
+                    div.className = 'scan-row';
+                    div.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i data-lucide="${type.icon}" style="color:var(--tool-accent)"></i>
+                            <div>
+                                <div style="font-weight:bold;">${type.name}</div>
+                                <div style="font-size:0.75rem; color:#666;">Query prepared</div>
+                            </div>
+                        </div>
+                        <a href="${url}" target="_blank" class="tool-btn" style="padding:0.4rem 0.8rem; font-size:0.8rem; text-decoration:none;">
+                            View Results &rarr;
+                        </a>
+                    `;
+                    list.appendChild(div);
+                    lucide.createIcons();
+
+                    // Update status
+                    if (generatedLinks.length === scanTypes.length) {
+                        status.innerText = `Scan Complete. ${scanTypes.length} potential vectors identified.`;
+                        status.style.color = "var(--tool-accent)";
+                    }
+                }, delay);
+                delay += 300; // Staggered reveal
+            });
+        }
+
+        function openAllLinks() {
+            if (generatedLinks.length === 0) return;
+            const confirm = window.confirm("Attempting to open " + generatedLinks.length + " tabs. Please allow popups for this site.");
+            if (confirm) {
+                generatedLinks.forEach(url => {
+                    window.open(url, '_blank');
+                });
+            }
+        }
+    </script>
+
+
+    <script src="../assets/js/app.js"></script>
+</body>
+
+</html>

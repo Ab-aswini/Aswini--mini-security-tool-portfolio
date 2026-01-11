@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Explore the Universe Lobby - A 3D interactive gateway to Aswini Behera's projects and digital experiments.">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>Universe Lobby | Portfolio</title>
+    <link rel="canonical" href="https://rouse.co.in/universe.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rouse.co.in/universe.html">
+    <meta property="og:title" content="Universe Lobby | Aswini Behera">
+    <meta property="og:description"
+        content="A 3D interactive gateway to Aswini Behera's projects and digital experiments.">
+    <meta property="og:image" content="https://rouse.co.in/assets/images/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <!-- Deferred Scripts -->
+    <script defer src="assets/js/lucide.min.js"></script>
+    <script defer src="assets/js/component-loader.js"></script>
+    <script defer src="assets/js/app.js"></script>
+    <script defer src="assets/js/decoder.js"></script>
+    <script defer src="assets/js/terminal.js"></script>
+
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+
+
+</head>
+
+<body>
+    <!-- Tubelight Navbar -->
+    <!-- Tubelight Navbar -->
+    <!-- Tubelight Navbar -->
+    <div id="nav-placeholder"></div>
+
+
+
+    <!-- Link Universe Specific Styles -->
+    <link rel="stylesheet" href="assets/css/universe.css">
+
+    <main>
+        <!-- Hero Section -->
+        <section class="universe-hero">
+            <h1 class="hero-title">Welcome to My Universe</h1>
+            <p class="hero-subtext">
+                "I don't work in one direction — I build across technology, business, fitness, life goals, and
+                intelligence tools. This is the structured map of how I grow, what I create, and how I think."
+            </p>
+        </section>
+
+        <!-- Universe Grid -->
+        <div class="universe-container">
+            <div class="universe-grid">
+
+                <!-- Card 1: Tech Projects -->
+                <a href="projects.html#tech" class="universe-card">
+                    <div class="card-icon"><i data-lucide="cpu"></i></div>
+                    <h3 class="card-title">Tech Projects</h3>
+                    <p class="card-desc">Tools, UI experiments, automations, and everything I build using code.</p>
+                    <div class="card-cta">Explore Tech <i data-lucide="arrow-right"></i></div>
+                </a>
+
+                <!-- Card 2: Business Projects -->
+                <a href="projects.html#business" class="universe-card">
+                    <div class="card-icon"><i data-lucide="trending-up"></i></div>
+                    <h3 class="card-title">Business Projects</h3>
+                    <p class="card-desc">Market research, strategy documents, PRDs, and product thinking work.</p>
+                    <div class="card-cta">View Strategy <i data-lucide="arrow-right"></i></div>
+                </a>
+
+                <!-- Card 3: Lifestyle -->
+                <a href="projects.html#lifestyle" class="universe-card">
+                    <div class="card-icon"><i data-lucide="dumbbell"></i></div>
+                    <h3 class="card-title">Lifestyle & Fitness</h3>
+                    <p class="card-desc">The systems I use for discipline, fitness, habits, and personal growth.</p>
+                    <div class="card-cta">See Systems <i data-lucide="arrow-right"></i></div>
+                </a>
+
+                <!-- Card 4: Life Goals -->
+                <a href="projects.html#goals" class="universe-card">
+                    <div class="card-icon"><i data-lucide="rocket"></i></div>
+                    <h3 class="card-title">Life Goals</h3>
+                    <p class="card-desc">My long-term goals and the roadmap of where I am heading.</p>
+                    <div class="card-cta">View Ambitions <i data-lucide="arrow-right"></i></div>
+                </a>
+
+                <!-- Card 5: Failure Library -->
+                <a href="projects.html#failures" class="universe-card">
+                    <div class="card-icon"><i data-lucide="book-x"></i></div>
+                    <h3 class="card-title">Failure Library</h3>
+                    <p class="card-desc">The mistakes, failed attempts, and lessons that shaped my execution.</p>
+                    <div class="card-cta">Read Lessons <i data-lucide="arrow-right"></i></div>
+                </a>
+
+                <!-- Card 6: Intelligence Tools -->
+                <a href="projects.html#tech" class="universe-card">
+                    <div class="card-icon"><i data-lucide="radar"></i></div>
+                    <h3 class="card-title">Intelligence Tools</h3>
+                    <p class="card-desc">A suite of browser-based intelligence tools built with JS (OSINT-Safe).</p>
+                    <div class="card-cta">Open Tools <i data-lucide="arrow-right"></i></div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- System Explanation -->
+        <section class="system-explanation">
+            <h2 class="system-title">Why My Universe Exists</h2>
+            <p class="system-text">
+                I build across multiple domains because real-world products don’t belong to just one category.
+                Tech needs business thinking. Business needs systems. Systems need discipline.
+                Discipline needs goals. Goals need failure to fuel them.
+                <br><br>
+                <strong>This universe connects all of it.</strong>
+            </p>
+        </section>
+    </main>
+
+
+</body>
+
+</html>

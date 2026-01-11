@@ -1,0 +1,648 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Fingerprinter - Archive</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        body {
+            background: #09090b;
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tool-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ec4899, #d946ef);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .url-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        .scan-btn {
+            background: #ec4899;
+            color: white;
+            border: none;
+            padding: 0 2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scan-btn:hover {
+            background: #db2777;
+        }
+
+        /* Results Grid */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            color: #94a3b8;
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Favicon Preview */
+        .favicon-preview-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            background: repeating-conic-gradient(#18181b 0% 25%, #27272a 0% 50%) 50% / 20px 20px;
+            border-radius: 8px;
+            border: 1px dashed #333;
+            margin-bottom: 1rem;
+        }
+
+        .favicon-img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+        }
+
+        .hash-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #ec4899;
+            font-size: 1.1rem;
+            text-align: center;
+            border: 1px solid #333;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .hash-label {
+            font-size: 0.75rem;
+            color: #71717a;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .shodan-btn {
+            display: block;
+            width: 100%;
+            background: rgba(236, 72, 153, 0.1);
+            border: 1px solid #ec4899;
+            color: #ec4899;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            margin-top: auto;
+        }
+
+        .shodan-btn:hover {
+            background: #ec4899;
+            color: white;
+        }
+
+        /* Asset Items */
+        .asset-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #222;
+            font-size: 0.9rem;
+        }
+
+        .asset-item:last-child {
+            border-bottom: none;
+        }
+
+        .asset-key {
+            color: #a1a1aa;
+        }
+
+        .asset-val {
+            color: #fff;
+            font-family: monospace;
+        }
+
+        .asset-val.found {
+            color: #10b981;
+        }
+
+        .asset-val.missing {
+            color: #ef4444;
+        }
+
+        /* Stack Identity */
+        .stack-identity {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .exploit-btn {
+            display: inline-block;
+            background: #ef4444;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-left: 0.5rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #71717a;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Responsive Fixes */
+        @media (max-width: 768px) {
+            .tool-container {
+                padding: 1rem;
+            }
+
+            .tool-title {
+                font-size: 1.75rem;
+                /* Smaller font for mobile */
+                line-height: 1.2;
+            }
+
+            .search-box {
+                flex-direction: column;
+                /* Stack input and button */
+                width: 100%;
+            }
+
+            .url-input,
+            .scan-btn {
+                width: 100%;
+                /* Full width */
+            }
+
+            .tool-header p {
+                font-size: 0.9rem;
+                padding: 0 1rem;
+            }
+        }
+    </style>
+    <!-- Theme Script -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="tool-container">
+        <div class="top-nav">
+            <a href="../tools/lab-architecture.html" class="tool-btn" style="color:#a1a1aa; text-decoration:none;">
+                <i data-lucide="arrow-left" style="height:1em;"></i> Back to Archives
+            </a>
+        </div>
+
+        <div class="tool-header">
+            <h1 class="tool-title">Stack Fingerprinter</h1>
+            <p style="color:#a1a1aa;">Identify Server Tech & Exploit Leads via Hash/Header Analysis.</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="targetUrl" class="url-input" placeholder="https://example.com">
+            <button class="scan-btn" id="scanBtn" onclick="analyzeAssets()">FINGERPRINT</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <i data-lucide="loader-2" class="spin"></i> Extracting Headers, Hashes & Assets...
+        </div>
+
+        <!-- Identity Alert -->
+        <div id="stackIdentity" class="stack-identity">
+            <i data-lucide="check-circle" style="width:16px; display:inline; vertical-align:middle;"></i>
+            <span id="stackName">Unknown Stack</span>
+        </div>
+
+        <div class="result-grid" id="results">
+            <!-- Left: Icon & Hash -->
+            <div class="card">
+                <div class="card-title"><i data-lucide="image"></i> FAVICON HASH</div>
+
+                <div class="favicon-preview-box">
+                    <img id="favImg" class="favicon-img" src="" alt="Favicon">
+                </div>
+
+                <div class="hash-display" id="mmh3Disp" title="Click to Copy">--</div>
+                <div class="hash-label" id="hashLabel">MurmurHash3</div>
+
+                <a href="#" target="_blank" id="shodanLink" class="shodan-btn">
+                    <i data-lucide="search" style="width:14px;"></i> HUNT ON SHODAN
+                </a>
+            </div>
+
+            <!-- Right: Server Stack -->
+            <div class="card">
+                <div class="card-title"><i data-lucide="server"></i> SERVER & HEADERS</div>
+
+                <div class="asset-item">
+                    <span class="asset-key">Server</span>
+                    <span class="asset-val" id="serverHeader">--</span>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-key">Powered By</span>
+                    <span class="asset-val" id="powerHeader">--</span>
+                </div>
+
+                <div style="margin-top:1.5rem;">
+                    <div class="card-title" style="font-size:0.75rem;"><i data-lucide="file-code"
+                            style="width:12px;"></i> ASSETS</div>
+                    <div class="asset-item">
+                        <span class="asset-key">Manifest.json</span>
+                        <span class="asset-val missing" id="manifestStatus">--</span>
+                    </div>
+                    <div class="asset-item">
+                        <span class="asset-key">Security.txt</span>
+                        <span class="asset-val missing" id="securityStatus">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="../assets/js/app.js"></script>
+
+    <script>
+        lucide.createIcons();
+
+        // Known Hash Dictionary (Top Frameworks)
+        const KNOWN_HASHES = {
+            '116323821': 'Spring Boot',
+            '81586312': 'Jenkins',
+            '-1255476057': 'Apache Tomcat',
+            '-1932986423': 'Jetty',
+            '360061327': 'Oracle WebLogic',
+            '-2043621487': 'Kubernetes',
+            '1770281229': 'Vue.js',
+            '10065094': 'React',
+            '-649472304': 'Plesk',
+            '-504221762': 'Jira',
+            '2019770535': 'GitLab',
+            '-695349282': 'Grafana',
+            '300891515': 'Drupal',
+            '-1502930644': 'Cockpit',
+            '-335345751': 'Outlook Web App'
+        };
+
+        async function analyzeAssets() {
+            const input = document.getElementById('targetUrl').value;
+            let url = input.startsWith('http') ? input : 'https://' + input;
+            const domain = new URL(url).hostname;
+
+            // UI Reset
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('stackIdentity').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            try {
+                // Parallel Execution
+                await Promise.allSettled([
+                    analyzeFavicon(url, domain),
+                    analyzeHeaders(url),
+                    checkManifest(domain),
+                    checkSecurityTxt(domain)
+                ]);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('results').style.display = 'grid';
+                lucide.createIcons();
+
+            } catch (e) {
+                // UI Error Display
+                document.getElementById('loading').style.display = 'none';
+                const results = document.getElementById('results');
+                results.style.display = 'block';
+                results.innerHTML = `<div style="grid-column: 1 / -1; color:#ef4444; text-align:center; padding:2rem; border:1px solid #ef4444; border-radius:8px; background:rgba(239,68,68,0.1)">
+                    <strong>Scan Error:</strong> ${e.message}
+                </div>`;
+            }
+        }
+
+        async function analyzeFavicon(url, domain) {
+            try {
+                // Strategy 1: Direct Fetch via Proxy
+                let blob = await fetchFaviconViaProxy(`https://${domain}/favicon.ico`);
+
+                // Strategy 2: Google Fallback (Direct Fetch - Google supports CORS)
+                if (!blob) {
+                    console.warn("Direct favicon failed, trying Google Fallback (Direct)...");
+                    try {
+                        const googleUrl = `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${domain}&size=64`;
+                        const gRes = await fetch(googleUrl); // Direct fetch!
+                        if (gRes.ok) {
+                            blob = await gRes.blob();
+                        }
+                    } catch (gErr) {
+                        console.warn("Google Direct failed:", gErr);
+                    }
+                }
+
+                if (!blob) throw new Error("All favicon sources failed");
+
+                const base64 = await blobToBase64(blob);
+                document.getElementById('favImg').src = base64;
+
+                const buffer = await blob.arrayBuffer();
+                const stdBase64 = arrayBufferToBase64(buffer);
+                const shodanBase64 = insertNewlines(stdBase64);
+                const mmh3 = murmurhash3_32_gc_signed(shodanBase64, 0);
+
+                // Hash Display
+                document.getElementById('mmh3Disp').innerText = mmh3;
+                document.getElementById('mmh3Disp').style.color = '#ec4899';
+                document.getElementById('hashLabel').innerText = "MurmurHash3 (Shodan Format)";
+
+                // DB Lookup
+                if (KNOWN_HASHES[mmh3.toString()]) {
+                    const stack = KNOWN_HASHES[mmh3.toString()];
+                    document.getElementById('stackName').innerText = `IDENTIFIED: ${stack}`;
+                    document.getElementById('stackIdentity').style.display = 'block';
+                    document.getElementById('stackIdentity').style.borderColor = '#10b981';
+                    document.getElementById('stackIdentity').style.color = '#10b981';
+                }
+
+                // Success Link
+                document.getElementById('shodanLink').href = `https://www.shodan.io/search?query=http.favicon.hash:${mmh3}`;
+                document.getElementById('shodanLink').innerHTML = '<i data-lucide="search" style="width:14px;"></i> HUNT HASH ON SHODAN';
+
+            } catch (favErr) {
+                console.warn("Favicon final failure:", favErr);
+                document.getElementById('favImg').src = '';
+                document.getElementById('mmh3Disp').innerText = "Not Found";
+                document.getElementById('mmh3Disp').style.color = '#ef4444';
+                document.getElementById('hashLabel').innerText = "Favicon Missing or Blocked";
+
+                // Fallback Link
+                document.getElementById('shodanLink').href = `https://www.shodan.io/search?query=${domain}`;
+                document.getElementById('shodanLink').innerHTML = '<i data-lucide="globe" style="width:14px;"></i> SEARCH DOMAIN (TEXT)';
+            }
+        }
+
+        async function fetchFaviconViaProxy(targetUrl) {
+            const proxies = [
+                (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+                (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`
+            ];
+
+            for (const proxyGen of proxies) {
+                try {
+                    const controller = new AbortController();
+                    const id = setTimeout(() => controller.abort(), 5000);
+                    const res = await fetch(proxyGen(targetUrl), { signal: controller.signal });
+                    clearTimeout(id);
+
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        const contentType = res.headers.get("content-type");
+                        if (contentType && contentType.includes("application/json")) {
+                            // Some proxies return JSON errors even with a 200 OK simply containing the error body
+                            // We should check if it's actually an image
+                            continue;
+                        }
+                        if (blob.size > 100) return blob;
+                    }
+                } catch (e) {
+                    console.warn("Proxy attempt failed:", e);
+                }
+            }
+            return null;
+        }
+
+        async function analyzeHeaders(url) {
+            const proxies = [
+                { url: (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`, name: 'corsproxy.io' },
+                { url: (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, name: 'allorigins.win' }
+            ];
+
+            for (const proxy of proxies) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+                    const res = await fetch(proxy.url(url), {
+                        method: 'GET',
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
+                    if (res.ok) {
+                        const server = res.headers.get('server') || res.headers.get('x-server') || 'Hidden/Protected';
+                        const powered = res.headers.get('x-powered-by') || 'Unknown';
+
+                        const serverEl = document.getElementById('serverHeader');
+                        serverEl.innerHTML = server;
+
+                        if (server.match(/Apache\/2\.4\.(49|50)/)) {
+                            serverEl.innerHTML += ` <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-41773" target="_blank" class="exploit-btn">CVE-2021-41773</a>`;
+                        }
+
+                        document.getElementById('powerHeader').innerText = powered;
+                        return; // Success, exit
+                    }
+                } catch (e) {
+                    console.warn(`Header scan failed on ${proxy.name}`, e);
+                }
+            }
+
+            // All failed
+            document.getElementById('serverHeader').innerText = "Proxy Network Error";
+            document.getElementById('powerHeader').innerText = "--";
+        }
+
+        async function checkManifest(domain) {
+            try {
+                const url = `https://${domain}/manifest.json`;
+                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+                if (res.ok) {
+                    const json = await res.json();
+                    document.getElementById('manifestStatus').innerText = "FOUND";
+                    document.getElementById('manifestStatus').className = "asset-val found";
+                } else {
+                    document.getElementById('manifestStatus').innerText = "Missing";
+                    document.getElementById('manifestStatus').className = "asset-val missing";
+                }
+            } catch (e) {
+                document.getElementById('manifestStatus').innerText = "Not Found";
+                document.getElementById('manifestStatus').className = "asset-val missing";
+            }
+        }
+
+        async function checkSecurityTxt(domain) {
+            try {
+                const url = `https://${domain}/.well-known/security.txt`;
+                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+                if (res.ok) {
+                    document.getElementById('securityStatus').innerText = "FOUND";
+                    document.getElementById('securityStatus').className = "asset-val found";
+                } else {
+                    document.getElementById('securityStatus').innerText = "Missing";
+                    document.getElementById('securityStatus').className = "asset-val missing";
+                }
+            } catch (e) {
+                document.getElementById('securityStatus').innerText = "Not Found";
+                document.getElementById('securityStatus').className = "asset-val missing";
+            }
+        }
+
+        // --- Helpers ---
+        function blobToBase64(blob) {
+            return new Promise((resolve, _) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function insertNewlines(str) {
+            return str.replace(/(.{76})/g, '$1\n') + '\n';
+        }
+
+        function murmurhash3_32_gc_signed(key, seed) {
+            let remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i;
+            if (key === undefined || key === null) return 0;
+            remainder = key.length & 3; bytes = key.length - remainder; h1 = seed;
+            c1 = 0xcc9e2d51; c2 = 0x1b873593; i = 0;
+            while (i < bytes) {
+                k1 = ((key.charCodeAt(i) & 0xff)) | ((key.charCodeAt(++i) & 0xff) << 8) | ((key.charCodeAt(++i) & 0xff) << 16) | ((key.charCodeAt(++i) & 0xff) << 24);
+                ++i;
+                k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
+                k1 = (k1 << 15) | (k1 >>> 17);
+                k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
+                h1 ^= k1;
+                h1 = (h1 << 13) | (h1 >>> 19);
+                h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
+                h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
+            }
+            k1 = 0;
+            switch (remainder) {
+                case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+                case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+                case 1: k1 ^= (key.charCodeAt(i) & 0xff);
+                    k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+                    k1 = (k1 << 15) | (k1 >>> 17);
+                    k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+                    h1 ^= k1;
+            }
+            h1 ^= key.length;
+            h1 ^= h1 >>> 16;
+            h1 = (((h1 & 0xffff) * 0x85ebca6b) + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+            h1 ^= h1 >>> 13;
+            h1 = ((((h1 & 0xffff) * 0xc2b2ae35) + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+            h1 ^= h1 >>> 16;
+            return h1 | 0;
+        }
+    </script>
+</body>
+
+</html>

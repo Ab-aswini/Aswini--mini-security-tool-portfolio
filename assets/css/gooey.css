@@ -1,0 +1,79 @@
+/* Gooey Text Styles */
+
+:root {
+    --gooey-primary: #111111;
+    --gooey-secondary: #444444;
+    --gooey-glow: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --gooey-primary: #ffffff;
+    --gooey-secondary: #a3a3ff;
+    --gooey-glow: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] {
+    --gooey-primary: #0d0d0d;
+    --gooey-secondary: #4a4aff;
+    --gooey-glow: rgba(0, 0, 0, 0.08);
+    /* Fixed typo in prompt from 0.08 to valid css? Prompt said 0.08, looks fine */
+}
+
+.gooey-container {
+    position: relative;
+    /* Increase height to prevent vertical overlap */
+    height: 300px;
+    /* Add margin to push neighbors away */
+    margin: 1rem 0;
+    display: flex;
+    /* Kept flex here for container alignment, inner wrapper is grid */
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* User's requested text styles: font-bold tracking-tight bg-gradient ... */
+.gooey-text {
+    /* Position handled by Grid Area in JS, remove absolute */
+    display: inline-block;
+    user-select: none;
+    text-align: center;
+
+    /* Reduced Max Size to ensure max 2 lines */
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.25;
+    padding-bottom: 0.2em;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+
+    /* Constrain width to ensure nice wrapping */
+    width: 90%;
+    max-width: 900px;
+    margin: 0 auto;
+
+    /* Gradient & Glow */
+    background: linear-gradient(to right, var(--gooey-primary), var(--gooey-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 12px var(--gooey-glow));
+
+    /* Ensure it handles the blur filter logic from JS */
+    transition: none;
+    will-change: filter, opacity;
+}
+
+@media (min-width: 768px) {
+    .gooey-text {
+        font-size: clamp(3rem, 6vw, 5rem);
+    }
+}
+
+/* Hidden SVG for Filter */
+#gooey-filter-svg {
+    position: absolute;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    pointer-events: none;
+}

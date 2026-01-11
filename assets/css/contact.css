@@ -1,0 +1,220 @@
+/* Contact Page Styles - Universe Theme Alignment */
+
+:root {
+    /* Light Mode (Universe Base) */
+    --contact-bg: #f8f9fa;
+    --contact-text: #1a1a1a;
+    --contact-subtext: #555555;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --accent-color: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="dark"] {
+    /* Dark Mode (Universe Base - Variant: Rose) */
+    --contact-bg: #0E0E13;
+    --contact-text: #ffffff;
+    --contact-subtext: #a1a1aa;
+    --card-bg: rgba(20, 20, 25, 0.6);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --accent-color: #f43f5e;
+    /* Rose Pink */
+    --accent-glow: rgba(244, 63, 94, 0.25);
+}
+
+body.contact-page {
+    background: var(--contact-bg);
+    color: var(--contact-text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* --- Header Section with Cosmic Glow --- */
+.contact-header {
+    position: relative;
+    text-align: center;
+    padding: 8rem 1rem 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Cosmic Glow */
+.contact-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    height: 60vh;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.contact-header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--contact-text) 0%, var(--contact-subtext) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.contact-header p {
+    font-size: 1.1rem;
+    color: var(--contact-subtext);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- Grid Section --- */
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+}
+
+.contact-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    box-shadow: var(--card-shadow);
+}
+
+.contact-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 40px var(--accent-glow);
+}
+
+.contact-card h3 {
+    font-size: clamp(1.1rem, 2vw, 1.25rem);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--contact-text);
+}
+
+.contact-card p {
+    font-size: 0.95rem;
+    color: var(--contact-subtext);
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--contact-text);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s;
+    width: fit-content;
+}
+
+.contact-card:hover .contact-btn {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* --- Scope / Bio Section --- */
+.contact-scope {
+    max-width: 900px;
+    margin: 0 auto 4rem;
+    padding: 3rem 2rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    /* Full border wrapper instead of top/bottom */
+    border-radius: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+    .contact-scope {
+        grid-template-columns: 1fr;
+    }
+}
+
+.scope-col h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--contact-text);
+}
+
+.scope-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.scope-col li {
+    margin-bottom: 0.75rem;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--contact-subtext);
+}
+
+/* Custom Bullets */
+.scope-col.open li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.scope-col.closed li::before {
+    content: "×";
+    position: absolute;
+    left: 0;
+    color: #ef4444;
+    /* Red */
+    font-weight: bold;
+}
+
+/* Bio Strip */
+.bio-strip {
+    text-align: center;
+    padding: 0 1rem 6rem;
+    color: var(--contact-subtext);
+    font-size: 0.95rem;
+}
+
+.bio-strip p {
+    max-width: 600px;
+    margin: 0.5rem auto;
+}

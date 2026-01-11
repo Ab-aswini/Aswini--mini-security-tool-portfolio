@@ -1,0 +1,246 @@
+[
+  {
+    "id": "intel-dashboard",
+    "category": "tech",
+    "title": "Digital Intelligence Dashboard",
+    "icon": "cpu",
+    "overview": "A unified dashboard for digital lookup and productivity.",
+    "description": "Built entirely in the browser with zero backend usage, this system provides structured utilities like username checks, email signal analysis, and metadata tools. Demonstrates frontend architecture skills.",
+    "tags": ["Tech", "Tools", "UI Systems"],
+    "cta": { "text": "View Details", "link": "projects/intel-dashboard.html", "icon": "arrow-right" }
+  },
+  {
+    "id": "micro-tools",
+    "category": "tech",
+    "title": "Micro Tools Suite",
+    "icon": "box",
+    "overview": "Small, fast, browser-based productivity utilities.",
+    "description": "Includes PDF utilities, text processors, and converters — all client-side and privacy-safe. Created to showcase efficient coding and interface clarity.",
+    "tags": ["Tech", "Utilities", "Productivity"],
+    "cta": { "text": "Open Tools", "link": "projects/micro-tools.html", "icon": "external-link" }
+  },
+  {
+    "id": "interactive-sphere",
+    "category": "tech",
+    "title": "Interactive Tech Sphere",
+    "icon": "aperture",
+    "overview": "A visual, animated representation of my tech stack.",
+    "description": "Uses cursor-reactive motion and cosmic aesthetics to create an engaging UI component. Built for performance, responsiveness, and experimental creativity.",
+    "tags": ["Tech", "UI/UX", "Animation"],
+    "cta": { "text": "View Demo", "link": "projects/interactive-sphere.html", "icon": "eye" }
+  },
+  {
+    "id": "automation-systems",
+    "category": "tech",
+    "title": "Automation Workflows",
+    "icon": "workflow",
+    "overview": "Pipelines connecting N8N, WhatsApp, and Notion.",
+    "description": "Automates repetitive tasks and improves operational efficiency using API sequencing and logic. Demonstrates system thinking and integration skills.",
+    "tags": ["Tech", "Automation", "Productivity"],
+    "cta": { "text": "View Breakdown", "link": "projects/automation-systems.html", "icon": "workflow" }
+  },
+  {
+    "id": "messaging-ui",
+    "category": "tech",
+    "title": "Messaging UI Prototype",
+    "icon": "message-square",
+    "overview": "Conceptual messaging interface with interaction layouts.",
+    "description": "Focused on minimal UI structure, layout flow, and clean conversation handling. Built as a design and UX experiment.",
+    "tags": ["Tech", "UI Prototype"],
+    "cta": { "text": "View Prototype", "link": "#", "icon": "image" }
+  },
+  {
+    "id": "landing-sites",
+    "category": "tech",
+    "title": "One-Page Landing Sites",
+    "icon": "layout",
+    "overview": "Clean, fast-loading landing pages for various use cases.",
+    "description": "Modern one-page websites with animations, smooth navigation, and crisp visual hierarchy. Useful for MVPs and client showcases.",
+    "tags": ["Tech", "UI/UX", "Web Dev"],
+    "cta": { "text": "View Pages", "link": "#", "icon": "layers" }
+  },
+  {
+    "id": "vibe-coding",
+    "category": "tech",
+    "title": "Vibe Coding Experiments",
+    "icon": "zap",
+    "overview": "Creative motion and interaction tests.",
+    "description": "Explores GSAP animations, parallax scenes, and cosmic UI patterns. Built to refine frontend animation and creative coding skills.",
+    "tags": ["Tech", "Creative Coding"],
+    "cta": { "text": "View Experiments", "link": "projects/ui-experiments.html", "icon": "zap" }
+  },
+  {
+    "id": "search-tools",
+    "category": "tech",
+    "title": "Search Enhancement Tools",
+    "icon": "search",
+    "overview": "Utilities for structured online searches.",
+    "description": "Generates smart queries and formatting suggestions to improve research workflows. Fully ethical and browser-side.",
+    "tags": ["Tech", "Tools"],
+    "cta": { "text": "View Tool", "link": "#", "icon": "search" }
+  },
+  {
+    "id": "nfc-tech",
+    "category": "tech",
+    "title": "NFC Waste Systems (Tech)",
+    "icon": "wifi",
+    "overview": "Prototype for digital waste tracking using NFC.",
+    "description": "Focused on system workflow, user interactions, and hardware-integration logic.",
+    "tags": ["Tech", "Concept", "Systems"],
+    "cta": { "text": "View Concept", "link": "#", "icon": "cpu" }
+  },
+  {
+    "id": "mofresh",
+    "category": "business",
+    "title": "MoFresh Strategy",
+    "icon": "sprout",
+    "overview": "Comprehensive business plan for a microgreens startup.",
+    "description": "Covers market analysis, pricing strategy, branding, and supply chain ideas. Demonstrates real-world business problem-solving.",
+    "tags": ["Business", "Strategy", "Startup"],
+    "cta": { "text": "View Case Study", "link": "#", "icon": "file-text" }
+  },
+  {
+    "id": "nuroweli",
+    "category": "business",
+    "title": "Nuroweli Brand Concept",
+    "icon": "palette",
+    "overview": "Brand exploration for wellness-oriented products.",
+    "description": "Includes brand positioning, strategy frameworks, and design direction. Demonstrates creative strategy.",
+    "tags": ["Business", "Branding"],
+    "cta": { "text": "View Concept", "link": "#", "icon": "pen-tool" }
+  },
+  {
+    "id": "whatsapp-ecom",
+    "category": "business",
+    "title": "WhatsApp E-Commerce",
+    "icon": "shopping-bag",
+    "overview": "Minimal e-commerce setup for a handloom store.",
+    "description": "Product upload system, catalog structure, and basic admin logic optimized for low-tech environments.",
+    "tags": ["Business", "Tech", "MVP"],
+    "cta": { "text": "View System", "link": "#", "icon": "shopping-bag" }
+  },
+  {
+    "id": "sports-app",
+    "category": "business",
+    "title": "Sports Performance App",
+    "icon": "activity",
+    "overview": "Concept for tracking student sports activity.",
+    "description": "Early sketches, logic planning, and value proposition breakdown for strategy exploration.",
+    "tags": ["Product", "Concept"],
+    "cta": { "text": "View Idea", "link": "#", "icon": "activity" }
+  },
+  {
+    "id": "nfc-biz",
+    "category": "business",
+    "title": "NFC Waste System (Biz)",
+    "icon": "bar-chart-2",
+    "overview": "Business concept parallel to the tech prototype.",
+    "description": "Defined user flow, revenue models, stakeholder mapping, and basic MVP pathways.",
+    "tags": ["Business", "Systems"],
+    "cta": { "text": "View Breakdown", "link": "#", "icon": "bar-chart" }
+  },
+  {
+    "id": "prarabdha",
+    "category": "product",
+    "title": "Prarabdha Ecosystem",
+    "icon": "layers",
+    "overview": "End-to-end preschool learning ecosystem design.",
+    "description": "Includes admin dashboards, teacher/parent apps, habit systems, and gamified learning. My strongest complete product work.",
+    "tags": ["Product", "EdTech", "Strategy"],
+    "highlight": true,
+    "cta": { "text": "View Product", "link": "#", "icon": "star" }
+  },
+  {
+    "id": "fmcg-research",
+    "category": "product",
+    "title": "FMCG Ad Creativity",
+    "icon": "file-text",
+    "overview": "Analysis on creativity and consumer response.",
+    "description": "6-month academic research involving surveys, analysis, and strategic insights into advertising.",
+    "tags": ["Research", "Marketing"],
+    "cta": { "text": "View Study", "link": "#", "icon": "book-open" }
+  },
+  {
+    "id": "ev-behavior",
+    "category": "product",
+    "title": "EV Customer Behavior",
+    "icon": "truck",
+    "overview": "Study of EV customer expectations (Tata & Mahindra).",
+    "description": "Analyzed patterns and market gaps, used during Mahindra EV internship.",
+    "tags": ["Research", "Automotive"],
+    "cta": { "text": "View Insights", "link": "#", "icon": "truck" }
+  },
+  {
+    "id": "abf-work",
+    "category": "product",
+    "title": "Aspirational Districts (ABF)",
+    "icon": "landmark",
+    "overview": "Government documentation and strategy.",
+    "description": "KPI dashboards for health & nutrition, education insights, and rural development mapping.",
+    "tags": ["Research", "Public Policy"],
+    "cta": { "text": "View Summary", "link": "#", "icon": "landmark" }
+  },
+  {
+    "id": "discipline",
+    "category": "lifestyle",
+    "title": "Discipline Framework",
+    "icon": "check-circle",
+    "overview": "Personal system for tracking habits.",
+    "description": "Focused on identity-based habits, consistency, and performance improvement.",
+    "tags": ["Lifestyle", "Systems"],
+    "cta": { "text": "View System", "link": "#", "icon": "check-circle" }
+  },
+  {
+    "id": "fitness",
+    "category": "lifestyle",
+    "title": "Fitness System",
+    "icon": "dumbbell",
+    "overview": "Structured approach to physical growth.",
+    "description": "Practical methods for maintaining physical and mental discipline.",
+    "tags": ["Lifestyle"],
+    "cta": { "text": "Explore", "link": "#", "icon": "dumbbell" }
+  },
+  {
+    "id": "life-goals",
+    "category": "lifestyle",
+    "title": "Life Goals Map",
+    "icon": "target",
+    "overview": "Long-term planning framework.",
+    "description": "1-year and 5-year ambitions, skill roadmap, and execution principles.",
+    "tags": ["Personal", "Systems"],
+    "cta": { "text": "View Goals", "link": "universe/goals.html", "icon": "target" }
+  },
+  {
+    "id": "project-alpha",
+    "category": "failures",
+    "title": "Project Alpha (Abandoned)",
+    "icon": "alert-octagon",
+    "overview": "First attempt at a social graph engine.",
+    "description": "<strong>Why it failed:</strong> Feature creep and lack of clear database schema planning led to unmaintainable spaghetti code.<br><br><strong>Lesson:</strong> Plan the data model before writing the API.",
+    "tags": ["Failed", "Backend"],
+    "failure_tag": "Failed",
+    "failure_color": "#ef4444"
+  },
+  {
+    "id": "crypto-tracker",
+    "category": "failures",
+    "title": "Crypto Tracker v1",
+    "icon": "trending-down",
+    "overview": "Real-time crypto price dashboard.",
+    "description": "<strong>Why it failed:</strong> Relied on free APIs that had strict rate limits, causing the app to crash under load.<br><br><strong>Lesson:</strong> Validate API scalability and error handling early.",
+    "tags": ["Crashed", "API"],
+    "failure_tag": "Crashed",
+    "failure_color": "#ef4444"
+  },
+  {
+    "id": "freelance-market",
+    "category": "failures",
+    "title": "Freelance Marketplace MVP",
+    "icon": "briefcase",
+    "overview": "Platform for local gig workers.",
+    "description": "<strong>Why it failed:</strong> Tried to build for both iOS and Web simultaneously without a team. Burnout struck.<br><br><strong>Lesson:</strong> Focus on one platform first (MVP).",
+    "tags": ["Burnout", "Strategy"],
+    "failure_tag": "Burnout",
+    "failure_color": "#ef4444"
+  }
+]

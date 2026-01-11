@@ -1,0 +1,204 @@
+/* Universe Lobby Styles */
+
+:root {
+    /* Light Mode Mockup */
+    --universe-bg: #f8f9fa;
+    --universe-text: #1a1a1a;
+    --universe-subtext: #555555;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(0, 0, 0, 0.08);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --card-hover-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --accent-color: #2563eb;
+    /* Royal Blue */
+    --accent-glow: rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Mockup */
+    --universe-bg: #0E0E13;
+    --universe-text: #ffffff;
+    --universe-subtext: #a1a1aa;
+    --card-bg: rgba(20, 20, 25, 0.6);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --card-hover-shadow: 0 10px 40px rgba(124, 58, 237, 0.15);
+    /* Purple tint */
+    --accent-color: #8b5cf6;
+    /* Neon Purple */
+    --accent-glow: rgba(139, 92, 246, 0.25);
+}
+
+/* Page Architecture */
+body {
+    background-color: var(--universe-bg);
+    color: var(--universe-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+}
+
+/* Hero Section */
+.universe-hero {
+    position: relative;
+    padding: 8rem 2rem 4rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Cosmic Glow Background Effect */
+.universe-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    height: 60vh;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.hero-title {
+    font-size: clamp(2rem, 5vw + 1rem, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--universe-text) 0%, var(--universe-subtext) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtext {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--universe-subtext);
+    line-height: 1.6;
+}
+
+/* Universe Grid */
+.universe-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.universe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 Columns Desktop */
+    gap: 2rem;
+}
+
+/* Card Design */
+.universe-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+}
+
+.universe-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--card-hover-shadow);
+    border-color: var(--accent-color);
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    background: rgba(128, 128, 128, 0.1);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: background 0.3s;
+}
+
+.universe-card:hover .card-icon {
+    background: var(--accent-glow);
+}
+
+.card-title {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.card-desc {
+    font-size: 0.95rem;
+    color: var(--universe-subtext);
+    line-height: 1.5;
+    flex-grow: 1;
+    /* Pushes CTA to bottom */
+}
+
+.card-cta {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-cta i {
+    transition: transform 0.3s;
+}
+
+.universe-card:hover .card-cta i {
+    transform: translateX(5px);
+}
+
+/* System Explanation Section */
+.system-explanation {
+    text-align: center;
+    padding: 6rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.system-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: 1.5rem;
+}
+
+.system-text {
+    font-size: 1.1rem;
+    color: var(--universe-subtext);
+    line-height: 1.8;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .universe-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 Columns Tablet */
+    }
+}
+
+@media (max-width: 768px) {
+    .universe-grid {
+        grid-template-columns: 1fr;
+        /* 1 Column Mobile */
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+}

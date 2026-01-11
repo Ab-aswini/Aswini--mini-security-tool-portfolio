@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Username Checker - Digital Intelligence Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <style>
+        @media (max-width: 600px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .tools-title {
+                font-size: 2rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <!-- Navbar (Simplified for subpages - Back Link) -->
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 40rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Username Checker</h1>
+            <p class="tools-subtitle">Check username availability across major platforms.</p>
+        </header>
+
+        <div class="tool-card">
+            <div class="input-group">
+                <input type="text" id="usernameInput" class="tool-input" placeholder="Enter username (e.g. Ab-aswini)">
+                <button id="checkBtn" class="tool-btn">Check</button>
+            </div>
+            <div id="resultsArea" class="result-box"></div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        // Platform Configuration
+        // We can only check platforms that expose a public API or allow cross-origin fetching.
+        // For others (Instagram, Facebook), we must fallback to manual links due to strict CORS/Auth policies.
+        const sites = [
+            {
+                name: 'GitHub',
+                urlBuilder: (u) => `https://github.com/${u}`,
+                checkType: 'api',
+                checkFn: async (u) => {
+                    const res = await fetch(`https://api.github.com/users/${u}`);
+                    return res.status === 200 ? 'taken' : (res.status === 404 ? 'available' : 'error');
+                }
+            },
+            {
+                name: 'Reddit',
+                urlBuilder: (u) => `https://www.reddit.com/user/${u}`,
+                checkType: 'api',
+                checkFn: async (u) => {
+                    // Reddit's public JSON API. Note: Likely blocked by CORS on local file, but might work on localhost/production.
+                    // Fallback to manual if fetch fails.
+                    try {
+                        const res = await fetch(`https://www.reddit.com/user/${u}/about.json`);
+                        if (res.ok) return 'taken';
+                        if (res.status === 404) return 'available';
+                        return 'error';
+                    } catch (e) { return 'manual'; }
+                }
+            },
+            { name: 'Instagram', urlBuilder: (u) => `https://www.instagram.com/${u}/`, checkType: 'manual' },
+            { name: 'Twitter / X', urlBuilder: (u) => `https://twitter.com/${u}`, checkType: 'manual' },
+            { name: 'Facebook', urlBuilder: (u) => `https://www.facebook.com/${u}`, checkType: 'manual' },
+            { name: 'LinkedIn', urlBuilder: (u) => `https://www.linkedin.com/in/${u}/`, checkType: 'manual' },
+            { name: 'Medium', urlBuilder: (u) => `https://medium.com/@${u}`, checkType: 'manual' },
+            { name: 'TikTok', urlBuilder: (u) => `https://www.tiktok.com/@${u}`, checkType: 'manual' },
+            { name: 'Telegram', urlBuilder: (u) => `https://t.me/${u}`, checkType: 'manual' }
+        ];
+
+        document.getElementById('checkBtn').addEventListener('click', async () => {
+            const username = document.getElementById('usernameInput').value.trim();
+            const resultsArea = document.getElementById('resultsArea');
+            if (!username) return;
+
+            // Render Initial Cards
+            let html = `<div style="margin-bottom:1rem;">Target: <strong>${username}</strong></div>`;
+            html += `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:0.75rem;">`;
+
+            sites.forEach((site, index) => {
+                const url = site.urlBuilder(username);
+                html += `
+                    <div id="card-${index}" class="tool-card-mini" style="
+                        padding:0.75rem; 
+                        background:var(--tool-bg-light); 
+                        border:1px solid var(--tool-border-light); 
+                        border-radius:6px; 
+                        text-align:center;
+                        transition:0.2s;
+                    ">
+                        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.25rem;">${site.name}</div>
+                        <div id="status-${index}" style="font-size:0.75rem; margin-bottom:0.5rem; color:#888;">
+                            ${site.checkType === 'manual' ? 'Login Wall' : 'Checking...'}
+                        </div>
+                        <a href="${url}" target="_blank" style="
+                            display:inline-block; 
+                            font-size:0.75rem; 
+                            text-decoration:none; 
+                            color:var(--tool-accent); 
+                            border:1px solid var(--tool-accent);
+                            padding:2px 8px;
+                            border-radius:4px;
+                        ">Open Check &rarr;</a>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+
+            // Advanced Search
+            html += `
+                <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid #333;">
+                    <div style="margin-bottom:0.5rem; font-size:0.9rem;">ðŸ” Deep Search (Google Dork):</div>
+                    <a href="https://www.google.com/search?q=%22${username}%22" target="_blank" class="tool-btn" style="text-decoration:none; font-size:0.9rem; padding:0.5rem 1rem;">Search "${username}" Everywhere</a>
+                </div>
+                
+                <div style="margin-top:2rem; text-align:center; font-size:0.75rem; opacity:0.5; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
+                    Data source: Direct platform APIs (GitHub, Reddit) & Client-side Checks
+                </div>
+            `;
+
+            resultsArea.innerHTML = html;
+            resultsArea.classList.add('visible');
+
+            // Run Checks
+            sites.forEach(async (site, index) => {
+                if (site.checkType === 'manual') return;
+
+                const statusEl = document.getElementById(`status-${index}`);
+                const cardEl = document.getElementById(`card-${index}`);
+
+                try {
+                    const result = await site.checkFn(username);
+
+                    if (result === 'taken') {
+                        statusEl.innerHTML = '<span style="color:var(--status-error)">â— Taken (Found)</span>';
+                        cardEl.style.borderColor = 'var(--status-error)';
+                    } else if (result === 'available') {
+                        statusEl.innerHTML = '<span style="color:var(--status-success)">â— Available</span>';
+                        cardEl.style.borderColor = 'var(--status-success)';
+                    } else {
+                        statusEl.innerHTML = '<span>Check Manually</span>';
+                    }
+                } catch (e) {
+                    statusEl.innerHTML = '<span>Check Manually</span>';
+                }
+            });
+        });
+    </script>
+
+    <!-- Hover Footer -->
+    <!-- Hover Footer -->
+
+</body>
+
+</html>

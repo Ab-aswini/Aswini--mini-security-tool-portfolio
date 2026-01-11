@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Intel | Identity System</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Core Libs -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #18181b;
+            --border: #27272a;
+            --accent: #3ca2fa;
+            --danger: #ef4444;
+            --success: #10b981;
+            --text-main: #e4e4e7;
+            --text-muted: #a1a1aa;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        .intel-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* HEADER */
+        .headers {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .badge {
+            background: rgba(60, 162, 250, 0.1);
+            color: var(--accent);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(60, 162, 250, 0.3);
+        }
+
+        /* INPUT */
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .glass-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 1.2rem;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Space Grotesk';
+            font-size: 1.1rem;
+        }
+
+        .glass-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .scan-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 0 3rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .scan-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .scan-btn:disabled {
+            background: #52525b;
+            cursor: not-allowed;
+        }
+
+        /* GRID LAYOUT */
+        .intel-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* SPECIFIC CARDS */
+        .card-summary {
+            grid-column: span 12;
+            border-left: 4px solid var(--accent);
+        }
+
+        .card-graph {
+            grid-column: span 8;
+            height: 500px;
+            /* Explicit height */
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+            /* Ensure visibility */
+        }
+
+        #graph-viz {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .card-risk {
+            grid-column: span 4;
+        }
+
+        .card-layer {
+            grid-column: span 3;
+            min-height: 250px;
+        }
+
+        .card-recon {
+            grid-column: span 6;
+            background: #000;
+            font-family: 'JetBrains Mono';
+            border-color: #333;
+        }
+
+        /* TYPOGRAPHY */
+        h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-big {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .data-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .data-list li {
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .data-list li:last-child {
+            border-bottom: none;
+        }
+
+        .highlight {
+            color: var(--accent);
+        }
+
+        .danger {
+            color: var(--danger);
+        }
+
+        /* PROGRESS */
+        .progress-line {
+            height: 4px;
+            background: var(--border);
+            width: 100%;
+            margin-top: -1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* REPORT TEXT */
+        .report-content {
+            font-family: 'Space Grotesk';
+            line-height: 1.6;
+            color: #d4d4d8;
+            white-space: pre-wrap;
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1s infinite;
+        }
+    </style>
+    <style>
+        @media (max-width: 900px) {
+            .intel-container {
+                padding: 1rem;
+            }
+
+            .headers {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .scan-btn {
+                width: 100%;
+                padding: 1rem 0;
+            }
+
+            /* Grid Collapse */
+            .intel-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                grid-column: span 1 !important;
+            }
+
+            .card-graph {
+                height: 350px;
+            }
+
+            .stat-big {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="intel-container">
+
+        <!-- HEADER -->
+        <div class="headers">
+            <div class="title">DEEP INTEL <span class="badge">V3.0 (8-LAYER)</span></div>
+            <a href="../tools.html"
+                style="color:var(--text-muted); text-decoration:none; display:flex; align-items:center; gap:0.5rem;">
+                <i data-lucide="arrow-left"></i> Exit
+            </a>
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="search-box">
+            <input type="text" id="targetInput" class="glass-input"
+                placeholder="Enter domain (e.g. example.com) to generate full dossier...">
+            <button id="scanBtn" class="scan-btn" onclick="startScan()">INITIATE SCAN</button>
+            <button class="scan-btn" onclick="exportData()"
+                style="background:var(--card); border:1px solid var(--border); color:var(--text-main); padding:0 2rem; margin-left:0.5rem;"
+                title="Download JSON Report">
+                <i data-lucide="download"></i>
+            </button>
+        </div>
+        <div class="progress-line">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <!-- MAIN DASHBOARD -->
+        <div class="intel-grid">
+
+            <!-- ROW 1: SUMMARY & RISK -->
+            <div class="card card-summary">
+                <h3><i data-lucide="file-text"></i> Intelligence Report (Human-Readable)</h3>
+                <div id="reportArea" class="report-content">Ready to generate report. Enter a domain and scan.</div>
+            </div>
+
+            <!-- ROW 2: GRAPH & RISK METRICS -->
+            <div class="card card-graph">
+                <div id="graph-viz" style="width:100%; height:100%;"></div>
+                <div
+                    style="position:absolute; bottom:1rem; left:1rem; background:rgba(0,0,0,0.7); padding:0.5rem; border-radius:4px; font-size:0.7rem; color:#aaa; pointer-events:none;">
+                    <span style="color:#fff">●</span> Domain
+                    <span style="color:#3ca2fa">●</span> Tech/Infra
+                    <span style="color:#ef4444">●</span> Identity/Risks
+                    <span style="color:#a855f7">●</span> Subdomains
+                </div>
+            </div>
+
+            <div class="card card-risk">
+                <h3><i data-lucide="shield-alert"></i> Risk Profile</h3>
+                <div class="stat-big" id="riskScore">0/100</div>
+                <div class="stat-label">Overall Risk Score</div>
+                <div style="margin-top:1.5rem;">
+                    <ul class="data-list" id="riskList">
+                        <li><span>Technical Risk</span> <span class="highlight">--</span></li>
+                        <li><span>Identity Concealment</span> <span class="highlight">--</span></li>
+                        <li><span>Supply Chain</span> <span class="highlight">--</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ROW 3: THE 8 LAYERS -->
+            <!-- Layer 1: DNS -->
+            <div class="card card-layer">
+                <h3><i data-lucide="server"></i> 1. DNS & Identity</h3>
+                <ul class="data-list" id="layer1_data">
+                    <li>Waiting...</li>
+                </ul>
+            </div>
+
+            <!-- Layer 3+: Infra -->
+            <div class="card card-layer">
+                <h3><i data-lucide="globe"></i> 3/4. Infra & ASN</h3>
+                <ul class="data-list" id="layer3_data">
+                    <li>Waiting...</li>
+                </ul>
+            </div>
+
+            <!-- Layer 6: Tech -->
+            <div class="card card-layer">
+                <h3><i data-lucide="code"></i> 6. Tech Stack</h3>
+                <div id="techTags" style="display:flex; gap:0.5rem; flex-wrap:wrap;"></div>
+            </div>
+
+            <!-- Layer 8: Business -->
+            <div class="card card-layer">
+                <h3><i data-lucide="briefcase"></i> 8. Business ID</h3>
+                <ul class="data-list" id="layer8_data">
+                    <li>Waiting...</li>
+                </ul>
+            </div>
+
+            <!-- ROW 4: RECON CONSOLE -->
+            <div class="card card-recon">
+                <h3><span class="live-dot"></span> Active Recon Console</h3>
+                <div id="consoleLog" style="height:200px; overflow-y:auto; color:#10b981; font-size:0.8rem;">
+                    _ system ready...
+                </div>
+            </div>
+
+            <div class="card card-recon" style="border-color:#ef4444;">
+                <h3><i data-lucide="alert-triangle" style="color:#ef4444;"></i> Vulnerabilities</h3>
+                <ul class="data-list" id="vulnList">
+                    <li><span style="color:#52525b">No vulnerabilities detected yet.</span></li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // STATE
+        const state = {
+            domain: '',
+            progress: 0,
+            graphNodes: [],
+            graphLinks: [],
+            intel: {
+                dns: [],
+                tech: [],
+                ids: [],
+                recon: [],
+                openPorts: [],
+                headers: {}
+            }
+        };
+
+        // --- MAIN CONTROLLER ---
+        async function startScan() {
+            const input = document.getElementById('targetInput').value.trim();
+            state.domain = input.replace(/https?:\/\//, '').replace(/\/$/, '');
+            if (!state.domain) return;
+
+            // Reset
+            resetUI();
+            log("Initialising scan for target: " + state.domain);
+            updateProgress(5);
+            state.graphNodes = [{ id: state.domain, group: 1, radius: 25 }];
+            renderGraph(); // Init graph immediately
+
+            try {
+                // PARALLEL EXECUTION OF LAYERS
+
+                // 1. Passive HTML & Identity (Layers 5, 6, 8)
+                log("Fetching source code (Proxy)...");
+                const html = await fetchSource(state.domain);
+                updateProgress(20);
+
+                analyzeHTML(html); // Tech, Scripts, IDs
+                updateProgress(40);
+
+                // 2. DNS & Infra (Layers 1, 3, 4)
+                log("Querying DNS & Infrastructure...");
+                await fetchDNS(state.domain);
+                updateProgress(60);
+
+                // 3. Subdomains (Layer 1 Extended)
+                log("Mapping Subdomains (CRT.SH)...");
+                await fetchSubdomains(state.domain);
+                updateProgress(75);
+
+                // 4. Active Recon (Intrusive)
+                log("Starting Active Directory Enumeration...");
+                await runActiveRecon(state.domain);
+                updateProgress(90);
+
+                // 5. Finalize
+                generateReport();
+                updateProgress(100);
+                log("Scan Complete.");
+
+            } catch (e) {
+                console.error(e);
+                log("CRITICAL ERROR: " + e.message);
+                alert("Scan failed: " + e.message);
+            }
+        }
+
+        // --- DATA FETCHERS ---
+
+        async function fetchSource(domain) {
+            try {
+                const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://' + domain)}`;
+                const res = await fetch(proxy);
+                if (!res.ok) throw new Error("Target unreachable");
+                state.intel.headers = Object.fromEntries(res.headers.entries()); // Capture headers if possible (basic)
+                return await res.text();
+            } catch (e) {
+                log("Source Fetch Error: " + e.message);
+                return "";
+            }
+        }
+
+        async function fetchDNS(domain) {
+            try {
+                // Google DNS over HTTPS
+                const res = await fetch(`https://dns.google/resolve?name=${domain}`);
+                const json = await res.json();
+
+                const list = document.getElementById('layer1_data');
+                list.innerHTML = '';
+
+                if (json.Answer) {
+                    json.Answer.forEach(rec => {
+                        const type = rec.type === 1 ? 'A' : (rec.type === 28 ? 'AAAA' : 'REC');
+                        list.innerHTML += `<li><span>${type} Record</span> <span class="highlight">${rec.data}</span></li>`;
+
+                        // Add IP to graph
+                        if (rec.type === 1) addToGraph(rec.data, 2, state.domain);
+                    });
+                } else {
+                    list.innerHTML = '<li><span>No standard records</span></li>';
+                }
+
+                // Mock ASN info (Real ASN requires paid API usually, or complex scraping)
+                document.getElementById('layer3_data').innerHTML = `
+                <li><span>Provider</span> <span class="highlight">${detectProvider(state.intel.headers)}</span></li>
+                <li><span>Server</span> <span>${state.intel.headers['server'] || 'Hidden'}</span></li>
+            `;
+
+            } catch (e) { log("DNS Error: " + e.message); }
+        }
+
+        async function fetchSubdomains(domain) {
+            try {
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://crt.sh/?q=%.${domain}&output=json`)}`);
+                const json = await res.json();
+                const data = JSON.parse(json.contents);
+                const subs = [...new Set(data.map(d => d.name_value))];
+
+                log(`Found ${subs.length} subdomains via Certificates.`);
+
+                // Add top 10 to graph
+                subs.slice(0, 10).forEach(s => {
+                    const sub = s.split('\n')[0];
+                    if (sub !== domain) addToGraph(sub, 4, domain);
+                });
+                renderGraph();
+            } catch (e) { log("Subdomain Error (non-fatal)"); }
+        }
+
+        async function runActiveRecon(domain) {
+            const paths = ['/robots.txt', '/sitemap.xml', '/.env', '/wp-admin', '/admin', '/backup.zip', '/.git/HEAD', '/api/docs'];
+            const vulnList = document.getElementById('vulnList');
+
+            let found = 0;
+            for (let path of paths) {
+                log(`Probing ${path}...`);
+                try {
+                    // Using NO-CORS mode fetch to probe. 
+                    // We assume if it resolves without error, it exists (opaque).
+                    // Wait, allorigins is better for status code.
+                    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://' + domain + path)}`;
+                    const res = await fetch(proxy);
+                    if (res.ok) {
+                        log(`[FOUND] ${path}`);
+                        if (found === 0) vulnList.innerHTML = '';
+                        vulnList.innerHTML += `<li class="danger"><span>Exposed File</span> <span>${path}</span></li>`;
+                        addToGraph(path, 3, domain); // Risk node
+                        found++;
+                    }
+                } catch (e) { }
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+
+        // --- ANALYZERS ---
+
+        function analyzeHTML(html) {
+            // Tech
+            let tech = [];
+            if (html.includes('wp-content')) tech.push('WordPress');
+            if (html.includes('react')) tech.push('React');
+            if (html.includes('bootstrap')) tech.push('Bootstrap');
+            if (html.includes('jquery')) tech.push('jQuery');
+            if (html.includes('shopify')) tech.push('Shopify');
+            state.intel.tech = tech;
+
+            document.getElementById('techTags').innerHTML = tech.map(t => `<span class="badge">${t}</span>`).join('');
+
+            // Identity (Layer 8)
+            const idList = document.getElementById('layer8_data');
+            idList.innerHTML = '';
+            const regex = {
+                'UA': /UA-[0-9]+-[0-9]+/g,
+                'G-': /G-[A-Z0-9]{6,}/g,
+                'Pub': /pub-[0-9]{16}/g,
+                'Email': /[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}/g
+            };
+
+            let foundIds = false;
+            Object.keys(regex).forEach(k => {
+                const match = html.match(regex[k]);
+                if (match) {
+                    [...new Set(match)].forEach(m => {
+                        if (k === 'Email' && (m.includes('.png') || m.includes('.jpg'))) return;
+                        idList.innerHTML += `<li><span>${k} ID</span> <span class="highlight">${m}</span></li>`;
+                        addToGraph(m, 3, state.domain);
+                        state.intel.ids.push(`${k}: ${m}`);
+                        foundIds = true;
+                    });
+                }
+            });
+            if (!foundIds) idList.innerHTML = '<li><span>No public trackers found</span></li>';
+
+            // Scripts (Supply Chain)
+            const parser = new DOMParser().parseFromString(html, 'text/html');
+            Array.from(parser.querySelectorAll('script[src]')).slice(0, 15).forEach(s => {
+                try {
+                    const host = new URL(s.src, `https://${state.domain}`).hostname;
+                    if (host !== state.domain) addToGraph(host, 2, state.domain);
+                } catch (e) { }
+            });
+
+            renderGraph();
+        }
+
+        // --- REPORT GENERATION (Layer 7 Simulation) ---
+        function generateReport() {
+            const s = state;
+            const techCount = s.intel.tech.length;
+            const idCount = s.intel.ids.length;
+            const subCount = s.graphNodes.filter(n => n.group === 4).length;
+
+            // Risk Calc
+            let risk = 0;
+            if (techCount > 3) risk += 10; // Bloated
+            if (subCount > 20) risk += 20; // Large attack surface
+            if (idCount === 0) risk += 30; // Suspiciously clean (Hidden)
+            if (s.intel.tech.includes('WordPress')) risk += 15;
+            document.getElementById('riskScore').innerText = `${risk}/100`;
+
+            // Natural Language Generation
+            let text = `TARGET: ${s.domain.toUpperCase()}\n\n`;
+            text += `SUMMARY:\n`;
+            text += `The target appears to be a ${techCount > 0 ? s.intel.tech.join('/') + ' based' : 'custom'} web application. `;
+            text += `We identified ${subCount} subdomains and ${idCount} tracking identities, suggesting a ${subCount > 10 ? 'large, distributed' : 'small, focused'} infrastructure.\n\n`;
+
+            text += `SUPPLY CHAIN:\n`;
+            text += `The site relies on ${s.graphNodes.filter(n => n.group === 2).length} external nodes (scripts/IPs). This visual complexity is mapped in the graph below.\n\n`;
+
+            text += `IDENTITY ANALYSIS:\n`;
+            if (idCount > 0) {
+                text += `High-confidence attribution possible. Detected usage of ${s.intel.ids.join(', ')}. These IDs can be correlated to find other assets owned by the same entity.\n\n`;
+            } else {
+                text += `Target is maintaining high OPSEC. No Analytics or AdSense IDs were exposed in the source code. This anonymity increases the Risk Score.\n\n`;
+            }
+
+            text += `RECOMMENDATION:\n`;
+            text += risk > 50 ? `High Risk. Proceed with caution. Inspect the 'Active Recon' log for specific vulnerabilities.` : `Moderate Risk. Standard security posture observed.`;
+
+            document.getElementById('reportArea').innerText = text;
+        }
+
+        // --- GRAPH ENGINE ---
+        function addToGraph(id, group, parent) {
+            if (!id || state.graphNodes.find(n => n.id === id)) return;
+
+            const radius = group === 1 ? 25 : (group === 3 ? 15 : 8);
+            const color = group === 1 ? '#fff' : (group === 2 ? '#3ca2fa' : (group === 3 ? '#ef4444' : '#a855f7'));
+
+            state.graphNodes.push({ id: id, group, radius, color });
+            state.graphLinks.push({ source: parent, target: id });
+        }
+
+        function renderGraph() {
+            const container = document.getElementById('graph-viz');
+            container.innerHTML = '';
+
+            let width = container.clientWidth || 800;
+            let height = container.clientHeight || 500;
+
+            const svg = d3.select("#graph-viz").append("svg")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("viewBox", `0 0 ${width} ${height}`)
+                .style("display", "block");
+
+            const simulation = d3.forceSimulation(state.graphNodes)
+                .force("link", d3.forceLink(state.graphLinks).id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collide", d3.forceCollide().radius(d => d.radius + 15));
+
+            const link = svg.append("g").selectAll("line")
+                .data(state.graphLinks).enter().append("line")
+                .attr("stroke", "#333").attr("stroke-width", 1);
+
+            const node = svg.append("g").selectAll("circle")
+                .data(state.graphNodes).enter().append("circle")
+                .attr("r", d => d.radius)
+                .attr("fill", d => d.color || '#777')
+                .attr("stroke", "#000").attr("stroke-width", 1.5)
+                .call(d3.drag()
+                    .on("start", (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+                    .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
+                    .on("end", (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
+                );
+
+            const label = svg.append("g").selectAll("text")
+                .data(state.graphNodes).enter().append("text")
+                .text(d => d.id)
+                .attr("font-size", "10px")
+                .attr("fill", "#ccc")
+                .attr("dx", 12)
+                .attr("dy", 4)
+                .style("pointer-events", "none");
+
+            simulation.on("tick", () => {
+                link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+                node.attr("cx", d => d.x).attr("cy", d => d.y);
+                label.attr("x", d => d.x).attr("y", d => d.y);
+            });
+
+            // RESIZE OBSERVER (Fixed)
+            const resizeObserver = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const newW = entry.contentRect.width;
+                    const newH = entry.contentRect.height;
+                    if (newW > 0 && newH > 0) {
+                        svg.attr("viewBox", `0 0 ${newW} ${newH}`);
+                        simulation.force("center", d3.forceCenter(newW / 2, newH / 2));
+                        simulation.alpha(0.3).restart();
+                    }
+                }
+            });
+            resizeObserver.observe(container);
+        }
+
+
+        // --- UTILS ---
+        function log(msg) {
+            const con = document.getElementById('consoleLog');
+            con.innerHTML += `<div>> ${msg}</div>`;
+            con.scrollTop = con.scrollHeight;
+        }
+
+        function updateProgress(pct) {
+            document.getElementById('progressBar').style.width = pct + '%';
+        }
+
+        function resetUI() {
+            state.graphNodes = [];
+            state.graphLinks = [];
+            document.getElementById('reportArea').innerText = 'Generating deeply analyzing report...';
+            document.getElementById('vulnList').innerHTML = '<li>Scanning...</li>';
+            document.getElementById('consoleLog').innerHTML = '';
+        }
+
+        function detectProvider(headers) {
+            if (!headers) return 'Unknown';
+            if (headers['server'] && headers['server'].includes('cloudflare')) return 'Cloudflare';
+            if (headers['via'] && headers['via'].includes('cloudfront')) return 'AWS CloudFront';
+            return 'Generic Hosting';
+        }
+
+        function exportData() {
+            if (!state.domain) { alert("Please run a scan first."); return; }
+
+            const report = {
+                target: state.domain,
+                timestamp: new Date().toISOString(),
+                risk_score: document.getElementById('riskScore').innerText,
+                summary: document.getElementById('reportArea').innerText,
+                intelligence: state.intel,
+                graph_node_count: state.graphNodes.length,
+                graph_link_count: state.graphLinks.length,
+                graph_nodes: state.graphNodes
+            };
+
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${state.domain.replace(/\./g, '_')}_intel_report.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+</body>
+
+</html>

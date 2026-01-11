@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog | Portfolio</title>
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <!-- Deferred Scripts -->
+    <script defer src="assets/js/lucide.min.js"></script>
+    <script defer src="assets/js/component-loader.js"></script>
+    <script defer src="assets/js/app.js"></script>
+    <script defer src="assets/js/decoder.js"></script>
+    <script defer src="assets/js/terminal.js"></script>
+
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+</head>
+
+<body class="changelog-page">
+    <!-- Tubelight Navbar -->
+    <div id="nav-placeholder"></div>
+
+
+
+    <main>
+        <h1>Changelog</h1>
+        <p>Project updates and history.</p>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+</body>
+
+</html>

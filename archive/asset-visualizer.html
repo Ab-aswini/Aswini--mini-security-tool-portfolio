@@ -1,0 +1,731 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Supply Chain Visualizer - Archive</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        body {
+            overflow: hidden;
+            /* Full screen graph */
+            background: #09090b;
+            /* Zinc-950 - Tech Theme Background */
+            margin: 0;
+            padding: 0;
+        }
+
+        #viz-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        .ui-layer {
+            position: relative;
+            z-index: 10;
+            pointer-events: none;
+            /* Let clicks pass through to graph where possible */
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            pointer-events: auto;
+            z-index: 20;
+        }
+
+        /* --- SEARCH BAR --- */
+        .search-container {
+            position: absolute;
+            top: 5rem;
+            /* Moved down to avoid overlap */
+            left: 2rem;
+            width: 350px;
+            pointer-events: auto;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 20;
+        }
+
+        .search-input {
+            flex: 1;
+            background: rgba(9, 9, 11, 0.9);
+            border: 1px solid #27272a;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3ca2fa;
+            box-shadow: 0 0 15px rgba(60, 162, 250, 0.2);
+        }
+
+        .search-btn {
+            background: #3ca2fa;
+            color: #000;
+            border: none;
+            padding: 0 1.25rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: hover 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: #2b93e6;
+            box-shadow: 0 0 10px #2b93e6;
+        }
+
+        .scan-status {
+            position: absolute;
+            top: 8.5rem;
+            left: 2rem;
+            font-size: 0.75rem;
+            color: #3ca2fa;
+            background: rgba(9, 9, 11, 0.8);
+            padding: 4px 12px;
+            border: 1px solid rgba(60, 162, 250, 0.3);
+            border-radius: 4px;
+            display: none;
+            font-family: monospace;
+            pointer-events: none;
+        }
+
+        /* --- DATA LOG / FLIGHT RECORDER --- */
+        .log-panel {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            bottom: 1rem;
+            width: 320px;
+            background: rgba(9, 9, 11, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #27272a;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 30;
+        }
+
+        .log-header {
+            padding: 1rem;
+            border-bottom: 1px solid #27272a;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+        }
+
+        .log-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* Scrollbar Styling */
+        .log-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .log-content::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+
+        .log-content::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            background: rgba(20, 20, 25, 0.4);
+            border: 1px solid #27272a;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            position: relative;
+            transition: all 0.2s;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-entry:hover {
+            border-color: #52525b;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .log-entry.js {
+            border-left: 3px solid #ef4444;
+        }
+
+        .log-entry.css {
+            border-left: 3px solid #3ca2fa;
+        }
+
+        .log-entry.img {
+            border-left: 3px solid #10b981;
+        }
+
+        .log-entry.other {
+            border-left: 3px solid #9ca3af;
+        }
+
+        .log-name {
+            color: #f3f4f6;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            word-break: break-all;
+            line-height: 1.3;
+        }
+
+        .log-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #9ca3af;
+            font-family: monospace;
+            font-size: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .log-link {
+            display: inline-block;
+            color: #3ca2fa;
+            text-decoration: none;
+            font-size: 0.7rem;
+            border: 1px solid rgba(60, 162, 250, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .log-link:hover {
+            background: rgba(60, 162, 250, 0.1);
+        }
+
+        .empty-log {
+            text-align: center;
+            color: #52525b;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            pointer-events: auto;
+            background: rgba(9, 9, 11, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #27272a;
+            z-index: 20;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #d1d5db;
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot-js {
+            background: #ef4444;
+        }
+
+        .dot-css {
+            background: #3ca2fa;
+        }
+
+        .dot-img {
+            background: #10b981;
+        }
+
+        .dot-other {
+            background: #9ca3af;
+        }
+
+        /* D3 Styles - Tech Map */
+        .node circle {
+            stroke: #09090b;
+            stroke-width: 1.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .node:hover circle {
+            stroke-width: 2px;
+            stroke: #fff;
+            transform: scale(1.3);
+        }
+
+        .link {
+            stroke: #27272a;
+            stroke-opacity: 0.4;
+            stroke-width: 1px;
+        }
+
+        .synapse {
+            fill: #3ca2fa;
+            filter: drop-shadow(0 0 2px #3ca2fa);
+            pointer-events: none;
+        }
+    </style>
+    <style>
+        @media (max-width: 800px) {
+            .ui-layer {
+                padding: 1rem;
+            }
+
+            .search-container {
+                top: 4rem;
+                width: 90%;
+                left: 5%;
+                transform: none;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .log-panel {
+                width: 100%;
+                height: 30vh;
+                top: auto;
+                bottom: 0;
+                right: 0;
+                border-left: none;
+                border-top: 1px solid #333;
+            }
+
+            .legend {
+                bottom: 32vh;
+                left: 1rem;
+            }
+
+            .top-bar {
+                top: 1rem;
+                left: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="viz-container"></div>
+
+    <div class="ui-layer">
+        <!-- Top Left Navigation -->
+        <div class="top-bar">
+            <a href="../tools/lab-architecture.html" class="tool-btn">
+                <i data-lucide="arrow-left"></i> Back to Lab
+            </a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" class="search-input" id="targetUrl" placeholder="Enter remote URL (e.g. google.com)">
+            <button class="search-btn" onclick="startScan()">
+                <i data-lucide="scan-line"></i>
+            </button>
+        </div>
+        <div class="scan-status" id="scanStatus">STATUS: IDLE</div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item"><span class="dot dot-js"></span> Script (JS)</div>
+            <div class="legend-item"><span class="dot dot-css"></span> Style (CSS)</div>
+            <div class="legend-item"><span class="dot dot-img"></span> Media (IMG)</div>
+            <div class="legend-item"><span class="dot dot-other"></span> Other</div>
+        </div>
+
+        <!-- Right Side Data Log -->
+        <div class="log-panel">
+            <div class="log-header">
+                <span><i data-lucide="clipboard-list"
+                        style="width:16px; display:inline-block; vertical-align:middle; margin-right:6px;"></i> ASSET
+                    LOG</span>
+                <span
+                    style="font-size:0.7rem; color:#71717a; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px;"
+                    id="logCount">0 ITEMS</span>
+            </div>
+            <div class="log-content" id="logContent">
+                <div class="empty-log">
+                    <i data-lucide="mouse-pointer-2"
+                        style="width:24px; height:24px; opacity:0.5; margin-bottom:0.5rem;"></i><br>
+                    Select nodes in the graph<br>to capture asset data.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let simulation, svg, g, link, node;
+        let currentData = { nodes: [], links: [] };
+        const loggedIds = new Set(); // Prevent duplicates in log
+
+        function initD3() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            svg = d3.select("#viz-container")
+                .append("svg")
+                .attr("viewBox", [0, 0, width, height])
+                .style("background", "transparent")
+                .call(d3.zoom().scaleExtent([0.1, 8]).on("zoom", (event) => {
+                    g.attr("transform", event.transform);
+                }));
+
+            g = svg.append("g");
+
+            link = g.append("g").attr("class", "links").selectAll("line");
+            node = g.append("g").attr("class", "nodes").selectAll("circle");
+
+            // Physics adjusted for STABILITY (High decay, center force)
+            simulation = d3.forceSimulation()
+                .force("link", d3.forceLink().id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collide", d3.forceCollide().radius(20))
+                .alphaDecay(0.06); // Settle faster
+
+            simulation.on("tick", ticked);
+        }
+
+        function ticked() {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+        }
+
+        // --- Data Collection (Local) ---
+        function collectLocalAssets() {
+            const navEntry = performance.getEntriesByType("navigation")[0];
+            const resources = performance.getEntriesByType("resource");
+            const nodes = [];
+            const links = [];
+
+            // Central Node
+            nodes.push({
+                id: "root",
+                name: window.location.hostname || "Localhost",
+                type: "root",
+                size: navEntry ? navEntry.transferSize : 0,
+                domain: window.location.hostname
+            });
+
+            resources.forEach((res) => {
+                const url = new URL(res.name);
+                const fileType = getFileType(res.name, res.initiatorType);
+                nodes.push({
+                    id: res.name,
+                    name: url.pathname.split('/').pop() || url.hostname,
+                    fullUrl: res.name,
+                    type: fileType,
+                    size: res.transferSize,
+                    duration: res.duration,
+                    domain: url.hostname
+                });
+                links.push({ source: "root", target: res.name });
+            });
+            return { nodes, links };
+        }
+
+        // --- Data Collection (Remote) ---
+        async function fetchRemoteAssets(targetUrl) {
+            if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
+
+            setStatus(`CONNECTING TO ${targetUrl.toUpperCase()}...`);
+
+            try {
+                // Public CORS proxy
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+
+                if (!data.contents) throw new Error("No content received");
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data.contents, 'text/html');
+
+                const nodes = [];
+                const links = [];
+                const host = new URL(targetUrl).hostname;
+
+                nodes.push({ id: "root", name: host, type: "root", domain: host, size: data.contents.length });
+
+                const assetSet = new Set();
+                const add = (urlStr, type) => {
+                    const absUrl = resolveUrl(urlStr, targetUrl);
+                    if (absUrl && !assetSet.has(absUrl)) {
+                        assetSet.add(absUrl);
+                        try {
+                            const u = new URL(absUrl);
+                            nodes.push({
+                                id: absUrl,
+                                name: u.pathname.split('/').pop() || u.hostname,
+                                fullUrl: absUrl,
+                                type: type,
+                                size: 0,
+                                domain: u.hostname
+                            });
+                            links.push({ source: "root", target: absUrl });
+                        } catch (e) { }
+                    }
+                };
+
+                doc.querySelectorAll('script[src]').forEach(el => add(el.getAttribute('src'), 'js'));
+                doc.querySelectorAll('link[rel="stylesheet"]').forEach(el => add(el.getAttribute('href'), 'css'));
+                doc.querySelectorAll('img[src]').forEach(el => add(el.getAttribute('src'), 'img'));
+
+                setStatus(`SCAN COMPLETE: ${nodes.length - 1} ASSETS FOUND`);
+                setTimeout(() => setStatus('STATUS: IDLE'), 4000);
+
+                return { nodes, links };
+
+            } catch (e) {
+                setStatus(`ERROR: ${e.message.toUpperCase()}`);
+                console.error(e);
+                return null;
+            }
+        }
+
+        function updateGraph(data) {
+            currentData = data;
+
+            // Nodes
+            node = node.data(data.nodes, d => d.id);
+            node.exit().transition().duration(500).attr("r", 0).remove();
+
+            const nodeEnter = node.enter().append("circle")
+                .attr("class", "node")
+                .attr("r", 0)
+                .attr("fill", d => getColor(d.type))
+                .call(drag(simulation))
+                .on("click", (event, d) => addToLog(d)); // Log interaction
+
+            nodeEnter.append("title").text(d => d.name);
+            nodeEnter.transition().duration(500).attr("r", d => getRadius(d));
+
+            node = nodeEnter.merge(node);
+
+            // Links
+            link = link.data(data.links, d => d.source.id + "-" + d.target.id);
+            link.exit().transition().duration(300).style("opacity", 0).remove();
+
+            const linkEnter = link.enter().append("line")
+                .attr("class", "link")
+                .style("opacity", 0);
+
+            linkEnter.transition().duration(500).style("opacity", 1);
+            link = linkEnter.merge(link);
+
+            simulation.nodes(data.nodes);
+            simulation.force("link").links(data.links);
+            simulation.alpha(1).restart();
+
+            fireSynapses();
+        }
+
+        // --- Log Logic ---
+        function addToLog(d) {
+            if (loggedIds.has(d.id)) return;
+            loggedIds.add(d.id);
+
+            const container = document.getElementById('logContent');
+            if (container.querySelector('.empty-log')) container.innerHTML = '';
+
+            const div = document.createElement('div');
+            div.className = `log-entry ${d.type}`;
+            div.innerHTML = `
+                <div class="log-name" title="${d.fullUrl}">${d.name}</div>
+                <div class="log-meta">
+                    <span>${d.type.toUpperCase()}</span>
+                    <span>${d.size ? formatBytes(d.size) : '---'}</span>
+                </div>
+                <div>
+                   <a href="${d.fullUrl}" target="_blank" class="log-link">OPEN RESOURCE</a>
+                </div>
+            `;
+            container.prepend(div);
+            document.getElementById('logCount').innerText = `${loggedIds.size} ITEMS`;
+            lucide.createIcons();
+        }
+
+        // --- Utilities ---
+        function resolveUrl(path, base) {
+            try { return new URL(path, base).href; } catch (e) { return null; }
+        }
+        function setStatus(msg) {
+            const el = document.getElementById('scanStatus');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        function getFileType(name, initiator) {
+            if (name.endsWith('.js') || initiator === 'script') return 'js';
+            if (name.endsWith('.css') || initiator === 'css' || initiator === 'link') return 'css';
+            if (name.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i) || initiator === 'img') return 'img';
+            return 'other';
+        }
+        function getColor(type) {
+            switch (type) {
+                case 'root': return '#f3f4f6';
+                case 'js': return '#ef4444';
+                case 'css': return '#3ca2fa';
+                case 'img': return '#10b981';
+                default: return '#9ca3af';
+            }
+        }
+        function getRadius(node) {
+            if (node.type === 'root') return 20;
+            const size = node.size || 1000;
+            return Math.max(4, Math.min(10, Math.log10(size) * 1.5));
+        }
+        function formatBytes(bytes) {
+            if (!+bytes) return '0 B';
+            const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+        }
+
+        // --- Interactions ---
+        async function startScan() {
+            const input = document.getElementById('targetUrl').value.trim();
+            if (!input) return;
+
+            loggedIds.clear();
+            document.getElementById('logContent').innerHTML = '<div class="empty-log"><i data-lucide="mouse-pointer-2" style="width:24px; height:24px; opacity:0.5; margin-bottom:0.5rem;"></i><br>Select nodes in the graph<br>to capture asset data.</div>';
+            document.getElementById('logCount').innerText = '0 ITEMS';
+            lucide.createIcons();
+
+            const newData = await fetchRemoteAssets(input);
+            if (newData) updateGraph(newData);
+        }
+
+        function drag(sim) {
+            function start(event) {
+                if (!event.active) sim.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+            function drag(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+            function end(event) {
+                if (!event.active) sim.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+            return d3.drag().on("start", start).on("drag", drag).on("end", end);
+        }
+
+        // Synapse Animation
+        let synapseInterval;
+        function fireSynapses() {
+            if (synapseInterval) clearInterval(synapseInterval);
+            const particleLayer = g.select(".particles").empty() ? g.append("g").attr("class", "particles") : g.select(".particles");
+
+            synapseInterval = setInterval(() => {
+                if (currentData.links.length === 0) return;
+                const randomLink = currentData.links[Math.floor(Math.random() * currentData.links.length)];
+                if (!randomLink.source.x || !randomLink.target.x) return;
+
+                const particle = particleLayer.append("circle")
+                    .attr("class", "synapse")
+                    .attr("r", 2).attr("fill", "#3ca2fa")
+                    .attr("cx", randomLink.source.x).attr("cy", randomLink.source.y);
+
+                particle.transition().duration(800 + Math.random() * 400).ease(d3.easeLinear)
+                    .attr("cx", randomLink.target.x).attr("cy", randomLink.target.y).remove();
+            }, 60);
+        }
+
+        window.addEventListener('resize', () => {
+            if (!svg) return;
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            svg.attr("viewBox", [0, 0, width, height]);
+            simulation.force("center", d3.forceCenter(width / 2, height / 2));
+            simulation.alpha(0.3).restart();
+        });
+
+        window.addEventListener('load', () => {
+            initD3();
+            setTimeout(() => {
+                const data = collectLocalAssets();
+                updateGraph(data);
+            }, 100);
+
+            document.getElementById('targetUrl').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') startScan();
+            });
+        });
+
+    </script>
+    <script src="../assets/js/app.js"></script>
+</body>
+
+</html>

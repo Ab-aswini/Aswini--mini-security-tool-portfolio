@@ -1,0 +1,564 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Forensics - Cookie & JWT Analyzer</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        body {
+            background: #09090b;
+            color: #e4e4e7;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tool-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tool-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .tool-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        /* INPUT SECTION */
+        .input-area {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .forensic-input {
+            width: 100%;
+            height: 150px;
+            background: #000;
+            border: 1px solid #3f3f46;
+            color: #a1a1aa;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        .forensic-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            color: #fff;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detect-badge {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #71717a;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+        }
+
+        .analyze-btn {
+            background: #a78bfa;
+            color: #000;
+            border: none;
+            padding: 0.6rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .analyze-btn:hover {
+            background: #c084fc;
+            transform: translateY(-1px);
+        }
+
+        /* DASHBOARD SECTION */
+        .dashboard {
+            display: none;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            animation: slideUp 0.5s ease;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .risk-card {
+            background: rgba(24, 24, 27, 0.6);
+            border: 1px solid #27272a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .risk-score {
+            font-size: 4rem;
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            color: #10b981;
+        }
+
+        .risk-label {
+            color: #71717a;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .finding-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .finding-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid #27272a;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid #71717a;
+        }
+
+        .finding-high {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .finding-med {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .finding-low {
+            border-left-color: #3b82f6;
+        }
+
+        .finding-safe {
+            border-left-color: #10b981;
+        }
+
+        .finding-title {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .finding-desc {
+            font-size: 0.9rem;
+            color: #a1a1aa;
+        }
+
+        .code-block {
+            background: #000;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            color: #d4d4d8;
+            overflow-x: auto;
+            border: 1px solid #333;
+        }
+
+        /* JSON TREE */
+        .json-key {
+            color: #f472b6;
+        }
+
+        .json-val {
+            color: #a78bfa;
+        }
+
+        .json-num {
+            color: #fbbf24;
+        }
+
+        .json-str {
+            color: #34d399;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <style>
+        @media (max-width: 800px) {
+            .tool-container {
+                padding: 1rem;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .input-area {
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .action-bar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .action-bar .detect-badge {
+                text-align: center;
+            }
+
+            .analyze-btn {
+                width: 100%;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tool-container">
+        <div class="top-nav">
+            <a href="../tools/lab-architecture.html" class="tool-btn" style="color:#a1a1aa; text-decoration:none;">
+                <i data-lucide="arrow-left" style="height:1em;"></i> Back to Lab
+            </a>
+        </div>
+
+        <div class="tool-header">
+            <h1 class="tool-title">Storage Forensics</h1>
+            <p style="color:#a1a1aa;">Analyze Cookies, JWTs, and LocalStorage JSON for Entropy & Privacy Leaks.</p>
+        </div>
+
+        <div class="input-area">
+            <textarea id="inputData" class="forensic-input"
+                placeholder="Paste Cookie String, JWT Token, or JSON Object here..."></textarea>
+            <div class="action-bar">
+                <div class="detect-badge" id="typeBadge">READY TO ANALYZE</div>
+                <button class="analyze-btn" onclick="startForensics()">RUN FORENSICS</button>
+            </div>
+        </div>
+
+        <div class="dashboard" id="dashboard">
+            <!-- Sidebar: Score -->
+            <div class="sidebar">
+                <div class="risk-card">
+                    <div id="scoreVal" class="risk-score">100</div>
+                    <div class="risk-label">Security Score</div>
+                </div>
+
+                <div class="risk-card" style="text-align:left;">
+                    <h3 style="margin-bottom:1rem; font-size:1rem; color:#fff;">Analysis Stats</h3>
+                    <div id="statsList" style="font-size:0.9rem; color:#a1a1aa; line-height:1.6;">
+                        <!-- Injected -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main: Findings -->
+            <div class="finding-list" id="findingsList">
+                <!-- Injected Findings -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+        let currentScore = 100;
+
+        document.getElementById('inputData').addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            const badge = document.getElementById('typeBadge');
+            if (!val) { badge.textContent = "READY TO ANALYZE"; return; }
+
+            if (val.startsWith('ey') && val.split('.').length === 3) badge.textContent = "DETECTED: JWT TOKEN";
+            else if (val.startsWith('{') || val.startsWith('[')) badge.textContent = "DETECTED: JSON OBJECT";
+            else if (val.includes('=') && val.includes(';')) badge.textContent = "DETECTED: COOKIE STRING";
+            else badge.textContent = "DETECTED: RAW STRING";
+        });
+
+        function startForensics() {
+            const input = document.getElementById('inputData').value.trim();
+            if (!input) return;
+
+            resetUI();
+
+            // Determine Mode
+            if (input.startsWith('ey') && input.split('.').length === 3) {
+                analyzeJWT(input);
+            } else if ((input.startsWith('{') || input.startsWith('[')) && isValidJSON(input)) {
+                analyzeJSON(JSON.parse(input));
+            } else {
+                analyzeCookies(input);
+            }
+
+            renderScore();
+            document.getElementById('dashboard').style.display = 'grid';
+            lucide.createIcons();
+        }
+
+        function resetUI() {
+            document.getElementById('findingsList').innerHTML = '';
+            document.getElementById('statsList').innerHTML = '';
+            currentScore = 100;
+        }
+
+        // --- ANALYZERS ---
+
+        function analyzeJWT(token) {
+            addStat("Type", "JWT (JSON Web Token)");
+            const parts = token.split('.');
+
+            // 1. Header Analysis
+            try {
+                const header = JSON.parse(atob(parts[0]));
+                addFinding("JWT Header", `Algorithm: ${header.alg}`, "safe", JSON.stringify(header, null, 2));
+
+                if (header.alg === 'none' || header.alg === 'HS256') { // Warning on HS256 for public keys
+                    const level = header.alg === 'none' ? 'high' : 'med';
+                    addFinding("Weak Algorithm", `Algorithm is '${header.alg}'. ${header.alg === 'none' ? 'CRITICAL: No signature!' : 'Verify symmetric key strength.'}`, level);
+                    currentScore -= (header.alg === 'none' ? 50 : 10);
+                }
+            } catch (e) { addFinding("Malformed Header", "Could not parse JWT header.", "high"); }
+
+            // 2. Payload Analysis
+            try {
+                const payload = JSON.parse(atob(parts[1]));
+                addFinding("JWT Payload", "Decoded claims:", "safe", JSON.stringify(payload, null, 2));
+
+                // Expiration Check
+                if (payload.exp) {
+                    const expDate = new Date(payload.exp * 1000);
+                    const now = new Date();
+                    if (expDate < now) {
+                        addFinding("Token Expired", `Token expired on ${expDate.toLocaleString()}`, "med");
+                        currentScore -= 10;
+                    } else {
+                        addStat("Expires", expDate.toLocaleTimeString());
+                    }
+                } else {
+                    addFinding("Missing Expiration", "Token has no 'exp' claim. It may never expire.", "med");
+                    currentScore -= 15;
+                }
+
+                // PII Scan in Payload
+                scanForPII(JSON.stringify(payload));
+
+            } catch (e) { addFinding("Malformed Payload", "Could not parse JWT payload.", "high"); }
+
+            addStat("Signature", "Present (Not Verified)");
+        }
+
+        function analyzeCookies(str) {
+            addStat("Type", "Cookie String");
+            const cookies = str.split(';').map(c => c.trim()).filter(c => c);
+            addStat("Count", cookies.length);
+
+            cookies.forEach(c => {
+                const [key, ...valParts] = c.split('=');
+                const val = valParts.join('=');
+
+                // Entropy Analysis
+                const entropy = calculateEntropy(val);
+                let entropyLevel = "safe";
+                let entropyMsg = `Entropy: ${entropy.toFixed(2)}`;
+
+                // High Entropy = Good for Session IDs, Bad for exposed data?
+                // Actually forensically: High Entropy usually means Encrypted/Hashed (Good).
+                // Low Entropy (e.g. "admin", "123") in a "session" field is Bad.
+
+                const isSession = /sess|id|token|auth/i.test(key);
+                if (isSession && entropy < 3 && val.length > 0) {
+                    addFinding(`Weak Session ID: ${key}`, `Value '${val}' has very low entropy (${entropy.toFixed(2)}). Predictable?`, "high");
+                    currentScore -= 20;
+                } else if (entropy > 4.5) {
+                    entropyMsg += " (High/Random)";
+                }
+
+                // Keyword Check
+                if (/user|email|name/i.test(key)) {
+                    // Check if value looks like plaintext
+                    if (val.includes('@') || val.includes(' ')) {
+                        addFinding(`Plaintext PII in Cookie: ${key}`, `Value appears to be readable user data.`, "med");
+                        currentScore -= 10;
+                    }
+                }
+
+                // Flag Check (Pseudo-check since we rely on string input)
+                // If user pastes "session=xyz; HttpOnly", we can detect it.
+                // But usually browsers copy just "key=value".
+
+                // Scan Value for PII
+                if (val.length > 5) scanForPII(val, key);
+            });
+
+            addFinding("Raw Cookies", `Parsed ${cookies.length} cookies.`, "safe", cookies.join('\n'));
+        }
+
+        function analyzeJSON(obj) {
+            addStat("Type", "JSON Object");
+            const str = JSON.stringify(obj, null, 2);
+            addFinding("JSON Content", "Structure analysis:", "safe", str);
+            scanForPII(str);
+        }
+
+        // --- UTILS ---
+
+        function scanForPII(str, context = "Data") {
+            // Email
+            const emails = str.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
+            if (emails) {
+                addFinding("Email Leak Detected", `Found ${emails.length} email addresses in ${context}.`, "high", emails.join('\n'));
+                currentScore -= 20;
+            }
+
+            // IP Address (Public)
+            const ips = str.match(/\b(?!(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.))(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/g);
+            if (ips) {
+                addFinding("Public IP Leak", `Found potential public IPs.`, "med", ips.join('\n'));
+                currentScore -= 5;
+            }
+
+            // AWS Keys
+            if (/(AKIA|ASIA)[A-Z0-9]{16}/.test(str)) {
+                addFinding("AWS Key Leak", "CRITICAL: Found pattern matching AWS Access Key ID.", "high");
+                currentScore -= 40;
+            }
+        }
+
+        function calculateEntropy(str) {
+            const len = str.length;
+            const frequencies = {};
+            for (let i = 0; i < len; i++) {
+                const char = str[i];
+                frequencies[char] = (frequencies[char] || 0) + 1;
+            }
+            return Object.values(frequencies)
+                .reduce((sum, f) => {
+                    const p = f / len;
+                    return sum - p * Math.log2(p);
+                }, 0);
+        }
+
+        function isValidJSON(str) {
+            try { JSON.parse(str); return true; } catch (e) { return false; }
+        }
+
+        function addFinding(title, desc, level, code = null) {
+            const list = document.getElementById('findingsList');
+            const item = document.createElement('div');
+            item.className = `finding-item finding-${level}`;
+
+            let icon = 'info';
+            if (level === 'high') icon = 'alert-triangle';
+            if (level === 'med') icon = 'alert-circle';
+            if (level === 'safe') icon = 'check-circle';
+
+            let html = `
+                <div class="finding-title">
+                    <i data-lucide="${icon}"></i> ${title}
+                </div>
+                <div class="finding-desc">${desc}</div>
+            `;
+
+            if (code) {
+                html += `<div class="code-block">${escapeHtml(code)}</div>`;
+            }
+
+            item.innerHTML = html;
+            list.appendChild(item);
+        }
+
+        function addStat(label, val) {
+            const list = document.getElementById('statsList');
+            list.innerHTML += `<div><strong>${label}:</strong> ${val}</div>`;
+        }
+
+        function renderScore() {
+            currentScore = Math.max(0, currentScore);
+            const el = document.getElementById('scoreVal');
+
+            // Calculate Grade
+            let grade = 'F';
+            let color = '#ef4444';
+
+            if (currentScore >= 90) { grade = 'A'; color = '#10b981'; }
+            else if (currentScore >= 80) { grade = 'B'; color = '#3ca2fa'; }
+            else if (currentScore >= 60) { grade = 'C'; color = '#f59e0b'; }
+            else if (currentScore >= 40) { grade = 'D'; color = '#fbbf24'; }
+
+            // Render Score & Grade
+            el.innerHTML = `${currentScore} <span style="font-size:0.5em; opacity:0.7; margin-left:10px;">GRADE ${grade}</span>`;
+            el.style.color = color;
+
+            // Update Label
+            const label = document.querySelector('.risk-label');
+            label.innerHTML = `Security Verdict: <strong style="color:${color}">${grade}</strong>`;
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+        }
+    </script>
+
+    <script src="../assets/js/app.js"></script>
+</body>
+
+</html>

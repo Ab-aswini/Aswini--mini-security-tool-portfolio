@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Forensics (EXIF) - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+            }
+
+            .tool-btn {
+                margin-top: 0.5rem;
+            }
+
+            #visualIntel>div {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 55rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Image Forensics Surface</h1>
+            <p class="tools-subtitle">Deep Metadata (XMP/IPTC/ICC) & Visual Intelligence Analysis.</p>
+        </header>
+
+        <div class="tool-card">
+            <div class="input-group">
+                <input type="file" id="fileInput" class="tool-input" accept="image/*">
+                <button id="scanBtn" class="tool-btn">Deep Scan Image</button>
+            </div>
+
+            <div id="previewContainer" style="margin-bottom:1.5rem; display:none; text-align:center;">
+                <img id="imgPreview" alt="Image Preview"
+                    style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid var(--tool-border-light);">
+            </div>
+
+            <!-- Visual Intelligence (Reverse Search) -->
+            <div id="visualIntel"
+                style="display:none; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:1.5rem;">
+                <h3 style="font-size:1rem; margin-bottom:0.5rem; color:#fff;">Visual Intelligence</h3>
+                <p style="font-size:0.85rem; color:#888; margin-bottom:1rem;">
+                    Upload this image to these search engines to find where else it appears on the web.
+                </p>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <a href="https://lens.google.com/" target="_blank" class="tool-btn"
+                        style="flex:1; text-align:center; text-decoration:none; background:#333;">
+                        <i data-lucide="search" style="vertical-align:middle;"></i> Google Lens
+                    </a>
+                    <a href="https://yandex.com/images/" target="_blank" class="tool-btn"
+                        style="flex:1; text-align:center; text-decoration:none; background:#fc3f1d; color:white; border-color:#fc3f1d;">
+                        <i data-lucide="globe" style="vertical-align:middle;"></i> Yandex
+                    </a>
+                    <a href="https://tineye.com/" target="_blank" class="tool-btn"
+                        style="flex:1; text-align:center; text-decoration:none; background:#18a0fb; color:white; border-color:#18a0fb;">
+                        <i data-lucide="eye" style="vertical-align:middle;"></i> TinEye
+                    </a>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div id="mapContainer"
+                style="height: 300px; width: 100%; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.1); display:none;">
+            </div>
+
+            <div id="resultsArea" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- ExifReader (Open Source, Powerful) -->
+    <script src="https://cdn.jsdelivr.net/npm/exifreader/dist/exif-reader.min.js"></script>
+
+
+    <script>
+        lucide.createIcons();
+        let selectedFile = null;
+        let map = null;
+
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            selectedFile = e.target.files[0];
+            if (!selectedFile) return;
+
+            // Show Preview & Tools
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const img = document.getElementById('imgPreview');
+                img.src = event.target.result;
+                document.getElementById('previewContainer').style.display = 'block';
+                document.getElementById('visualIntel').style.display = 'block';
+                document.getElementById('resultsArea').classList.remove('visible');
+                document.getElementById('mapContainer').style.display = 'none';
+            };
+            reader.readAsDataURL(selectedFile);
+        });
+
+        document.getElementById('scanBtn').addEventListener('click', async function () {
+            if (!selectedFile) {
+                alert("Please select an image first.");
+                return;
+            }
+
+            const resultsArea = document.getElementById('resultsArea');
+            const mapDiv = document.getElementById('mapContainer');
+
+            resultsArea.innerHTML = "Deciphering standard & hidden metadata...";
+            resultsArea.classList.add('visible');
+
+            try {
+                // Use ExifReader to parse file
+                const tags = await ExifReader.load(selectedFile, { expanded: true });
+
+                // ExifReader returns 'expanded' object with groups: 'exif', 'iptc', 'xmp', 'gps', 'file'
+
+                if (!tags || Object.keys(tags).length === 0) {
+                    resultsArea.innerHTML = `<div style="color:var(--status-warn);">No Metadata found. Image is clean.</div>`;
+                    return;
+                }
+
+                // --- 1. Map Logic ---
+                let lat = null, lon = null;
+                if (tags.gps && tags.gps.Latitude && tags.gps.Longitude) {
+                    lat = tags.gps.Latitude;
+                    lon = tags.gps.Longitude;
+                }
+
+                if (lat && lon) {
+                    mapDiv.style.display = 'block';
+                    if (map) map.remove();
+                    setTimeout(() => {
+                        map = L.map('mapContainer').setView([lat, lon], 13);
+                        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                            attribution: '&copy; OpenStreetMap &copy; CARTO',
+                            subdomains: 'abcd',
+                            maxZoom: 19
+                        }).addTo(map);
+                        L.marker([lat, lon]).addTo(map)
+                            .bindPopup(`<b>GPS Coordinates Found</b><br>${lat.toFixed(6)}, ${lon.toFixed(6)}`)
+                            .openPopup();
+                    }, 100);
+                }
+
+                // --- 2. Intel Analysis ---
+                let intelScore = 0;
+                let riskLabel = 'Low Intel Value (Safe)';
+                let riskColor = 'var(--status-success)';
+
+                // Helper to check deep tags safely
+                const has = (group, key) => tags[group] && tags[group][key];
+
+                const checkGPS = (lat && lon);
+                const checkDevice = has('exif', 'Model') || has('exif', 'Make');
+                const checkTools = has('xmp', 'CreatorTool') || has('exif', 'Software');
+                // Check multiple fields for author/owner logic
+                const checkAuthor = has('iptc', 'Byline') || has('exif', 'Artist') || has('xmp', 'creator') || has('iptc', 'CopyrightNotice');
+
+                if (checkGPS) intelScore += 50;
+                if (checkDevice) intelScore += 20;
+                if (checkTools) intelScore += 10;
+                if (checkAuthor) intelScore += 20;
+
+                if (intelScore >= 40) {
+                    riskLabel = "STRONG INTELLIGENCE FOUND";
+                    riskColor = 'var(--status-error)';
+                } else if (intelScore > 0) {
+                    riskLabel = "Medium Intelligence Value";
+                    riskColor = 'var(--status-warn)';
+                }
+
+                // --- 3. Build UI ---
+                let summaryHtml = `
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); padding:1rem; margin-bottom:1.5rem; border-radius:8px;">
+                        <div style="color:${riskColor}; font-weight:bold; font-size:1.1rem; margin-bottom:1rem; border-left:4px solid ${riskColor}; padding-left:0.5rem;">
+                            ${riskLabel}
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:1rem;">
+                            <div class="intel-stat">
+                                <div style="color:#888;">Location</div>
+                                ${checkGPS ? `<div style="color:var(--status-error); font-weight:bold;">ðŸ“ FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                            </div>
+                            <div class="intel-stat">
+                                <div style="color:#888;">Device</div>
+                                ${checkDevice ? `<div style="color:var(--status-warn); font-weight:bold;">ðŸ“± FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                            </div>
+                             <div class="intel-stat">
+                                <div style="color:#888;">History/XMP</div>
+                                ${checkTools ? `<div style="color:var(--status-warn); font-weight:bold;">ðŸ’¾ FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                            </div>
+                            <div class="intel-stat">
+                                <div style="color:#888;">Author/IPTC</div>
+                                ${checkAuthor ? `<div style="color:var(--status-error); font-weight:bold;">ðŸ‘¤ FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // --- 4. Tag Tables ---
+                function makeTable(title, groupData) {
+                    if (!groupData) return '';
+                    let rows = '';
+                    for (const [key, val] of Object.entries(groupData)) {
+                        // ExifReader 'expanded' format: keys are tag names, value is the processed value
+                        if (typeof val === 'object' && val !== null) {
+                            // Prefer description, then value, then raw stringify
+                            let displayVal = val.description || val.value;
+                            if (Array.isArray(displayVal)) displayVal = displayVal.join(', ');
+                            if (!displayVal && displayVal !== 0) displayVal = JSON.stringify(val);
+
+                            rows += `<tr><td>${key}</td><td>${displayVal}</td></tr>`;
+                        } else {
+                            rows += `<tr><td>${key}</td><td>${val}</td></tr>`;
+                        }
+                    }
+                    if (rows === '') return '';
+
+                    return `
+                        <div style="margin-top:1.5rem;">
+                            <div style="font-weight:bold; color:var(--tool-accent); border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:10px;">${title}</div>
+                            <table class="meta-table" style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+                                ${rows}
+                            </table>
+                        </div>
+                    `;
+                }
+
+                // Add styling for tables
+                let html = `
+                    <style>
+                        .meta-table td { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color:#aaa; }
+                        .meta-table td:first-child { width: 40%; color:#666; }
+                        .meta-table td:last-child { color: #ddd; font-family:monospace; word-break:break-all; }
+                    </style>
+                ` + summaryHtml;
+
+                if (tags.gps) html += makeTable("ðŸ“ GPS Data", tags.gps);
+                if (tags.exif) html += makeTable("ðŸ“· Camera (EXIF)", tags.exif);
+                if (tags.xmp) html += makeTable("ðŸ’¾ XMP / History (Deep)", tags.xmp);
+                if (tags.iptc) html += makeTable("ðŸ“° IPTC / Copyright", tags.iptc);
+                if (tags.png || tags.file) html += makeTable("ðŸ“ File Properties", tags.file || tags.png);
+
+                resultsArea.innerHTML = html;
+
+            } catch (error) {
+                console.error(error);
+                resultsArea.innerText = "Error parsing image: " + error.message;
+            }
+        });
+    </script>
+
+    <!-- Hover Footer -->
+    <!-- Hover Footer -->
+
+</body>
+
+</html>

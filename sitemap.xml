@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://rouse.co.in/</loc>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://rouse.co.in/about.html</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://rouse.co.in/projects.html</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://rouse.co.in/tools.html</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://rouse.co.in/universe.html</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://rouse.co.in/contact.html</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+</urlset>

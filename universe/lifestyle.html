@@ -1,0 +1,247 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifestyle & Fitness | Universe</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+    
+    
+    <style>
+        header nav {
+            display: none !important;
+        }
+
+        header {
+            justify-content: flex-start;
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <!-- Tubelight Navbar -->
+    <!-- Tubelight Navbar -->
+    <div class="tubelight-navbar">
+        <div class="tubelight-container">
+
+            <a href="../index.html" class="tubelight-item">
+                <span class="nav-text">Home</span>
+                <span class="nav-icon"><i data-lucide="home"></i></span>
+                <div class="tubelight-lamp">
+                    <div class="lamp-beam"></div>
+                    <div class="lamp-glow-1"></div>
+                    <div class="lamp-glow-2"></div>
+                </div>
+            </a>
+
+            <a href="../about.html" class="tubelight-item">
+                <span class="nav-text">About</span>
+                <span class="nav-icon"><i data-lucide="user"></i></span>
+                <div class="tubelight-lamp">
+                    <div class="lamp-beam"></div>
+                    <div class="lamp-glow-1"></div>
+                    <div class="lamp-glow-2"></div>
+                </div>
+            </a>
+
+            <a href="../universe.html" class="tubelight-item">
+                <span class="nav-text">Universe</span>
+                <span class="nav-icon"><i data-lucide="globe"></i></span>
+                <div class="tubelight-lamp">
+                    <div class="lamp-beam"></div>
+                    <div class="lamp-glow-1"></div>
+                    <div class="lamp-glow-2"></div>
+                </div>
+            </a>
+
+            <a href="../projects.html" class="tubelight-item">
+                <span class="nav-text">Projects</span>
+                <span class="nav-icon"><i data-lucide="briefcase"></i></span>
+                <div class="tubelight-lamp">
+                    <div class="lamp-beam"></div>
+                    <div class="lamp-glow-1"></div>
+                    <div class="lamp-glow-2"></div>
+                </div>
+            </a>
+
+            <a href="../tools.html" class="tubelight-item">
+                <span class="nav-text">Tools</span>
+                <span class="nav-icon"><i data-lucide="cpu"></i></span>
+                <div class="tubelight-lamp">
+                    <div class="lamp-beam"></div>
+                    <div class="lamp-glow-1"></div>
+                    <div class="lamp-glow-2"></div>
+                </div>
+            </a>
+
+            <a href="../contact.html" class="tubelight-item">
+                <span class="nav-text">Contact</span>
+                <span class="nav-icon"><i data-lucide="mail"></i></span>
+                <div class="tubelight-lamp">
+                    <div class="lamp-beam"></div>
+                    <div class="lamp-glow-1"></div>
+                    <div class="lamp-glow-2"></div>
+                </div>
+            </a>
+
+            <div class="tubelight-item" id="theme-switch-container">
+                <button class="theme-toggle-btn" onclick="toggleTheme()"
+                    style="background:none; border:none; cursor:pointer; font-size:1.2rem; padding:0; display:flex; align-items:center;">ðŸŒ™</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">PORTFOLIO</div>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="../universe.html">Universe</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../tools.html">Tools</a></li>
+                <li><a href="../failures.html">Failures</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+                <li><button class="theme-toggle-btn" onclick="toggleTheme()"
+                        style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:1rem;">ðŸŒ™</button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main style="text-align: center; padding: 4rem 2rem;">
+        <h1 style="margin-bottom: 2rem;">Lifestyle & Fitness</h1>
+        <p style="margin-bottom: 4rem;">Health and wellness journey.</p>
+    </main>
+
+    <script src="../assets/js/app.js"></script>
+    
+    <script src="../assets/js/lucide.min.js"></script>
+    
+
+    
+    <!-- Hover Footer -->
+    <!-- Hover Footer -->
+    <footer class="hover-footer">
+        <div class="footer-bg-gradient"></div>
+
+        <div class="footer-content">
+            <div class="footer-grid">
+                <!-- Brand Section -->
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <span class="brand-heart">&hearts;</span>
+                        <span class="brand-name">Aswini</span>
+                    </div>
+                    <p class="brand-desc">
+                        Multi-disciplinary builder working across tech, business, and cyber intelligence.
+                    </p>
+                </div>
+
+                <!-- Link Section 1 -->
+                <div class="footer-col">
+                    <h4 class="footer-title">Explore</h4>
+                    <ul class="footer-links">
+                        <li><a href="../about.html" class="footer-link">About Me</a></li>
+                        <li><a href="../projects.html" class="footer-link">Projects</a></li>
+                        <li><a href="../universe.html" class="footer-link">Universe</a></li>
+                        <li><a href="../failures.html" class="footer-link">Failure Library</a></li>
+                    </ul>
+                </div>
+
+                <!-- Link Section 2 -->
+                <div class="footer-col">
+                    <h4 class="footer-title">Tools</h4>
+                    <ul class="footer-links">
+                        <li><a href="../tools/dashboard.html" class="footer-link">Intel Dashboard</a></li>
+                        <li><a href="../tools/username-checker.html" class="footer-link">User Check</a></li>
+                        <li>
+                            <a href="#" class="footer-link" style="display:flex; align-items:center;">
+                                Live Status
+                                <span class="pulse-dot"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="footer-col">
+                    <h4 class="footer-title">Contact</h4>
+                    <ul class="contact-list">
+                        <li class="contact-item">
+                            <i data-lucide="mail" class="contact-icon"></i>
+                            <a href="mailto:aswinibehera666@outlook.com" class="footer-link">Email Me</a>
+                        </li>
+                        <li class="contact-item">
+                            <i data-lucide="phone" class="contact-icon"></i>
+                            <a href="tel:+918658992725" class="footer-link">+91 86589 92725</a>
+                        </li>
+                        <li class="contact-item">
+                            <i data-lucide="map-pin" class="contact-icon"></i>
+                            <span>Odisha, India</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="footer-bottom">
+                <div class="social-links">
+                    <a href="#" class="social-link" aria-label="GitHub"><i data-lucide="github"></i></a>
+                    <a href="#" class="social-link" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+                    <a href="#" class="social-link" aria-label="Twitter"><i data-lucide="twitter"></i></a>
+                    <a href="#" class="social-link" aria-label="Globe"><i data-lucide="globe"></i></a>
+                </div>
+                <p>&copy; 2025 Aswini Behera. All rights reserved.</p>
+            </div>
+        </div>
+
+        <!-- Text Hover Effect (SVG) -->
+        <!-- React: lg:flex hidden h-[30rem] -mt-52 -mb-36 -->
+        <div class="text-hover-wrapper">
+            <svg id="text-hover-svg" class="text-hover-svg" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="textGradient" gradientUnits="userSpaceOnUse" cx="50%" cy="50%" r="25%">
+                        <stop offset="0%" stop-color="#eab308" />
+                        <stop offset="25%" stop-color="#ef4444" />
+                        <stop offset="50%" stop-color="#80eeb4" />
+                        <stop offset="75%" stop-color="#06b6d4" />
+                        <stop offset="100%" stop-color="#8b5cf6" />
+                    </linearGradient>
+
+                    <radialGradient id="revealMask" gradientUnits="userSpaceOnUse" r="20%" cx="50%" cy="50%">
+                        <stop offset="0%" stop-color="white" />
+                        <stop offset="100%" stop-color="black" />
+                    </radialGradient>
+
+                    <mask id="textMask">
+                        <rect x="0" y="0" width="100%" height="100%" fill="url(#revealMask)" />
+                    </mask>
+                </defs>
+
+                <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+                    class="layer-hover-gray">ASWINI</text>
+                <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle"
+                    class="layer-static-blue">ASWINI</text>
+                <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" mask="url(#textMask)"
+                    class="layer-spotlight">ASWINI</text>
+            </svg>
+        </div>
+    </footer>
+</body>
+
+</html>
+
+

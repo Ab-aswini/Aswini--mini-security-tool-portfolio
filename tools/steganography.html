@@ -1,0 +1,331 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Steganography - Digital Tools</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .tool-input,
+            .tool-btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .category-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 45rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Secure Steganography</h1>
+            <p class="tools-subtitle">Hide encrypted text inside images using advanced RGB-LSB encoding.</p>
+        </header>
+
+        <div class="tool-card">
+            <!-- 1. UPLOAD -->
+            <h3 style="color:var(--tool-accent); margin-bottom:1rem;">1. Select Base Image</h3>
+            <div class="input-group">
+                <input type="file" id="uploadInput" class="tool-input" accept="image/png, image/jpeg, image/webp">
+            </div>
+            <div id="previewContainer" style="display:none; text-align:center; margin-bottom:1.5rem;">
+                <img id="preview" alt="Upload Preview"
+                    style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid #333;">
+                <p style="font-size:0.8rem; color:#888; margin-top:0.5rem;">Image loaded successfully. Ready for
+                    processing.</p>
+            </div>
+
+            <!-- 2. ACTION -->
+            <div class="category-tabs"
+                style="display:flex; gap:0.5rem; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:0.5rem; margin-top:2rem;">
+                <button class="tab-btn active" id="tabEncode" onclick="switchMode('encode')">Hide Text (Encode)</button>
+                <button class="tab-btn" id="tabDecode" onclick="switchMode('decode')">Read Text (Decode)</button>
+            </div>
+
+            <!-- ENCODE UI -->
+            <div id="encodeSection" class="tool-section">
+                <div class="input-group">
+                    <textarea id="secretMsg" class="tool-input" placeholder="Enter your secret message here..." rows="4"
+                        style="font-family:monospace;"></textarea>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="encPass" class="tool-input" placeholder="Encryption Password (Optional)">
+                    <button id="btnEncode" class="tool-btn">Encrypt & Hide Data</button>
+                </div>
+                <p style="font-size:0.8rem; color:#6b7280; margin-top:0.5rem;">
+                    <i data-lucide="lock" style="height:1em; vertical-align:middle;"></i> Data is encrypted with your
+                    password + RGB-LSB encoded. Output is PNG (Lossless).
+                </p>
+            </div>
+
+            <!-- DECODE UI -->
+            <div id="decodeSection" class="tool-section" style="display:none;">
+                <div class="input-group">
+                    <input type="password" id="decPass" class="tool-input" placeholder="Encryption Password (Required)">
+                    <button id="btnDecode" class="tool-btn" style="background:#555">Decrypt & Read Data</button>
+                </div>
+            </div>
+
+            <!-- RESULT -->
+            <div id="resultsArea" class="result-box"></div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+
+        let currentMode = 'encode';
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        const uploadInput = document.getElementById('uploadInput');
+        const preview = document.getElementById('preview');
+        const resultsArea = document.getElementById('resultsArea');
+
+        // --- TABS ---
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tool-section').forEach(s => s.style.display = 'none');
+
+            if (mode === 'encode') {
+                document.getElementById('tabEncode').classList.add('active');
+                document.getElementById('encodeSection').style.display = 'block';
+            } else {
+                document.getElementById('tabDecode').classList.add('active');
+                document.getElementById('decodeSection').style.display = 'block';
+            }
+            resultsArea.classList.remove('visible');
+        }
+
+        // --- UPLOAD HANDLER ---
+        uploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    // Resize if massive to prevent crash, keeping aspect ratio
+                    let w = img.width;
+                    let h = img.height;
+                    const maxDim = 2000;
+                    if (w > maxDim || h > maxDim) {
+                        const ratio = Math.min(maxDim / w, maxDim / h);
+                        w *= ratio;
+                        h *= ratio;
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    preview.src = canvas.toDataURL('image/png'); // Force PNG preview
+                    document.getElementById('previewContainer').style.display = 'block';
+                    resultsArea.classList.remove('visible');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // --- ENCRYPTION HELPERS (Simple XOR for Client-Side Demo) ---
+        // Verify Robustness: Magic Bytes "STG:"
+        const MAGIC = "STG:";
+
+        function encrypt(text, pass) {
+            if (!pass) pass = "DEFAULT";
+            let res = "";
+            for (let i = 0; i < text.length; i++) {
+                res += String.fromCharCode(text.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
+            }
+            return res; // Keep raw string for binary conversion
+        }
+
+        function strToBin(str) {
+            let bin = "";
+            for (let i = 0; i < str.length; i++) {
+                bin += str.charCodeAt(i).toString(2).padStart(8, '0');
+            }
+            return bin;
+        }
+
+        function binToStr(bin) {
+            let str = "";
+            for (let i = 0; i < bin.length; i += 8) {
+                const byte = bin.slice(i, i + 8);
+                if (byte.length < 8) break;
+                str += String.fromCharCode(parseInt(byte, 2));
+            }
+            return str;
+        }
+
+        // --- ENCODE LOGIC ---
+        document.getElementById('btnEncode').addEventListener('click', () => {
+            if (!preview.src) { alert("Please upload an image first."); return; }
+            const msg = document.getElementById('secretMsg').value;
+            const pass = document.getElementById('encPass').value;
+            if (!msg) { alert("Please enter a message."); return; }
+
+            resultsArea.innerHTML = "Encrypting & Encoding to Pixels...";
+            resultsArea.classList.add('visible');
+
+            setTimeout(() => {
+                try {
+                    const fullMsg = MAGIC + msg; // Add Magic Header
+                    const encrypted = encrypt(fullMsg, pass);
+                    const binary = strToBin(encrypted) + "00000000"; // Null terminator
+
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+
+                    if (binary.length > data.length * 0.75) {
+                        throw new Error("Message too long for this image size.");
+                    }
+
+                    // RGB LSB Encoding (Indices 0, 1, 2, 4, 5, 6...)
+                    let bitIdx = 0;
+                    for (let i = 0; i < data.length; i++) {
+                        if ((i + 1) % 4 === 0) continue; // Skip Alpha Channel
+
+                        if (bitIdx < binary.length) {
+                            // Replace LSB
+                            const bit = parseInt(binary[bitIdx]);
+                            data[i] = (data[i] & ~1) | bit;
+                            bitIdx++;
+                        } else {
+                            break; // Done
+                        }
+                    }
+
+                    ctx.putImageData(imgData, 0, 0);
+                    const finalUrl = canvas.toDataURL('image/png');
+
+                    resultsArea.innerHTML = `
+                        <div style="color:var(--status-success); font-weight:bold; font-size:1.1rem; margin-bottom:0.5rem;">
+                            <i data-lucide="check-circle"></i> Encryption Successful
+                        </div>
+                        <div style="font-size:0.9rem; margin-bottom:1rem; color:#ccc;">
+                            The image below now contains your hidden data. You MUST download it as PNG.
+                        </div>
+                        <a href="${finalUrl}" download="steg_secure_image.png" class="tool-btn" style="text-decoration:none; display:inline-block;">
+                            <i data-lucide="download"></i> Download Secure Image
+                        </a>
+                    `;
+                    lucide.createIcons();
+
+                } catch (e) {
+                    resultsArea.innerHTML = `<div style="color:var(--status-error)">Error: ${e.message}</div>`;
+                }
+            }, 100);
+        });
+
+        // --- DECODE LOGIC ---
+        document.getElementById('btnDecode').addEventListener('click', () => {
+            if (!preview.src) { alert("Please upload an image first."); return; }
+            const pass = document.getElementById('decPass').value;
+
+            resultsArea.innerHTML = "Scanning pixels...";
+            resultsArea.classList.add('visible');
+
+            setTimeout(() => {
+                try {
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+                    let binary = "";
+
+                    // Extract Binary (Arbitrary limit 100KB to stop loop)
+                    const maxBits = 100000 * 8;
+                    for (let i = 0; i < data.length; i++) {
+                        if ((i + 1) % 4 === 0) continue; // Skip Alpha
+
+                        binary += (data[i] & 1).toString();
+
+                        // Check for null terminator every byte
+                        if (binary.length % 8 === 0 && binary.length > 0) {
+                            if (binary.slice(-8) === "00000000") break;
+                        }
+                        if (binary.length >= maxBits) break;
+                    }
+
+                    // Convert to String
+                    const rawStr = binToStr(binary.slice(0, -8)); // Remove terminator
+                    if (!rawStr) throw new Error("No data structure found.");
+
+                    // Decrypt
+                    const decrypted = encrypt(rawStr, pass); // XOR is symmetric
+
+                    // Check Magic
+                    if (decrypted.startsWith(MAGIC)) {
+                        const originalMsg = decrypted.substring(MAGIC.length);
+                        resultsArea.innerHTML = `
+                             <div style="color:var(--status-accent); font-weight:bold; font-size:1.1rem; margin-bottom:0.5rem;">
+                                <i data-lucide="unlock"></i> Message Decrypted
+                            </div>
+                            <div style="background:#111; padding:1rem; border-radius:6px; font-family:monospace; color:#fff; word-break:break-all; max-height:200px; overflow-y:auto;">
+                                ${originalMsg.replace(/</g, "&lt;")}
+                            </div>
+                        `;
+                        lucide.createIcons();
+                    } else {
+                        resultsArea.innerHTML = `
+                            <div style="color:var(--status-warn);">
+                                <strong>Decryption Failed:</strong> Incorrect password or no valid data found.
+                                <br><span style="font-size:0.8rem; opacity:0.7">Ensure you are using the exact same password and the original PNG file.</span>
+                            </div>
+                        `;
+                    }
+
+                } catch (e) {
+                    resultsArea.innerHTML = `<div style="color:var(--status-error)">Error: ${e.message}</div>`;
+                }
+            }, 100);
+        });
+
+    </script>
+
+    <!-- Hover Footer -->
+    <!-- Hover Footer -->
+
+</body>
+
+</html>

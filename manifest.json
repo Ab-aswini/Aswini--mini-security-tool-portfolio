@@ -1,0 +1,21 @@
+{
+    "name": "Aswini Behera | Builder & Cyber Intelligence",
+    "short_name": "Aswini",
+    "description": "Portfolio of Aswini Behera - Multi-disciplinary builder working across tech, business, and cyber intelligence.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#0a0a0a",
+    "icons": [
+        {
+            "src": "assets/images/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/images/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

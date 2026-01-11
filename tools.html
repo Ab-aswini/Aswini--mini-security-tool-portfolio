@@ -1,0 +1,239 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Intelligence Tools | Aswini Behera</title>
+    <link rel="canonical" href="https://rouse.co.in/tools.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rouse.co.in/tools.html">
+    <meta property="og:title" content="Digital Tools | Aswini Behera">
+    <meta property="og:description" content="Browser-based OSINT-safe utilities for digital intelligence and analysis.">
+    <meta property="og:image" content="https://rouse.co.in/assets/images/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+
+    <!-- Fonts & Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/global.css">
+
+    <!-- Deferred Scripts -->
+    <script defer src="assets/js/lucide.min.js"></script>
+    <script defer src="assets/js/component-loader.js"></script>
+    <script defer src="assets/js/app.js"></script>
+    <script defer src="assets/js/decoder.js"></script>
+    <script defer src="assets/js/terminal.js"></script>
+    <link rel="stylesheet" href="assets/css/beam.css">
+    <link rel="stylesheet" href="assets/css/tools.css">
+
+    <!-- Theme Data Script (Anti-Flicker) -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+            document.documentElement.setAttribute("data-theme", theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page">
+
+    <!-- Synced Tubelight Navbar -->
+    <!-- Tubelight Navbar -->
+    <div id="nav-placeholder"></div>
+    <div class="nav-spacer"></div>
+    <main class="tools-container">
+        <section class="tools-header">
+            <h1 class="hero-title">Digital Intelligence Tools</h1>
+            <p class="hero-subtext">A collection of OSINT, networking, and privacy utilities.</p>
+        </section>
+
+        <div class="tools-grid">
+
+            <!-- 0. Site Dossier (New Hub) -->
+            <a href="tools/site-dossier.html" class="tool-card" style="border-color: var(--accent);">
+                <i data-lucide="globe-2" class="tool-icon" style="color:var(--accent);"></i>
+                <div class="tool-name">
+                    Site Dossier
+                    <span class="badge">V3.0</span>
+                </div>
+                <div class="tool-desc">Full 8-Layer Domain Intelligence: DNS, Infra, Supply Chain Graph, and Risk
+                    Scoring.</div>
+            </a>
+            <a href="tools/dashboard.html" class="tool-card">
+                <i data-lucide="scan-face" class="tool-icon"></i>
+                <div class="tool-name">Imposter Scanner</div>
+                <div class="tool-desc">Hunt down a username across 50+ social platforms to find hidden profiles.</div>
+            </a>
+
+            <!-- 2. Email Intelligence -->
+            <a href="tools/email-intel.html" class="tool-card">
+                <i data-lucide="mail-check" class="tool-icon"></i>
+                <div class="tool-name">Email Intelligence</div>
+                <div class="tool-desc">Analyze email format, domain MX records, and Gravatar presence.</div>
+            </a>
+
+            <!-- 3. IP Intelligence -->
+            <a href="tools/ip-intel.html" class="tool-card">
+                <i data-lucide="map-pin" class="tool-icon"></i>
+                <div class="tool-name">IP Intelligence</div>
+                <div class="tool-desc">Geolocation and ISP data for any IP address.</div>
+            </a>
+
+            <!-- 4. DNS & WHOIS -->
+            <a href="tools/dns-whois.html" class="tool-card">
+                <i data-lucide="server" class="tool-icon"></i>
+                <div class="tool-name">DNS & WHOIS</div>
+                <div class="tool-desc">Lookup A, MX, NS records and domain registration details.</div>
+            </a>
+
+            <!-- 5. Public Search Generator -->
+            <a href="tools/public-search.html" class="tool-card">
+                <i data-lucide="search" class="tool-icon"></i>
+                <div class="tool-name">Public Search Dorks</div>
+                <div class="tool-desc">Generate advanced legal Google Dorks for OSINT research.</div>
+            </a>
+
+            <!-- 6. Breach Checker -->
+            <a href="tools/breach-checker.html" class="tool-card">
+                <i data-lucide="shield-alert" class="tool-icon"></i>
+                <div class="tool-name">Breach Checker</div>
+                <div class="tool-desc">Check if a password has been exposed (k-Anonymous / Safe).</div>
+            </a>
+
+            <!-- 7. Image Metadata -->
+            <a href="tools/image-exif.html" class="tool-card">
+                <i data-lucide="image" class="tool-icon"></i>
+                <div class="tool-name">Image EXIF Viewer</div>
+                <div class="tool-desc">Extract hidden metadata, GPS, and device info from images client-side.</div>
+            </a>
+
+            <!-- 8. PDF Utilites -->
+            <a href="tools/pdf-tools.html" class="tool-card">
+                <i data-lucide="file-text" class="tool-icon"></i>
+                <div class="tool-name">PDF Utilities</div>
+                <div class="tool-desc">Analyze, render, and extract text from PDFs in the browser.</div>
+            </a>
+
+            <!-- 9. Browser Fingerprint -->
+            <a href="tools/browser-fingerprint.html" class="tool-card">
+                <i data-lucide="fingerprint" class="tool-icon"></i>
+                <div class="tool-name">Browser Fingerprint</div>
+                <div class="tool-desc">Analyze your browser's unique fingerprint and tracking potential.</div>
+            </a>
+
+            <!-- 10. Steganography -->
+            <a href="tools/steganography.html" class="tool-card">
+                <i data-lucide="eye-off" class="tool-icon"></i>
+                <div class="tool-name">Steganography</div>
+                <div class="tool-desc">Hide secret messages inside images or extract them.</div>
+            </a>
+
+
+
+            <!-- 11. Entropy Visualizer -->
+            <a href="tools/entropy-visualizer.html" class="tool-card">
+                <i data-lucide="binary" class="tool-icon"></i>
+                <div class="tool-name">
+                    Entropy Visualizer
+                    <span class="badge">New</span>
+                </div>
+                <div class="tool-desc">Visualize Shannon entropy and randomness patterns in files.</div>
+            </a>
+
+
+
+
+
+            <!-- 12. Subresource Scanner (New Phase 2) -->
+            <a href="tools/subresource-scanner.html" class="tool-card">
+                <i data-lucide="network" class="tool-icon"></i>
+                <div class="tool-name">
+                    Dependency Visualizer
+                    <span class="badge">New</span>
+                </div>
+                <div class="tool-desc">Map external domains, CDNs, and scripts embedded in any webpage.</div>
+            </a>
+
+            <!-- 13. Password Analysis (Upgraded) -->
+            <a href="tools/password-strength.html" class="tool-card">
+                <i data-lucide="key" class="tool-icon"></i>
+                <div class="tool-name">Password Analysis</div>
+                <div class="tool-desc">Entropy calculation, structure masking, and realistic crack-time estimation.
+                </div>
+            </a>
+
+
+
+            <!-- 14. APK X-Ray (New) -->
+            <a href="tools/apk-analyzer.html" class="tool-card">
+                <i data-lucide="smartphone" class="tool-icon"></i>
+                <div class="tool-name">
+                    APK X-Ray
+                    <span class="badge">New</span>
+                </div>
+                <div class="tool-desc">Extract backend API URLs and secrets from Android App files.</div>
+            </a>
+
+            <!-- 15. Technical Architecture (New Hub) -->
+            <div class="tool-card" style="display:none"></div> <!-- spacer -->
+            <!-- 15. Technical Architecture (New Hub) -->
+            <a href="tools/lab-architecture.html" class="tool-card"
+                style="position: relative; overflow: visible; box-shadow: 0 0 30px -5px rgba(60, 162, 250, 0.3);">
+
+                <!-- Continuous Loop Border -->
+                <!-- Continuous Loop Border (Layered Approach) -->
+                <!-- 1. Spinning Gradient Background -->
+                <div style="position: absolute; inset: -2px; border-radius: 18px; overflow: hidden; z-index: 0;">
+                    <div
+                        style="position: absolute; inset: -50%; background: conic-gradient(from 0deg, #00f3ff, #ff00ff, #ffeb3b, #00f3ff); animation: spinBorder 4s linear infinite;">
+                    </div>
+                </div>
+
+                <!-- 2. Solid Inner Mask (Blocks the center) -->
+                <div
+                    style="position: absolute; inset: 2px; background: var(--tool-bg); border-radius: 14px; z-index: 0;">
+                </div>
+                <style>
+                    @keyframes spinBorder {
+                        100% {
+                            transform: rotate(360deg);
+                        }
+                    }
+                </style>
+
+                <!-- Content -->
+                <div style="position: relative; z-index: 1;">
+                    <i data-lucide="server" class="tool-icon"></i>
+                    <div class="tool-name">
+                        Lab Architecture
+                        <span
+                            style="display:inline-block; width:6px; height:6px; background:var(--tool-accent); border-radius:50%; margin-left:6px; box-shadow: 0 0 5px var(--tool-accent); animation: pulse 1.5s infinite;"></span>
+                    </div>
+                    <div class="tool-desc">Deep Search Archives & Technical Documentation.</div>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <!-- Reused Footer -->
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+
+</body>
+
+</html>

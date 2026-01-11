@@ -1,0 +1,284 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Architecture - Digital Intelligence Lab</title>
+    <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="../assets/js/lucide.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+    <link rel="stylesheet" href="../assets/css/global.css">
+
+
+
+    <link rel="stylesheet" href="../assets/css/tools.css">
+    <style>
+        .doc-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .doc-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .doc-text {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .arch-diagram {
+            border: 1px dashed #444;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            background: #000;
+            font-family: monospace;
+            color: var(--tool-accent);
+        }
+
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .archive-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .archive-card:hover {
+            border-color: var(--tool-accent);
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .archive-name {
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .archive-desc {
+            font-size: 0.85rem;
+            color: #888;
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) {
+            .tools-container {
+                padding: 1rem;
+            }
+
+            .tools-title {
+                font-size: 1.75rem;
+            }
+
+            .arch-diagram {
+                overflow-x: auto;
+                white-space: pre;
+                font-size: 0.7rem;
+                padding: 1rem;
+            }
+        }
+    </style>
+    <!-- Theme Data Script -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body class="tools-page" data-theme="dark">
+    <div style="padding: 1.5rem;">
+        <a href="../tools.html" class="tool-btn"
+            style="background:transparent; border:1px solid currentColor; color:inherit;">
+            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+        </a>
+    </div>
+
+    <div class="tools-container" style="max-width: 65rem;">
+        <header class="tools-header" style="margin-top:2rem;">
+            <h1 class="tools-title">Technical Architecture</h1>
+            <p class="tools-subtitle">Inside the Digital Intelligence Lab: Privacy-First Design & Deep Search Archives.
+            </p>
+        </header>
+
+        <!-- Section 1: Architecture -->
+        <div class="doc-section">
+            <h2 class="doc-title"><i data-lucide="server"></i> System Architecture</h2>
+            <p class="doc-text">
+                The Digital Intelligence Lab operates on a <strong>Zero-Backend, Client-Side Architecture</strong>.
+                This design ensures maximum privacy for the user, as sensitive data like passwords, files, or search
+                queries
+                are processed locally in your browser and are never stored on our servers.
+            </p>
+
+            <div class="arch-diagram">
+                [USER BROWSER] <===> [STATIC ASSETS (GitHub/Firebase)]
+                    |
+                    v
+                    [CLIENT-SIDE LOGIC (JS/WASM)]
+                    |
+                    +-----+-----+-----+
+                    | | |
+                    [CORS] [APIs] [LOCAL]
+                    Proxy Fetch Calc
+            </div>
+
+            <p class="doc-text">
+                <strong>Key Principles:</strong>
+            </p>
+            <ul style="color:#aaa; padding-left:1.5rem; line-height:1.6;">
+                <li><strong>Stateless:</strong> No database. No tracking cookies. Every session is fresh.</li>
+                <li><strong>Transparent:</strong> External API calls (HIBP, Cloudflare) are explicitly attributed.</li>
+                <li><strong>Secure:</strong> File analysis (Entropy, EXIF) happens in memory using the HTML5 File API.
+                </li>
+            </ul>
+        </div>
+
+        <!-- Section 2: Deep Search Archives -->
+        <div class="doc-section" style="border-color: var(--tool-accent);">
+            <h2 class="doc-title" style="color:var(--tool-accent);">
+                <i data-lucide="archive"></i> Deep Search Archives
+            </h2>
+            <p class="doc-text">
+                This secure archive contains powerful OSINT utilities derived from our local research tools.
+                These specialized modules perform deep scans across public datasets.
+            </p>
+
+            <div class="archive-grid">
+
+
+
+
+
+
+                <!-- Tool 4: Asset Visualizer -->
+                <a href="../archive/asset-visualizer.html" class="archive-card"
+                    style="border-color:var(--tool-accent);">
+                    <div class="archive-name">
+                        <i data-lucide="network"></i> Asset Visualizer
+                    </div>
+                    <div class="archive-desc">
+                        Interactive force-directed graph mapping your site's entire supply chain and resource
+                        dependencies.
+                    </div>
+                </a>
+
+                <!-- Tool 3: JS Vuln Mapper -->
+                <a href="../archive/js-vuln-scanner.html" class="archive-card" style="border-color:#ef4444;">
+                    <div class="archive-name" style="color:#ef4444;">
+                        <i data-lucide="bug"></i> JS Vuln Mapper
+                    </div>
+                    <div class="archive-desc">
+                        Deep scan client-side bundles for vulnerabilities, source maps, and secrets.
+                    </div>
+                </a>
+
+                <!-- Tool 4: ASN Intel -->
+                <a href="../archive/asn-intel.html" class="archive-card" style="border-color:#3b82f6;">
+                    <div class="archive-name" style="color:#3b82f6;">
+                        <i data-lucide="radar"></i> ASN Intelligence
+                    </div>
+                    <div class="archive-desc">
+                        Military-grade network recon. Interactive map, BGP routing data, and threat intel.
+                    </div>
+                </a>
+
+                <!-- Tool 5: Stack Fingerprinter -->
+                <a href="../archive/favicon-analyzer.html" class="archive-card" style="border-color:#ec4899;">
+                    <div class="archive-name" style="color:#ec4899;">
+                        <i data-lucide="fingerprint"></i> Stack Fingerprinter
+                    </div>
+                    <div class="archive-desc">
+                        Identify Server Stack, CMS, and Exploit leads via Headers & Favicon Hashes.
+                    </div>
+                </a>
+
+                <!-- Tool 5: TLS Auditor (New) -->
+                <a href="../archive/tls-auditor.html" class="archive-card" style="border-color:#f59e0b;">
+                    <div class="archive-name" style="color:#f59e0b;">
+                        <i data-lucide="lock"></i> TLS & Cipher Auditor
+                    </div>
+                    <div class="archive-desc">
+                        Deep inspection of SSL/TLS handshake, Cipher Suites, and Mozilla Observatory Security Grading.
+                    </div>
+                </a>
+
+                <!-- Tool 6: Storage Forensics (New) -->
+                <a href="../archive/storage-forensics.html" class="archive-card" style="border-color:#a78bfa;">
+                    <div class="archive-name" style="color:#a78bfa;">
+                        <i data-lucide="database"></i> Storage Forensics <span
+                            style="font-size:0.7em; background:var(--status-success); color:black; padding:2px 6px; border-radius:4px; margin-left:auto;">NEW</span>
+                    </div>
+                    <div class="archive-desc">
+                        Deep Forensic Analyzer for Cookies, JWT Tokens, and LocalStorage. Detects PII and weak entropy.
+                    </div>
+                </a>
+
+                <!-- Tool 8: DNS History (New) -->
+                <a href="../archive/dns-history.html" class="archive-card" style="border-color:#8b5cf6;">
+                    <div class="archive-name" style="color:#8b5cf6;">
+                        <i data-lucide="history"></i> DNS Chronology
+                    </div>
+                    <div class="archive-desc">
+                        Time-travel through DNS records. Analyze past infrastructure, IP history, and mail server
+                        changes.
+                    </div>
+                </a>
+
+
+            </div>
+        </div>
+
+        <!-- Section 3: Future Roadmap -->
+        <div class="doc-section">
+            <h2 class="doc-title"><i data-lucide="git-branch"></i> Lab Roadmap</h2>
+            <p class="doc-text">
+                We are continuously integrating new experimental modules. Upcoming features include WebAssembly-based
+                audio forensics and expanded blockchain analytics.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+
+</body>
+
+</html>
