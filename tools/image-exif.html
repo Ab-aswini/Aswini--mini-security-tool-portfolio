@@ -71,7 +71,7 @@
 
         <div class="tool-card">
             <div class="input-group">
-                <input type="file" id="fileInput" class="tool-input" accept="image/*">
+                <input type="file" id="fileInput" class="tool-input" accept="image/*" aria-label="Upload Image File" title="Upload Image File">
                 <button id="scanBtn" class="tool-btn">Deep Scan Image</button>
             </div>
 
@@ -88,15 +88,15 @@
                     Upload this image to these search engines to find where else it appears on the web.
                 </p>
                 <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-                    <a href="https://lens.google.com/" target="_blank" class="tool-btn"
+                    <a href="https://lens.google.com/" target="_blank" rel="noopener noreferrer" class="tool-btn"
                         style="flex:1; text-align:center; text-decoration:none; background:#333;">
                         <i data-lucide="search" style="vertical-align:middle;"></i> Google Lens
                     </a>
-                    <a href="https://yandex.com/images/" target="_blank" class="tool-btn"
+                    <a href="https://yandex.com/images/" target="_blank" rel="noopener noreferrer" class="tool-btn"
                         style="flex:1; text-align:center; text-decoration:none; background:#fc3f1d; color:white; border-color:#fc3f1d;">
                         <i data-lucide="globe" style="vertical-align:middle;"></i> Yandex
                     </a>
-                    <a href="https://tineye.com/" target="_blank" class="tool-btn"
+                    <a href="https://tineye.com/" target="_blank" rel="noopener noreferrer" class="tool-btn"
                         style="flex:1; text-align:center; text-decoration:none; background:#18a0fb; color:white; border-color:#18a0fb;">
                         <i data-lucide="eye" style="vertical-align:middle;"></i> TinEye
                     </a>
