@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 
 <head>
@@ -55,12 +55,26 @@
     <div id="nav-placeholder"></div>
     <div class="nav-spacer"></div>
     <main class="tools-container">
-        <section class="tools-header">
-            <h1 class="hero-title">Digital Intelligence Tools</h1>
-            <p class="hero-subtext">A collection of OSINT, networking, and privacy utilities.</p>
+        <section class="tools-header" style="text-align: center; margin-bottom: 2rem;">
+            <span class="v2-badge-cyber" style="margin-bottom: 0.75rem;"><i data-lucide="cpu" style="width:12px; height:12px;"></i> V2 CYBER TOOL MATRIX</span>
+            <h1 class="hero-title" style="font-size: 2.5rem; margin-top: 0.5rem;">Digital Intelligence Suite</h1>
+            <p class="hero-subtext" style="color: var(--text-dim); max-width: 600px; margin: 0 auto 1.5rem;">100% Client-Side Privacy-First Security & OSINT Utilities</p>
+            
+            <!-- V2 Search Bar & Category Filters -->
+            <div style="max-width: 650px; margin: 0 auto 1.5rem; position: relative;">
+                <i data-lucide="search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); width: 18px;"></i>
+                <input type="text" id="v2-tool-search" placeholder="Search security tools (e.g. EXIF, IP, Breach, Password)..." style="width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem; border-radius: 12px; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text); outline: none; font-size: 0.95rem; font-family: var(--font-main);" />
+            </div>
+
+            <div id="v2-cat-filters" style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                <button class="v2-cat-btn active" data-cat="all" style="padding: 0.4rem 1rem; border-radius: 9999px; background: var(--cyber-blue); color: #000; border: none; font-weight: 600; font-size: 0.8rem; cursor: pointer;">All Tools</button>
+                <button class="v2-cat-btn" data-cat="osint" style="padding: 0.4rem 1rem; border-radius: 9999px; background: var(--glass-bg); color: var(--text); border: 1px solid var(--glass-border); font-size: 0.8rem; cursor: pointer;">OSINT & Recon</button>
+                <button class="v2-cat-btn" data-cat="security" style="padding: 0.4rem 1rem; border-radius: 9999px; background: var(--glass-bg); color: var(--text); border: 1px solid var(--glass-border); font-size: 0.8rem; cursor: pointer;">Security & Privacy</button>
+                <button class="v2-cat-btn" data-cat="forensics" style="padding: 0.4rem 1rem; border-radius: 9999px; background: var(--glass-bg); color: var(--text); border: 1px solid var(--glass-border); font-size: 0.8rem; cursor: pointer;">Forensics & Analysis</button>
+            </div>
         </section>
 
-        <div class="tools-grid">
+        <div class="tools-grid" id="v2-tools-grid">
 
             <!-- 0. Site Dossier (New Hub) -->
             <a href="tools/site-dossier.html" class="tool-card" style="border-color: var(--accent);">
@@ -232,8 +246,59 @@
 
     <div id="footer-placeholder"></div>
 
-    <!-- Scripts -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchInput = document.getElementById("v2-tool-search");
+            const filterBtns = document.querySelectorAll(".v2-cat-btn");
+            const cards = document.querySelectorAll(".tool-card");
 
+            function filterTools() {
+                const query = searchInput.value.toLowerCase().trim();
+                const activeBtn = document.querySelector(".v2-cat-btn.active");
+                const cat = activeBtn ? activeBtn.getAttribute("data-cat") : "all";
+
+                cards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    const matchesSearch = !query || text.includes(query);
+                    
+                    let matchesCat = true;
+                    if (cat === "osint") {
+                        matchesCat = text.includes("ip") || text.includes("dossier") || text.includes("email") || text.includes("username") || text.includes("search") || text.includes("imposter");
+                    } else if (cat === "security") {
+                        matchesCat = text.includes("breach") || text.includes("password") || text.includes("fingerprint") || text.includes("entropy") || text.includes("scanner");
+                    } else if (cat === "forensics") {
+                        matchesCat = text.includes("exif") || text.includes("pdf") || text.includes("steganography") || text.includes("apk") || text.includes("architecture");
+                    }
+
+                    if (matchesSearch && matchesCat) {
+                        card.style.display = "";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener("input", filterTools);
+            }
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove("active");
+                        b.style.background = "var(--glass-bg)";
+                        b.style.color = "var(--text)";
+                        b.style.border = "1px solid var(--glass-border)";
+                    });
+                    btn.classList.add("active");
+                    btn.style.background = "var(--cyber-blue)";
+                    btn.style.color = "#000";
+                    btn.style.border = "none";
+                    filterTools();
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

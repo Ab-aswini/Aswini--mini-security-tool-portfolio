@@ -529,7 +529,32 @@
                 } else {
                     typeElement.innerText = "🏠 Residential";
                     descElement.innerText = "Standard Connection";
-                    riskCard.style.cssText = "background: rgba(16, 185, 129, 0.1); border-color: var(--status-success); color: var(--status-success); grid-area: risk;";
+                // V2 Action Bar Export & Copy Buttons
+                let v2ActionBar = document.getElementById('v2-ip-action-bar');
+                if (!v2ActionBar) {
+                    v2ActionBar = document.createElement('div');
+                    v2ActionBar.id = 'v2-ip-action-bar';
+                    v2ActionBar.style.cssText = "grid-column: 1 / -1; display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;";
+                    v2ActionBar.innerHTML = `
+                        <button id="btn-copy-ip" class="v2-cmd-btn" style="background: var(--card); border: 1px solid var(--glass-border);"><i data-lucide="copy" style="width:14px;"></i> Copy JSON</button>
+                        <button id="btn-export-ip" class="v2-cmd-btn" style="background: var(--cyber-blue); color: #000; font-weight: 600;"><i data-lucide="download" style="width:14px;"></i> Export Intel Report</button>
+                    `;
+                    resultContainer.appendChild(v2ActionBar);
+
+                    document.getElementById('btn-copy-ip').addEventListener('click', () => {
+                        navigator.clipboard.writeText(JSON.stringify(consolidatedIpIntelligence, null, 2));
+                        alert('IP Intelligence JSON copied to clipboard!');
+                    });
+
+                    document.getElementById('btn-export-ip').addEventListener('click', () => {
+                        const blob = new Blob([JSON.stringify(consolidatedIpIntelligence, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `IP_Intel_Report_${consolidatedIpIntelligence.ip}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
                 }
 
                 resultContainer.style.display = 'grid';

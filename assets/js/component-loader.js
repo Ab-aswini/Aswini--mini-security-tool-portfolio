@@ -6,6 +6,11 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
     const prefix = getPathPrefix();
+    
+    // Auto-load V2 Matrix and V2 HUD scripts if not already present
+    loadV2Script(prefix + "assets/js/v2-matrix.js");
+    loadV2Script(prefix + "assets/js/v2-hud.js");
+
     await loadComponent("nav-placeholder", prefix + "components/navbar.html", prefix);
     await loadComponent("footer-placeholder", prefix + "components/footer.html", prefix);
     
@@ -17,6 +22,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Set active nav item
     setActiveNav();
 });
+
+function loadV2Script(src) {
+    const filename = src.split('/').pop();
+    if (!document.querySelector(`script[src*="${filename}"]`)) {
+        const s = document.createElement("script");
+        s.src = src;
+        s.defer = true;
+        document.head.appendChild(s);
+    }
+}
 
 function getPathPrefix() {
     // Check component-loader script src to determine relative depth
