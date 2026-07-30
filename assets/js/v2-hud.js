@@ -59,6 +59,7 @@
         { id: "tools", title: "Open Tools Suite Matrix", category: "Navigation", icon: "grid", url: "tools.html" },
         { id: "projects", title: "View Built Systems & Projects", category: "Navigation", icon: "folder", url: "projects.html" },
         { id: "universe", title: "Explore Universe Portfolio", category: "Navigation", icon: "globe", url: "universe.html" },
+        { id: "cyber-forge", title: "CyberForge Cryptography & Payload Studio", category: "Security Tools", icon: "binary", url: "tools/cyber-forge.html" },
         { id: "ip-intel", title: "IP & Network Intelligence", category: "Security Tools", icon: "wifi", url: "tools/ip-intel.html" },
         { id: "exif", title: "Image EXIF Metadata Visualizer", category: "Security Tools", icon: "camera", url: "tools/image-exif.html" },
         { id: "breach", title: "Data Breach Exposure Checker", category: "Security Tools", icon: "shield-alert", url: "tools/breach-checker.html" },
