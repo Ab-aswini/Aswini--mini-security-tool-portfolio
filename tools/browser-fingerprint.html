@@ -112,9 +112,12 @@
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
+    <script defer src="../assets/js/component-loader.js"></script>
 </head>
 
 <body class="tools-page" data-theme="dark">
+    <div id="nav-placeholder"></div>
+    <div class="nav-spacer"></div>
     <div style="padding: 1.5rem;">
         <a href="../tools.html" class="tool-btn"
             style="background:transparent; border:1px solid currentColor; color:inherit;">
@@ -341,7 +344,7 @@
             const isBot = navigator.webdriver || window.callPhantom || window._phantom;
             document.getElementById('botStatus').innerHTML = isBot
                 ? `<span class="error">ðŸ¤– ROBOT DETECTED</span>`
-                : `<span class="success">ðŸ‘¤ HUMAN</span>`;
+                : `<span class="success">👤 HUMAN</span>`;
 
             document.getElementById('uaString').innerText = navigator.userAgent;
             document.getElementById('dntStatus').innerText = navigator.doNotTrack == "1" ? "Enabled" : "Disabled";
@@ -373,6 +376,7 @@
     <!-- Hover Footer -->
     <!-- Hover Footer -->
 
+    <div id="footer-placeholder"></div>
 </body>
 
 </html>

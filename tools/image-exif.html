@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -50,9 +50,12 @@
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
+    <script defer src="../assets/js/component-loader.js"></script>
 </head>
 
 <body class="tools-page" data-theme="dark">
+    <div id="nav-placeholder"></div>
+    <div class="nav-spacer"></div>
     <div style="padding: 1.5rem;">
         <a href="../tools.html" class="tool-btn"
             style="background:transparent; border:1px solid currentColor; color:inherit;">
@@ -218,23 +221,29 @@
                             ${riskLabel}
                         </div>
                         
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:1rem;">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:1rem; margin-bottom:1rem;">
                             <div class="intel-stat">
                                 <div style="color:#888;">Location</div>
-                                ${checkGPS ? `<div style="color:var(--status-error); font-weight:bold;">ðŸ“ FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                                ${checkGPS ? `<div style="color:var(--status-error); font-weight:bold;">📍 FOUND</div>` : `<div style="color:var(--status-success);">✅ CLEAN</div>`}
                             </div>
                             <div class="intel-stat">
                                 <div style="color:#888;">Device</div>
-                                ${checkDevice ? `<div style="color:var(--status-warn); font-weight:bold;">ðŸ“± FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                                ${checkDevice ? `<div style="color:var(--status-warn); font-weight:bold;">📱 FOUND</div>` : `<div style="color:var(--status-success);">✅ CLEAN</div>`}
                             </div>
                              <div class="intel-stat">
                                 <div style="color:#888;">History/XMP</div>
-                                ${checkTools ? `<div style="color:var(--status-warn); font-weight:bold;">ðŸ’¾ FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                                ${checkTools ? `<div style="color:var(--status-warn); font-weight:bold;">💾 FOUND</div>` : `<div style="color:var(--status-success);">✅ CLEAN</div>`}
                             </div>
                             <div class="intel-stat">
                                 <div style="color:#888;">Author/IPTC</div>
-                                ${checkAuthor ? `<div style="color:var(--status-error); font-weight:bold;">ðŸ‘¤ FOUND</div>` : `<div style="color:var(--status-success);">âœ… CLEAN</div>`}
+                                ${checkAuthor ? `<div style="color:var(--status-error); font-weight:bold;">👤 FOUND</div>` : `<div style="color:var(--status-success);">✅ CLEAN</div>`}
                             </div>
+                        </div>
+
+                        <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+                            <button id="stripBtn" class="tool-btn" style="background:var(--status-success); color:#000; font-weight:bold;">
+                                🛡️ Sanitize & Strip EXIF Metadata
+                            </button>
                         </div>
                     </div>
                 `;
@@ -244,9 +253,7 @@
                     if (!groupData) return '';
                     let rows = '';
                     for (const [key, val] of Object.entries(groupData)) {
-                        // ExifReader 'expanded' format: keys are tag names, value is the processed value
                         if (typeof val === 'object' && val !== null) {
-                            // Prefer description, then value, then raw stringify
                             let displayVal = val.description || val.value;
                             if (Array.isArray(displayVal)) displayVal = displayVal.join(', ');
                             if (!displayVal && displayVal !== 0) displayVal = JSON.stringify(val);
@@ -268,7 +275,6 @@
                     `;
                 }
 
-                // Add styling for tables
                 let html = `
                     <style>
                         .meta-table td { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color:#aaa; }
@@ -277,13 +283,32 @@
                     </style>
                 ` + summaryHtml;
 
-                if (tags.gps) html += makeTable("ðŸ“ GPS Data", tags.gps);
-                if (tags.exif) html += makeTable("ðŸ“· Camera (EXIF)", tags.exif);
-                if (tags.xmp) html += makeTable("ðŸ’¾ XMP / History (Deep)", tags.xmp);
-                if (tags.iptc) html += makeTable("ðŸ“° IPTC / Copyright", tags.iptc);
-                if (tags.png || tags.file) html += makeTable("ðŸ“ File Properties", tags.file || tags.png);
+                if (tags.gps) html += makeTable("📍 GPS Data", tags.gps);
+                if (tags.exif) html += makeTable("📷 Camera (EXIF)", tags.exif);
+                if (tags.xmp) html += makeTable("💾 XMP / History (Deep)", tags.xmp);
+                if (tags.iptc) html += makeTable("📰 IPTC / Copyright", tags.iptc);
+                if (tags.png || tags.file) html += makeTable("📄 File Properties", tags.file || tags.png);
 
                 resultsArea.innerHTML = html;
+
+                // Add Strip EXIF listener
+                const stripBtn = document.getElementById('stripBtn');
+                if (stripBtn) {
+                    stripBtn.addEventListener('click', () => {
+                        const img = document.getElementById('imgPreview');
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        const cleanUrl = canvas.toDataURL('image/jpeg', 0.95);
+                        const a = document.createElement('a');
+                        a.href = cleanUrl;
+                        a.download = `sanitized_${file.name.replace(/\.[^/.]+$/, "")}.jpg`;
+                        a.click();
+                    });
+                }                resultsArea.innerHTML = html;
 
             } catch (error) {
                 console.error(error);
@@ -295,6 +320,7 @@
     <!-- Hover Footer -->
     <!-- Hover Footer -->
 
+    <div id="footer-placeholder"></div>
 </body>
 
 </html>

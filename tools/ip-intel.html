@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -114,6 +114,7 @@
             color: var(--accent);
         }
     </style>
+    <script defer src="../assets/js/component-loader.js"></script>
     <!-- Theme Data Script (Anti-Flicker) -->
     <script>
         (function () {
@@ -125,16 +126,16 @@
     </script>
 </head>
 
-<body class="tools-page" data-theme="dark">
-    <div style="padding: 1.5rem;">
-        <a href="../tools.html" class="tool-btn"
-            style="background:transparent; border:1px solid currentColor; color:inherit;">
-            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
-        </a>
-    </div>
-
+<body class="tools-page">
+    <div id="nav-placeholder"></div>
     <div class="nav-spacer"></div>
-    <div class="tools-container" style="max-width: 900px;"> <!-- Compact Width -->
+
+    <div class="tools-container" style="max-width: 900px; padding-top: 1rem;">
+        <div style="margin-bottom: 1rem;">
+            <a href="../tools.html" class="tool-btn" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:inherit; font-size:0.85rem; padding:0.4rem 0.8rem;">
+                <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+            </a>
+        </div>
         <!-- 1. HEADER -->
         <header class="tools-header">
             <h1 class="tools-title">IP Intelligence</h1>
@@ -497,7 +498,7 @@
                 if (consolidatedIpIntelligence.timeZone) {
                     try {
                         const timeString = new Date().toLocaleTimeString('en-US', { timeZone: consolidatedIpIntelligence.timeZone, hour: '2-digit', minute: '2-digit' });
-                        document.getElementById('d-time').innerText = "?? " + timeString;
+                        document.getElementById('d-time').innerText = "🕒 " + timeString;
                     } catch (e) { document.getElementById('d-time').innerText = consolidatedIpIntelligence.timeZone; }
                 } else {
                     document.getElementById('d-time').innerText = "--:--";
@@ -518,15 +519,15 @@
                 let isCellular = cellularKeywords.some(keyword => orgUpper.includes(keyword));
 
                 if (isHosting) {
-                    typeElement.innerText = "?? Hosting / VPN";
+                    typeElement.innerText = "🛡️ Hosting / VPN";
                     descElement.innerText = "Potential Masked Location";
                     riskCard.style.cssText = "background: rgba(239, 68, 68, 0.1); border-color: var(--status-error); color: var(--status-error); grid-area: risk;";
                 } else if (isCellular) {
-                    typeElement.innerText = "?? Mobile / Cellular";
+                    typeElement.innerText = "📱 Mobile / Cellular";
                     descElement.innerText = "Low Location Accuracy";
                     riskCard.style.cssText = "background: rgba(245, 158, 11, 0.1); border-color: var(--status-warn); color: var(--status-warn); grid-area: risk;";
                 } else {
-                    typeElement.innerText = "?? Residential";
+                    typeElement.innerText = "🏠 Residential";
                     descElement.innerText = "Standard Connection";
                     riskCard.style.cssText = "background: rgba(16, 185, 129, 0.1); border-color: var(--status-success); color: var(--status-success); grid-area: risk;";
                 }
@@ -564,6 +565,7 @@
 
 
     <!-- Hover Footer -->
+    <div id="footer-placeholder"></div>
 
 </body>
 

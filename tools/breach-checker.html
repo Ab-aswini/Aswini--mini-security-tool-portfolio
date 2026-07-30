@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,35 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Breach Checker - Digital Tools</title>
     <link rel="icon" type="image/png" href="../assets/images/favicon.png">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     <script src="../assets/js/lucide.min.js"></script>
+    <script defer src="../assets/js/component-loader.js"></script>
+    <script defer src="../assets/js/app.js"></script>
     <link rel="stylesheet" href="../assets/css/global.css">
-
-
     <link rel="stylesheet" href="../assets/css/tools.css">
     <style>
-        @media (max-width: 768px) {
-            .tools-container {
-                padding: 1rem;
-            }
-
-            .input-group {
-                flex-direction: column;
-            }
-
-            .tool-input,
-            .tool-btn {
-                width: 100%;
-            }
-
-            .tool-btn {
-                margin-top: 0.5rem;
-            }
+        .entropy-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+            overflow: hidden;
+            margin: 0.5rem 0 1rem 0;
+        }
+        .entropy-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background-color 0.3s ease;
         }
     </style>
-    <!-- Theme Data Script (Anti-Flicker) -->
     <script>
         (function () {
             const savedTheme = localStorage.getItem("theme");
@@ -45,129 +36,174 @@
     </script>
 </head>
 
-<body class="tools-page" data-theme="dark">
-    <div style="padding: 1.5rem;">
-        <a href="../tools.html" class="tool-btn"
-            style="background:transparent; border:1px solid currentColor; color:inherit;">
-            <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
-        </a>
-    </div>
+<body class="tools-page">
+    <div id="nav-placeholder"></div>
+    <div class="nav-spacer"></div>
 
-    <div class="tools-container" style="max-width: 40rem;">
-        <header class="tools-header" style="margin-top:2rem;">
+    <div class="tools-container" style="max-width: 42rem; padding-top: 1rem;">
+        <div style="margin-bottom: 1rem;">
+            <a href="../tools.html" class="tool-btn" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:inherit; font-size:0.85rem; padding:0.4rem 0.8rem;">
+                <i data-lucide="arrow-left" style="height:1em; vertical-align:middle;"></i> Back to Tools
+            </a>
+        </div>
+
+        <header class="tools-header">
             <h1 class="tools-title">Breach Checker</h1>
-            <p class="tools-subtitle">Securely check if a password has been compromised (k-Anonymity).</p>
+            <p class="tools-subtitle">Securely check if a password has been compromised using zero-knowledge k-Anonymity.</p>
         </header>
 
         <div class="tool-card">
-
-            <div
-                style="margin-bottom: 1.5rem; opacity: 0.9; line-height: 1.5; font-size: 0.95rem; background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
-                <strong>Why check?</strong> Hackers use lists of millions of stolen passwords to break into accounts.
-                If your password is in this database, it is <strong>unsafe</strong> to use anywhere.
+            <div style="margin-bottom: 1.5rem; opacity: 0.9; line-height: 1.5; font-size: 0.95rem; background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
+                <strong>Why check?</strong> Hackers use billions of leaked passwords to launch credential-stuffing attacks.
                 <br><br>
-                This tool uses a secure method (k-Anonymity) to check the database <strong>without ever revealing your
-                    password</strong> to us or anyone else.
+                This tool uses SHA-1 prefixing (<strong>k-Anonymity</strong>) to query HaveIBeenPwned. <strong>Your password never leaves your browser.</strong>
             </div>
 
             <div class="input-group">
-                <input type="password" id="passInput" class="tool-input" placeholder="Enter password to check...">
+                <input type="password" id="passInput" class="tool-input" placeholder="Enter password to check exposure...">
                 <button id="checkBtn" class="tool-btn">Check Exposure</button>
             </div>
-            <div style="font-size:0.8rem; color:#6b7280; margin-bottom:1rem;">
-                <i data-lucide="lock" style="width:1em; vertical-align:middle"></i>
-                Privacy First: Your password is <strong>never sent</strong>. Only the first 5 characters of its SHA-1
-                hash are checked against the database.
+
+            <div class="entropy-bar">
+                <div id="entropyFill" class="entropy-fill"></div>
             </div>
+            <div id="entropyText" style="font-size:0.8rem; opacity:0.7; margin-bottom:1rem;">Entropy: 0 bits</div>
+
+            <div style="font-size:0.8rem; opacity:0.6; margin-bottom:1rem;">
+                <i data-lucide="lock" style="width:1em; vertical-align:middle"></i>
+                Privacy First: Only the first 5 characters of the SHA-1 hash are queried.
+            </div>
+
             <div id="resultsArea" class="result-box"></div>
+        </div>
+
+        <!-- Password Generator Tool -->
+        <div class="tool-card" style="margin-top: 1.5rem;">
+            <h3 style="margin-bottom: 0.5rem; font-size:1.1rem; font-weight:700;">Need a Safe Password?</h3>
+            <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;">Generate a high-entropy cryptographically secure password instantly.</p>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <input type="text" id="genResult" class="tool-input" readonly placeholder="Generated password will appear here...">
+                <button id="genBtn" class="tool-btn" style="background:var(--accent); color:#000; font-weight:700;">Generate</button>
+            </div>
         </div>
 
         <!-- Deep Search Redirects -->
         <div class="tool-card" style="margin-top: 1.5rem;">
-            <h3 style="margin-bottom: 0.5rem;">Deep Identity Search</h3>
-            <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;">
-                Want to check if your <strong>Email Address</strong> or <strong>Phone Number</strong> was exposed in a
-                data breach?
-                Use these trusted external platforms for a deep dive.
-            </p>
+            <h3 style="margin-bottom: 0.5rem; font-size:1.1rem; font-weight:700;">Deep Identity Search</h3>
+            <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;">Check if your Email or Phone Number was exposed in major corporate leaks.</p>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <a href="https://haveibeenpwned.com/" target="_blank" class="tool-btn"
-                    style="background: #ef4444; border: none; font-weight: bold;">
-                    <i data-lucide="shield-alert" style="vertical-align: middle; margin-right: 5px;"></i>
-                    Check Email (Have I Been Pwned)
+                <a href="https://haveibeenpwned.com/" target="_blank" class="tool-btn" style="background: #ef4444; border: none; font-weight: bold; text-decoration:none;">
+                    <i data-lucide="shield-alert" style="vertical-align: middle; margin-right: 5px;"></i> Check Email (Have I Been Pwned)
                 </a>
-                <a href="https://cybernews.com/personal-data-leak-check/" target="_blank" class="tool-btn"
-                    style="background: transparent; border: 1px solid #4b5563;">
-                    <i data-lucide="search" style="vertical-align: middle; margin-right: 5px;"></i>
-                    CyberNews Leak Check
+                <a href="https://cybernews.com/personal-data-leak-check/" target="_blank" class="tool-btn" style="background: transparent; border: 1px solid #4b5563; text-decoration:none;">
+                    <i data-lucide="search" style="vertical-align: middle; margin-right: 5px;"></i> CyberNews Leak Check
                 </a>
             </div>
         </div>
     </div>
 
+    <div id="footer-placeholder"></div>
 
     <script>
-        lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
 
-        document.getElementById('checkBtn').addEventListener('click', async () => {
-            const password = document.getElementById('passInput').value;
-            const resultsArea = document.getElementById('resultsArea');
-            if (!password) return;
+            const passInput = document.getElementById('passInput');
+            const entropyFill = document.getElementById('entropyFill');
+            const entropyText = document.getElementById('entropyText');
 
-            resultsArea.innerHTML = "Hashing securely (SHA-1)...";
-            resultsArea.classList.add('visible');
-
-            // 1. Hash Password (SHA-1)
-            const msgBuffer = new TextEncoder().encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-
-            // 2. Prepare k-Anonymity Request
-            const prefix = hashHex.substring(0, 5);
-            const suffix = hashHex.substring(5);
-
-            resultsArea.innerText = `Hash Prefix: ${prefix}***** (Checking Database...)`;
-
-            try {
-                // 3. Query HIBP API
-                const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
-                const text = await res.text();
-
-                // 4. Parse Response (Format: SUFFIX:COUNT)
-                // We look for our specific suffix in the list
-                const regex = new RegExp(`^${suffix}:([0-9]+)`, 'm');
-                const match = text.match(regex);
-
-                if (match) {
-                    const count = parseInt(match[1]);
-                    resultsArea.innerHTML = `
-<div style="color:var(--status-error); font-size:1.2rem; font-weight:bold;">âš ï¸ LEAKED!</div>
-This password appears in <strong>${count.toLocaleString()}</strong> known data breaches.
-<br><br>
-Recommendation: Do not use this password.
-<div style="margin-top:1.5rem; pt:1rem; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; opacity:0.5;">
-    Data source: <a href="https://haveibeenpwned.com/API/v3" target="_blank" style="color:inherit;">Have I Been Pwned API</a> (k-Anonymity Model)
-</div>
-                    `;
-                } else {
-                    resultsArea.innerHTML = `
-<div style="color:var(--status-success); font-size:1.2rem; font-weight:bold;">âœ… Safe (Clean)</div>
-This password was NOT found in the public breach database.
-<div style="margin-top:1.5rem; pt:1rem; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; opacity:0.5;">
-    Data source: <a href="https://haveibeenpwned.com/API/v3" target="_blank" style="color:inherit;">Have I Been Pwned API</a> (k-Anonymity Model)
-</div>
-                    `;
+            passInput.addEventListener('input', () => {
+                const val = passInput.value;
+                if (!val) {
+                    entropyFill.style.width = '0%';
+                    entropyText.innerText = 'Entropy: 0 bits';
+                    return;
                 }
+                let pool = 0;
+                if (/[a-z]/.test(val)) pool += 26;
+                if (/[A-Z]/.test(val)) pool += 26;
+                if (/[0-9]/.test(val)) pool += 10;
+                if (/[^a-zA-Z0-9]/.test(val)) pool += 32;
+                
+                const bits = Math.floor(val.length * Math.log2(pool || 1));
+                const pct = Math.min(100, Math.floor((bits / 80) * 100));
+                entropyFill.style.width = `${pct}%`;
+                
+                if (bits < 40) {
+                    entropyFill.style.backgroundColor = 'var(--status-error)';
+                    entropyText.innerText = `Entropy: ${bits} bits (Weak)`;
+                } else if (bits < 60) {
+                    entropyFill.style.backgroundColor = 'var(--status-warn)';
+                    entropyText.innerText = `Entropy: ${bits} bits (Moderate)`;
+                } else {
+                    entropyFill.style.backgroundColor = 'var(--status-success)';
+                    entropyText.innerText = `Entropy: ${bits} bits (Strong)`;
+                }
+            });
 
-            } catch (e) {
-                resultsArea.innerText = "Error connecting to Pwned API.";
-            }
+            document.getElementById('checkBtn').addEventListener('click', async () => {
+                const password = passInput.value;
+                const resultsArea = document.getElementById('resultsArea');
+                if (!password) return;
+
+                resultsArea.innerHTML = "Hashing securely (SHA-1)...";
+                resultsArea.classList.add('visible');
+
+                const msgBuffer = new TextEncoder().encode(password);
+                const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+                const prefix = hashHex.substring(0, 5);
+                const suffix = hashHex.substring(5);
+
+                resultsArea.innerText = `Hash Prefix: ${prefix}***** (Querying k-Anonymity Database...)`;
+
+                try {
+                    const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+                    const text = await res.text();
+
+                    const regex = new RegExp(`^${suffix}:([0-9]+)`, 'm');
+                    const match = text.match(regex);
+
+                    if (match) {
+                        const count = parseInt(match[1]);
+                        resultsArea.innerHTML = `
+                            <div style="color:var(--status-error); font-size:1.2rem; font-weight:bold;">⚠️ LEAKED!</div>
+                            This password appears in <strong>${count.toLocaleString()}</strong> known data breaches.
+                            <br><br>
+                            <strong>Recommendation:</strong> Change this password immediately anywhere it is used.
+                            <div style="margin-top:1rem; padding-top:0.8rem; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; opacity:0.6;">
+                                Data source: Have I Been Pwned k-Anonymity API
+                            </div>
+                        `;
+                    } else {
+                        resultsArea.innerHTML = `
+                            <div style="color:var(--status-success); font-size:1.2rem; font-weight:bold;">✅ Clean (No Breaches Found)</div>
+                            This password was NOT found in public breach logs.
+                            <div style="margin-top:1rem; padding-top:0.8rem; border-top:1px solid rgba(255,255,255,0.1); font-size:0.75rem; opacity:0.6;">
+                                Data source: Have I Been Pwned k-Anonymity API
+                            </div>
+                        `;
+                    }
+                } catch (e) {
+                    resultsArea.innerText = "Error connecting to Pwned Passwords API. Check network status.";
+                }
+            });
+
+            // Password Generator
+            document.getElementById('genBtn').addEventListener('click', () => {
+                const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}";
+                const array = new Uint32Array(20);
+                crypto.getRandomValues(array);
+                let pwd = "";
+                for (let i = 0; i < 20; i++) {
+                    pwd += chars[array[i] % chars.length];
+                }
+                document.getElementById('genResult').value = pwd;
+            });
         });
     </script>
-
-
-    <script src="../assets/js/app.js"></script>
 </body>
 
 </html>
