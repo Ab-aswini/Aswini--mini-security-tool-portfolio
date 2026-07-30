@@ -55,17 +55,35 @@
     // 2. Global Command Palette Overlay (Ctrl + K)
     // -------------------------------------------------------------
     const COMMANDS = [
+        // Navigation
         { id: "home", title: "Go to Overview Hub", category: "Navigation", icon: "home", url: "index.html" },
+        { id: "about", title: "About Aswini Behera & Background", category: "Navigation", icon: "user", url: "about.html" },
         { id: "tools", title: "Open Tools Suite Matrix", category: "Navigation", icon: "grid", url: "tools.html" },
         { id: "projects", title: "View Built Systems & Projects", category: "Navigation", icon: "folder", url: "projects.html" },
         { id: "universe", title: "Explore Universe Portfolio", category: "Navigation", icon: "globe", url: "universe.html" },
+        { id: "failures", title: "Failure Library & Key Lessons", category: "Navigation", icon: "alert-triangle", url: "failures.html" },
+        { id: "contact", title: "Contact & Communication Channels", category: "Navigation", icon: "mail", url: "contact.html" },
+
+        // Security Tools
         { id: "cyber-forge", title: "CyberForge Cryptography & Payload Studio", category: "Security Tools", icon: "binary", url: "tools/cyber-forge.html" },
-        { id: "ip-intel", title: "IP & Network Intelligence", category: "Security Tools", icon: "wifi", url: "tools/ip-intel.html" },
+        { id: "ip-intel", title: "IP & Network Intelligence Hub", category: "Security Tools", icon: "wifi", url: "tools/ip-intel.html" },
+        { id: "email-intel", title: "Email Intelligence & OSINT Recon", category: "Security Tools", icon: "mail", url: "tools/email-intel.html" },
+        { id: "public-search", title: "Public Search & Google Dorking", category: "Security Tools", icon: "search", url: "tools/public-search.html" },
+        { id: "dns-whois", title: "DNS Records & Whois Recon", category: "Security Tools", icon: "server", url: "tools/dns-whois.html" },
+        { id: "subresource", title: "Subresource & Endpoint Discovery", category: "Security Tools", icon: "layers", url: "tools/subresource-scanner.html" },
+        { id: "site-dossier", title: "Site Dossier & Header Security Auditor", category: "Security Tools", icon: "file-text", url: "tools/site-dossier.html" },
         { id: "exif", title: "Image EXIF Metadata Visualizer", category: "Security Tools", icon: "camera", url: "tools/image-exif.html" },
         { id: "breach", title: "Data Breach Exposure Checker", category: "Security Tools", icon: "shield-alert", url: "tools/breach-checker.html" },
-        { id: "pwd", title: "Password Entropy & Strength", category: "Security Tools", icon: "lock", url: "tools/password-strength.html" },
+        { id: "pwd", title: "Password Entropy & Strength Analyzer", category: "Security Tools", icon: "lock", url: "tools/password-strength.html" },
         { id: "fp", title: "Browser Fingerprint Inspector", category: "Security Tools", icon: "fingerprint", url: "tools/browser-fingerprint.html" },
-        { id: "theme", title: "Toggle Light / Dark Mode", category: "Actions", icon: "moon", action: toggleTheme }
+        { id: "stego", title: "Steganography Image Concealer", category: "Security Tools", icon: "image", url: "tools/steganography.html" },
+        { id: "pdf", title: "PDF Forensics & Metadata Inspector", category: "Security Tools", icon: "file", url: "tools/pdf-tools.html" },
+        { id: "apk", title: "APK Static Analyzer", category: "Security Tools", icon: "smartphone", url: "tools/apk-analyzer.html" },
+        { id: "entropy", title: "Entropy Visualizer & Binary Analyzer", category: "Security Tools", icon: "bar-chart-2", url: "tools/entropy-visualizer.html" },
+        { id: "dash", title: "Real-time Intel Dashboard", category: "Security Tools", icon: "activity", url: "tools/dashboard.html" },
+
+        // Actions
+        { id: "theme", title: "Toggle Light / Dark Theme", category: "Actions", icon: "moon", action: function() { if (window.toggleTheme) window.toggleTheme(); } }
     ];
 
     function initCommandPalette() {
@@ -221,9 +239,12 @@
             }
         });
 
-        // Attach palette triggers if present
-        document.querySelectorAll(".v2-cmd-trigger").forEach((btn) => {
-            btn.addEventListener("click", openPalette);
+        // Delegated click listener for palette triggers (handles dynamically loaded components)
+        document.addEventListener("click", (e) => {
+            if (e.target.closest(".v2-cmd-trigger")) {
+                e.preventDefault();
+                openPalette();
+            }
         });
     }
 

@@ -378,3 +378,57 @@ section.visible {
     text-align: center;
     padding: 6rem 2rem;
 }
+
+/* Pillar Matrix Helpers */
+.hero-badge-wrap {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.pillar-section {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+}
+
+.pillar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.pillar-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.pillar-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.pillar-desc {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+}
+
+.pillar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    text-decoration: none;
+}
+
+.pillar-link-cyber { color: var(--cyber-blue); }
+.pillar-link-purple { color: var(--neon-purple); }
+.pillar-link-green { color: var(--matrix-green); }

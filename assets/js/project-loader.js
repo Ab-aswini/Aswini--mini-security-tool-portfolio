@@ -94,6 +94,15 @@ function createProjectCard(project) {
             ctaLink.style.color = '#fff';
         }
         ctaLink.innerHTML = `${project.cta.text} <i data-lucide="${project.cta.icon}"></i>`;
+
+        if (project.cta.link === '#' || !project.cta.link) {
+            ctaLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.showToast) {
+                    window.showToast(`Case study for "${project.title}" is in technical documentation archive.`, 'info');
+                }
+            });
+        }
     }
 
     article.appendChild(contentDiv);

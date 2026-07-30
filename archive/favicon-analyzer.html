@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -326,7 +326,7 @@
                 <div class="hash-display" id="mmh3Disp" title="Click to Copy">--</div>
                 <div class="hash-label" id="hashLabel">MurmurHash3</div>
 
-                <a href="#" target="_blank" id="shodanLink" class="shodan-btn">
+                <a href="#" target="_blank" id="shodanLink" class="shodan-btn" rel="noopener noreferrer">
                     <i data-lucide="search" style="width:14px;"></i> HUNT ON SHODAN
                 </a>
             </div>
@@ -534,7 +534,7 @@
                         serverEl.innerHTML = server;
 
                         if (server.match(/Apache\/2\.4\.(49|50)/)) {
-                            serverEl.innerHTML += ` <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-41773" target="_blank" class="exploit-btn">CVE-2021-41773</a>`;
+                            serverEl.innerHTML += ` <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-41773" target="_blank" class="exploit-btn" rel="noopener noreferrer">CVE-2021-41773</a>`;
                         }
 
                         document.getElementById('powerHeader').innerText = powered;

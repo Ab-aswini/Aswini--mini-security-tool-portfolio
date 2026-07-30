@@ -37,6 +37,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+// -------------------------------------------------------------------------
+// 3. Global Toast Notifications & Clipboard Helpers
+// -------------------------------------------------------------------------
+window.showToast = function (message, type = 'info') {
+    let container = document.getElementById('v2-toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'v2-toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `v2-toast v2-toast-${type}`;
+
+    let iconName = 'info';
+    if (type === 'success') iconName = 'check-circle';
+    if (type === 'error') iconName = 'alert-triangle';
+    if (type === 'warn') iconName = 'alert-circle';
+
+    toast.innerHTML = `
+        <i data-lucide="${iconName}" class="v2-toast-icon"></i>
+        <span>${message}</span>
+    `;
+
+    container.appendChild(toast);
+
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+};
+
+window.copyToClipboard = async function (text, successMsg = 'Copied to clipboard!') {
+    if (!text) return;
+    try {
+        await navigator.clipboard.writeText(text);
+        window.showToast(successMsg, 'success');
+    } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+        window.showToast(successMsg, 'success');
+    }
+};
+
 
 
 // -------------------------------------------------------------------------

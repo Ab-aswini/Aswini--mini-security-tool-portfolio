@@ -61,15 +61,15 @@
             </div>
         </a>
 
-        <div class="tubelight-item" style="padding: 0 0.5rem;">
-            <button class="v2-cmd-btn v2-cmd-trigger" title="Command Palette (Ctrl + K)">
-                <i data-lucide="terminal" style="width:14px; height:14px; color:var(--cyber-blue);"></i>
+        <div class="tubelight-item nav-cmd-wrapper">
+            <button class="v2-cmd-btn v2-cmd-trigger" title="Command Palette (Ctrl + K)" aria-label="Command Palette">
+                <i data-lucide="terminal" class="nav-cmd-icon"></i>
                 <span class="v2-kbd">Ctrl K</span>
             </button>
         </div>
 
         <div class="tubelight-item" id="theme-switch-container">
-            <button class="theme-toggle-btn" onclick="toggleTheme()">🌙</button>
+            <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Light and Dark Theme">🌙</button>
         </div>
     </div>
 </nav>

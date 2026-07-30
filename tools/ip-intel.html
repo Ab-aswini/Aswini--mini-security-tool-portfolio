@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Intelligence - Digital Tools</title>
     <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="../assets/images/favicon.png">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
         rel="stylesheet">
@@ -173,7 +174,7 @@
             <!-- B. Map (Right Side) -->
             <div id="map-area" class="bento-card" style="padding: 0; overflow:hidden; position:relative;">
                 <div id="ipMap" style="width:100%; height:100%; min-height: 250px;"></div>
-                <a id="gmaps-link" href="#" target="_blank"
+                <a id="gmaps-link" href="#" target="_blank" rel="noopener noreferrer"
                     style="position:absolute; bottom:10px; right:10px; z-index:400; background:var(--background); padding:4px 8px; border-radius:4px; font-size:0.7rem; text-decoration:none; opacity:0.9;">
                     Open in Google Maps ?
                 </a>
@@ -202,8 +203,8 @@
                     <div class="bento-val" id="d-asn">--</div>
                     <!-- ASN Links -->
                     <div id="asn-links" style="margin-top:0.5rem; display:none; gap:0.5rem; font-size: 0.75rem;">
-                        <a id="bgp-link" href="#" target="_blank" class="link-hover">BGP</a>
-                        <a id="peering-link" href="#" target="_blank" class="link-hover">Peering</a>
+                        <a id="bgp-link" href="#" target="_blank" rel="noopener noreferrer" class="link-hover">BGP</a>
+                        <a id="peering-link" href="#" target="_blank" rel="noopener noreferrer" class="link-hover">Peering</a>
                     </div>
                 </div>
             </div>
@@ -481,6 +482,11 @@
                 document.getElementById('d-loc').innerText = consolidatedIpIntelligence.city || 'Unknown';
                 document.getElementById('d-country').innerText = `${consolidatedIpIntelligence.region || ''}, ${consolidatedIpIntelligence.country}`;
 
+                const gmapsEl = document.getElementById('gmaps-link');
+                if (gmapsEl && consolidatedIpIntelligence.latitude && consolidatedIpIntelligence.longitude) {
+                    gmapsEl.href = `https://www.google.com/maps?q=${consolidatedIpIntelligence.latitude},${consolidatedIpIntelligence.longitude}`;
+                }
+
                 document.getElementById('d-isp').innerText = consolidatedIpIntelligence.isp || 'N/A';
                 document.getElementById('d-org').innerText = consolidatedIpIntelligence.org || 'N/A';
 
@@ -542,8 +548,11 @@
                     resultContainer.appendChild(v2ActionBar);
 
                     document.getElementById('btn-copy-ip').addEventListener('click', () => {
-                        navigator.clipboard.writeText(JSON.stringify(consolidatedIpIntelligence, null, 2));
-                        alert('IP Intelligence JSON copied to clipboard!');
+                        if (window.copyToClipboard) {
+                            window.copyToClipboard(JSON.stringify(consolidatedIpIntelligence, null, 2), 'IP Intelligence JSON copied to clipboard!');
+                        } else {
+                            navigator.clipboard.writeText(JSON.stringify(consolidatedIpIntelligence, null, 2));
+                        }
                     });
 
                     document.getElementById('btn-export-ip').addEventListener('click', () => {

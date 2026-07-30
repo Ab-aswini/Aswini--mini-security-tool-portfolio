@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -542,7 +542,7 @@
                         The target site (${domain}) may have strong anti-bot protection or is unreachable via our public proxies.
                     </p>
                     <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
-                        <a href="https://${domain}" target="_blank" class="scan-btn" style="background:#333; border:1px solid #555; text-decoration:none; display:inline-block; line-height:3;">
+                        <a href="https://${domain}" target="_blank" class="scan-btn" style="background:#333; border:1px solid #555; text-decoration:none; display:inline-block; line-height:3;" rel="noopener noreferrer">
                             <i data-lucide="external-link" style="vertical-align:middle; width:16px;"></i> Visit Site Directly
                         </a>
                         <button onclick="retryScan()" class="scan-btn" style="background:#ef4444;">
@@ -794,7 +794,7 @@
                         data.vulns.slice(0, 3).forEach(v => {
                             vulnHtml += `
                                 <div class="vuln-item">
-                                    <a href="https://osv.dev/vulnerability/${v.id}" target="_blank" class="vuln-id">${v.id}</a>
+                                    <a href="https://osv.dev/vulnerability/${v.id}" target="_blank" class="vuln-id" rel="noopener noreferrer">${v.id}</a>
                                     <div class="vuln-desc">${v.summary || 'Details unavailable'}</div>
                                 </div>`;
                         });

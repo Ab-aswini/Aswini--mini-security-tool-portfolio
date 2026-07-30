@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Intelligence - Digital Tools</title>
     <link rel="icon" type="image/png" href="../assets/images/favicon.png">
+    <link rel="apple-touch-icon" href="../assets/images/favicon.png">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@400;700&display=swap"
         rel="stylesheet">
@@ -207,10 +208,13 @@
     <div>SPF: ${hasSPF ? '<span style="color:var(--status-success)">Active</span>' : '<span style="color:var(--status-warn)">Missing</span>'}</div>
 </div>
 
-<div style="margin-bottom:1rem;">
-    <a href="https://haveibeenpwned.com/account/${email}" target="_blank" class="tool-btn" style="display:block; text-align:center; text-decoration:none; padding:0.5rem; font-size:0.9rem;">
+<div style="margin-bottom:1rem; display:flex; gap:0.5rem;">
+    <a href="https://haveibeenpwned.com/account/${email}" target="_blank" rel="noopener noreferrer" class="tool-btn" style="flex:1; text-align:center; text-decoration:none; padding:0.5rem; font-size:0.9rem;">
         Check Data Breaches (HIBP) &rarr;
     </a>
+    <button onclick="copyToClipboard('${email}', 'Email address copied to clipboard!')" class="tool-btn" style="background:var(--card); border:1px solid var(--border-color); color:var(--text); padding:0.5rem 0.8rem; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.35rem;">
+        <i data-lucide="copy" style="width:14px; height:14px;"></i> Copy
+    </button>
 </div>
 
 [Technical Data]
@@ -223,9 +227,9 @@
 
                 resultsArea.innerHTML += `
                     <div style="margin-top:2rem; text-align:center; font-size:0.75rem; opacity:0.5; border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem;">
-                        Data sources: <a href="https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/" target="_blank" style="color:inherit; text-decoration:underline;">Cloudflare DoH</a>, 
-                        <a href="https://debounce.io" target="_blank" style="color:inherit; text-decoration:underline;">Debounce.io</a>, 
-                        <a href="https://gravatar.com" target="_blank" style="color:inherit; text-decoration:underline;">Gravatar</a>
+                        Data sources: <a href="https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:underline;">Cloudflare DoH</a>, 
+                        <a href="https://debounce.io" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:underline;">Debounce.io</a>, 
+                        <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:underline;">Gravatar</a>
                     </div>
                 `;
 

@@ -87,8 +87,8 @@
     <section id="hero">
         <!-- Hero Text Content (Centered Top) -->
         <div class="hero-content">
-            <div style="display: flex; gap: 0.75rem; align-items: center; justify-content: center; margin-bottom: 0.75rem; flex-wrap: wrap;">
-                <span class="v2-badge-cyber"><i data-lucide="shield" style="width:12px; height:12px;"></i> V3 CYBER NOIR ARCHITECTURE</span>
+            <div class="hero-badge-wrap">
+                <span class="v2-badge-cyber"><i data-lucide="shield" class="nav-cmd-icon"></i> V3 CYBER NOIR ARCHITECTURE</span>
                 <div class="v2-hud-bar"></div>
             </div>
 
@@ -100,8 +100,8 @@
             <p class="hero-sub monospace">> ROLE: CYBER_INTELLIGENCE_ANALYST & FULLSTACK_ARCHITECT<br>> FOCUS: SERVERLESS_SECURITY_UTILITIES & AUTONOMOUS_SYSTEMS</p>
 
             <div class="hero-btns">
-                <a href="tools.html" class="btn-primary"><i data-lucide="cpu" style="width:16px; height:16px; vertical-align:middle; margin-right:4px;"></i> Launch Security Tools</a>
-                <button class="btn-secondary v2-cmd-trigger" style="cursor:pointer;"><i data-lucide="terminal" style="width:16px; height:16px; vertical-align:middle; margin-right:4px;"></i> Command Palette (Ctrl+K)</button>
+                <a href="tools.html" class="btn-primary"><i data-lucide="cpu" class="nav-cmd-icon"></i> Launch Security Tools</a>
+                <button class="btn-secondary v2-cmd-trigger"><i data-lucide="terminal" class="nav-cmd-icon"></i> Command Palette (Ctrl+K)</button>
             </div>
         </div>
 
@@ -115,33 +115,33 @@
     </section>
 
     <!-- CORE PILLARS MATRIX SECTION -->
-    <section style="max-width: 1200px; margin: 3rem auto; padding: 0 1.5rem;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+    <section class="pillar-section">
+        <div class="pillar-grid">
             <div class="v2-glass-card">
-                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                    <i data-lucide="shield-check" style="width:24px; height:24px; color:var(--cyber-blue);"></i>
-                    <h3 style="font-size:1.15rem; font-weight:700;">Cyber OSINT & Forensics</h3>
+                <div class="pillar-card-header">
+                    <i data-lucide="shield-check" class="contact-icon text-cyber-blue"></i>
+                    <h3 class="pillar-title">Cyber OSINT & Forensics</h3>
                 </div>
-                <p style="font-size:0.9rem; color:var(--text-dim); line-height:1.5;">Building 100% client-side zero-knowledge security tools, EXIF metadata scrubbers, IP threat scorers, and data breach calculators.</p>
-                <a href="tools.html" style="display:inline-flex; align-items:center; gap:0.35rem; color:var(--cyber-blue); font-size:0.85rem; font-weight:600; margin-top:1rem; text-decoration:none;">Explore Security Suite &rarr;</a>
+                <p class="pillar-desc">Building 100% client-side zero-knowledge security tools, EXIF metadata scrubbers, IP threat scorers, and data breach calculators.</p>
+                <a href="tools.html" class="pillar-link pillar-link-cyber">Explore Security Suite &rarr;</a>
             </div>
 
             <div class="v2-glass-card">
-                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                    <i data-lucide="cpu" style="width:24px; height:24px; color:var(--neon-purple);"></i>
-                    <h3 style="font-size:1.15rem; font-weight:700;">Systems & Full-Stack</h3>
+                <div class="pillar-card-header">
+                    <i data-lucide="cpu" class="contact-icon text-neon-purple"></i>
+                    <h3 class="pillar-title">Systems & Full-Stack</h3>
                 </div>
-                <p style="font-size:0.9rem; color:var(--text-dim); line-height:1.5;">Architecting scalable web applications, serverless microservices, real-time data pipelines, and responsive modern user interfaces.</p>
-                <a href="projects.html" style="display:inline-flex; align-items:center; gap:0.35rem; color:var(--neon-purple); font-size:0.85rem; font-weight:600; margin-top:1rem; text-decoration:none;">View Case Studies &rarr;</a>
+                <p class="pillar-desc">Architecting scalable web applications, serverless microservices, real-time data pipelines, and responsive modern user interfaces.</p>
+                <a href="projects.html" class="pillar-link pillar-link-purple">View Case Studies &rarr;</a>
             </div>
 
             <div class="v2-glass-card">
-                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                    <i data-lucide="compass" style="width:24px; height:24px; color:var(--matrix-green);"></i>
-                    <h3 style="font-size:1.15rem; font-weight:700;">Product & Strategy</h3>
+                <div class="pillar-card-header">
+                    <i data-lucide="compass" class="contact-icon text-matrix-green"></i>
+                    <h3 class="pillar-title">Product & Strategy</h3>
                 </div>
-                <p style="font-size:0.9rem; color:var(--text-dim); line-height:1.5;">Merging technology with sustainable zero-budget infrastructure models, user-centric product workflows, and privacy-first design.</p>
-                <a href="universe.html" style="display:inline-flex; align-items:center; gap:0.35rem; color:var(--matrix-green); font-size:0.85rem; font-weight:600; margin-top:1rem; text-decoration:none;">Discover Universe Hub &rarr;</a>
+                <p class="pillar-desc">Merging technology with sustainable zero-budget infrastructure models, user-centric product workflows, and privacy-first design.</p>
+                <a href="universe.html" class="pillar-link pillar-link-green">Discover Universe Hub &rarr;</a>
             </div>
         </div>
     </section>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -620,7 +620,7 @@
             footer.style.borderTop = "1px solid #27272a";
             footer.innerHTML = `
                 <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
-                    <a href="https://observatory.mozilla.org/analyze/${domain}" target="_blank" class="tool-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; background:rgba(60,162,250,0.1); color:#3ca2fa; border:1px solid #3ca2fa;">
+                    <a href="https://observatory.mozilla.org/analyze/${domain}" target="_blank" class="tool-btn" style="text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem; background:rgba(60,162,250,0.1); color:#3ca2fa; border:1px solid #3ca2fa;" rel="noopener noreferrer">
                          <i data-lucide="external-link" style="width:16px;"></i> Verify on Mozilla
                     </a>
                     <button onclick="startAudit()" class="tool-btn" style="background:rgba(255,255,255,0.05); color:#a1a1aa; border:1px solid #3f3f46;">
@@ -656,7 +656,7 @@
                         <button onclick="runNativeAudit('${domain}')" class="tool-btn" style="border:1px solid #3ca2fa; background:rgba(60,162,250,0.1); color:#3ca2fa; cursor:pointer;">
                             <i data-lucide="cpu" style="width:1em; height:1em; margin-right:0.5rem;"></i> Run Local Audit
                         </button>
-                        <a href="https://observatory.mozilla.org/analyze/${domain}" target="_blank" class="tool-btn" style="display:inline-flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.5rem 1rem;">
+                        <a href="https://observatory.mozilla.org/analyze/${domain}" target="_blank" class="tool-btn" style="display:inline-flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.5rem 1rem;" rel="noopener noreferrer">
                             <i data-lucide="external-link" style="width:1em; height:1em;"></i> Check Officially
                         </a>
                     </div>
