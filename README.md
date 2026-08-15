@@ -1,66 +1,99 @@
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=28&duration=3000&pause=1000&color=00E5FF&center=true&vCenter=true&multiline=true&repeat=true&width=800&height=100&lines=%F0%9F%9B%A1%EF%B8%8F+Digital+Intelligence+Suite;Zero-Knowledge+%E2%80%A2+Client-Side+%E2%80%A2+Privacy-First" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=30&duration=2500&pause=1000&color=00E5FF&center=true&vCenter=true&multiline=true&repeat=true&width=800&height=110&lines=%F0%9F%9B%A1%EF%B8%8F+DIGITAL+INTELLIGENCE+PORTFOLIO;16+Client-Side+Zero-Knowledge+Security+Tools;OSINT+%E2%80%A2+Forensics+%E2%80%A2+Cryptography+%E2%80%A2+Recon" alt="Cyber Intelligence Typing Banner" />
 </p>
 
 <pre align="center">
 <code>
- ██████╗██╗   ██╗██████╗ ███████╗██████╗     ██╗      █████╗ ██████╗ 
-██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗    ██║     ██╔══██╗██╔══██╗
-██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝    ██║     ███████║██████╔╝
-██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗    ██║     ██╔══██║██╔══██╗
-╚██████╗   ██║   ██████╔╝███████╗██║  ██║    ███████╗██║  ██║██████╔╝
- ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚══════╝╚═╝  ╚═╝╚═════╝
-        ⚡ Security Tools & Digital Intelligence Portfolio ⚡
+  ██████╗██╗   ██╗██████╗ ███████╗██████╗     ██╗      █████╗ ██████╗ 
+ ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗    ██║     ██╔══██╗██╔══██╗
+ ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝    ██║     ███████║██████╔╝
+ ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗    ██║     ██╔══██║██╔══██╗
+ ╚██████╗   ██║   ██████╔╝███████╗██║  ██║    ███████╗██║  ██║██████╔╝
+  ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝    ╚══════╝╚═╝  ╚═╝╚═════╝ 
+        ⚡ High-Performance Browser-Based Security & OSINT Suite ⚡
 </code>
 </pre>
 
 <p align="center">
-  <strong>🔬 16 Browser-Based Security & OSINT Tools — No Server, No Tracking, No Cost</strong>
+  <strong>🔬 100% Client-Side Privacy-First Architecture — Zero Servers • Zero Tracking • Zero Cost ($0.00)</strong>
 </p>
 
 <p align="center">
-  <a href="https://rouse.co.in"><img src="https://img.shields.io/badge/🌐_Live_Site-rouse.co.in-00E5FF?style=for-the-badge&labelColor=0a0a0a" alt="Live Site" /></a>
-  <a href="#-tool-arsenal"><img src="https://img.shields.io/badge/🛡️_Tools-16_Active-a855f7?style=for-the-badge&labelColor=0a0a0a" alt="Tools" /></a>
-  <a href="#-zero-budget-infrastructure"><img src="https://img.shields.io/badge/💰_Cost-$0.00-00ff88?style=for-the-badge&labelColor=0a0a0a" alt="Cost" /></a>
+  <a href="https://rouse.co.in"><img src="https://img.shields.io/badge/🌐_Live_Deployment-rouse.co.in-00E5FF?style=for-the-badge&logo=googlechrome&logoColor=black&labelColor=0a0a0a" alt="Live Site" /></a>
+  <a href="#-tool-arsenal-16-active-modules"><img src="https://img.shields.io/badge/🛡️_Security_Arsenal-16_Tools-a855f7?style=for-the-badge&logo=shield&logoColor=white&labelColor=0a0a0a" alt="Tools" /></a>
+  <a href="#-zero-budget-infrastructure"><img src="https://img.shields.io/badge/💰_Total_Cost-$0.00%2Fmo-00ff88?style=for-the-badge&logo=cashapp&logoColor=black&labelColor=0a0a0a" alt="Cost" /></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/Ab-aswini/Aswini--mini-security-tool-portfolio?style=flat-square&color=00E5FF&labelColor=0d1117" alt="Stars" />
-  <img src="https://img.shields.io/github/forks/Ab-aswini/Aswini--mini-security-tool-portfolio?style=flat-square&color=a855f7&labelColor=0d1117" alt="Forks" />
-  <img src="https://img.shields.io/github/last-commit/Ab-aswini/Aswini--mini-security-tool-portfolio?style=flat-square&color=00ff88&labelColor=0d1117" alt="Last Commit" />
-  <img src="https://img.shields.io/badge/license-MIT-yellow?style=flat-square&labelColor=0d1117" alt="License" />
-  <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square&labelColor=0d1117" alt="PRs Welcome" />
+  <img src="https://img.shields.io/badge/Architecture-Cyber_Noir_v3.0-00E5FF?style=flat-square&labelColor=0d1117" alt="Architecture" />
+  <img src="https://img.shields.io/badge/Privacy-100%25_Zero_Knowledge-00ff88?style=flat-square&labelColor=0d1117" alt="Privacy" />
+  <img src="https://img.shields.io/badge/Platform-Browser_Native-a855f7?style=flat-square&labelColor=0d1117" alt="Platform" />
+  <img src="https://img.shields.io/badge/Build_Step-None_(Pure_Vanilla)-ffb800?style=flat-square&labelColor=0d1117" alt="No Build Step" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square&labelColor=0d1117" alt="License" />
+  <img src="https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square&labelColor=0d1117" alt="PRs Welcome" />
+</p>
+
+<p align="center">
+  <a href="#-quick-navigation"><strong>Quick Navigation</strong></a> •
+  <a href="#-mission--architect-overview"><strong>Overview</strong></a> •
+  <a href="#-tool-arsenal-16-active-modules"><strong>Tools Matrix</strong></a> •
+  <a href="#-system-architecture"><strong>Architecture</strong></a> •
+  <a href="#-user-execution-lifecycle"><strong>User Flow</strong></a> •
+  <a href="#-technology-dna"><strong>Tech Stack</strong></a> •
+  <a href="#-project-evolution--roadmap"><strong>Roadmap</strong></a> •
+  <a href="#-zero-budget-infrastructure"><strong>Zero Budget</strong></a> •
+  <a href="#-quick-start"><strong>Quick Start</strong></a>
 </p>
 
 ---
 
-## 🧬 What Is This?
+## 🧭 Quick Navigation
 
-> **A weaponized portfolio of 16 client-side security & intelligence tools** — built with zero backend, zero tracking, and zero cost. Every tool runs 100% in your browser. Your data never leaves your machine.
+```mermaid
+flowchart TD
+    HUB["🏠 Home Gateway (index.html)"]
+    HUB --> SEC["🛡️ Security Suite (tools.html)"]
+    HUB --> PROJ["📂 Project Archives (projects.html)"]
+    HUB --> ABOUT["👤 Architect Dossier (about.html)"]
+    HUB --> UNIV["🌌 Universe Portal (universe.html)"]
+    HUB --> CONTACT["📬 Direct Terminal (contact.html)"]
 
-Built by [**Aswini Behera**](https://rouse.co.in/about.html) — a multi-disciplinary builder working across **Cyber Intelligence**, **Full-Stack Architecture**, and **Product Strategy**.
+    SEC --> S1["🔍 OSINT & Reconnaissance (6 Tools)"]
+    SEC --> S2["🔒 Security & Privacy (5 Tools)"]
+    SEC --> S3["🔬 Digital Forensics (5 Tools)"]
+
+    UNIV --> U1["💻 Tech Systems & Experiments"]
+    UNIV --> U2["📈 Business Strategies & PRDs"]
+    UNIV --> U3["🏋️ Discipline, Health & Life Goals"]
+    UNIV --> U4["📉 Failure Library & Retrospectives"]
+```
+
+---
+
+## 🧬 Mission & Architect Overview
+
+> **A weaponized portfolio of 16 client-side digital intelligence and cybersecurity utilities** designed for investigators, security researchers, and developers. Built with strict **zero-knowledge processing**: every calculation, hash, visual extraction, and pattern match happens inside the user's browser runtime.
+
+Architected by [**Aswini Behera**](https://rouse.co.in/about.html) — a multi-disciplinary builder working across **Cyber Intelligence**, **Full-Stack Systems**, and **Autonomous Workflows**.
 
 <table>
 <tr>
 <td width="33%" align="center">
 
-**🛡️ Cyber OSINT**
-<br/>
-Client-side zero-knowledge security tools, EXIF scrubbers, IP threat scorers & breach calculators
+### 🛡️ Cyber OSINT
+*Client-side zero-knowledge security tools, EXIF metadata scrubbers, IP threat scorers, and data breach calculators.*
 
 </td>
 <td width="33%" align="center">
 
-**💻 Systems & Full-Stack**
-<br/>
-Scalable web apps, serverless microservices, real-time pipelines & modern responsive UI
+### 💻 Systems & Full-Stack
+*Scalable web applications, serverless microservices, real-time data pipelines, and cyber noir UI.*
 
 </td>
 <td width="33%" align="center">
 
-**🧭 Product & Strategy**
-<br/>
-Zero-budget infrastructure, user-centric workflows & privacy-first product design
+### 🧭 Product & Strategy
+*Sustainable $0-budget infrastructure, user-centric threat modeling, and privacy-first engineering.*
 
 </td>
 </tr>
@@ -68,155 +101,129 @@ Zero-budget infrastructure, user-centric workflows & privacy-first product desig
 
 ---
 
-## 🔥 Tool Arsenal
+## 🔥 Tool Arsenal (16 Active Modules)
 
-> **16 production-ready security tools** — all running client-side with zero-knowledge architecture.
+Every tool is fully functional, isolated, and accessible directly from the [`/tools`](https://rouse.co.in/tools.html) dashboard.
 
-| | Tool | Description | Category |
-|:---:|:---|:---|:---:|
-| 🔐 | **CyberForge Studio** `V3 NEW` | Multi-format payload encoder, JWT inspector, ROT13 cipher & Web Crypto hashing | `Security` |
-| 🌐 | **Site Dossier** `V3.0` | Full 8-Layer Domain Intelligence: DNS, Infra, Supply Chain Graph & Risk Scoring | `OSINT` |
-| 👤 | **Imposter Scanner** | Hunt down usernames across 50+ social platforms to find hidden profiles | `OSINT` |
-| 📧 | **Email Intelligence** | Analyze email format, domain MX records, and Gravatar presence | `OSINT` |
-| 📍 | **IP Intelligence** | Geolocation, ISP data, threat scoring & network analysis for any IP | `OSINT` |
-| 🔎 | **DNS & WHOIS** | Lookup A, MX, NS records and domain registration details | `OSINT` |
-| 🔍 | **Public Search Dorks** | Generate advanced legal Google Dorks for OSINT research | `OSINT` |
-| 🚨 | **Breach Checker** | Check if passwords have been exposed using k-Anonymous hashing (safe) | `Security` |
-| 📸 | **Image EXIF Viewer** | Extract hidden metadata, GPS coordinates & device info from images | `Forensics` |
-| 📄 | **PDF Utilities** | Analyze, render, and extract text from PDFs entirely in the browser | `Forensics` |
-| 🖥️ | **Browser Fingerprint** | Analyze your browser's unique fingerprint and tracking potential | `Security` |
-| 🕵️ | **Steganography** | Hide secret messages inside images or extract hidden data | `Forensics` |
-| 📊 | **Entropy Visualizer** `NEW` | Visualize Shannon entropy and randomness patterns in any file | `Forensics` |
-| 🌐 | **Dependency Visualizer** `NEW` | Map external domains, CDNs, and scripts embedded in any webpage | `Security` |
-| 🔑 | **Password Analysis** | Entropy calculation, structure masking & realistic crack-time estimation | `Security` |
-| 📱 | **APK X-Ray** `NEW` | Extract backend API URLs, secrets & endpoints from Android APK files | `Forensics` |
+### 🔍 Category 1: OSINT & Reconnaissance Matrix
+
+| Module | Access | Purpose & Features | Data Scope |
+|:---|:---:|:---|:---:|
+| 🌐 **Site Dossier** `v3.0` | [`site-dossier.html`](tools/site-dossier.html) | Full 8-layer domain intelligence: DNS trees, ASN routing, supply chain scripts, SSL health, and aggregated threat scoring. | Domain / URL |
+| 👤 **Imposter Scanner** | [`dashboard.html`](tools/dashboard.html) | Direct-discovery social hunter scanning 50+ platforms simultaneously for hijacked or duplicate profiles. | Username |
+| 📍 **IP Intelligence** | [`ip-intel.html`](tools/ip-intel.html) | Comprehensive geolocation mapping, ASN routing classification, ISP lookup, and threat rating. | IPv4 / IPv6 |
+| 📧 **Email Intelligence** | [`email-intel.html`](tools/email-intel.html) | Deep email syntax verification, domain MX record validation, and MD5/SHA256 Gravatar identity lookups. | Email |
+| 🔎 **DNS & WHOIS Hub** | [`dns-whois.html`](tools/dns-whois.html) | Multi-record query suite (A, AAAA, MX, TXT, NS, SOA, CNAME) via DNS-over-HTTPS with zero ISP sniffing. | Domain |
+| 🔍 **Public Search Dorks** | [`public-search.html`](tools/public-search.html) | Advanced automated legal Google Dork generator for cloud storage exposures, admin panels, and leaked logs. | Keyword / Target |
+
+### 🔒 Category 2: Security & Cryptography Engine
+
+| Module | Access | Purpose & Features | Security Model |
+|:---|:---:|:---|:---:|
+| 🔐 **CyberForge Studio** `v3.0` | [`cyber-forge.html`](tools/cyber-forge.html) | Multi-format encoding suite (Base64, Hex, URL, Binary), JWT inspector/decoder, ROT ciphers, and WebCrypto SHA/MD5 hashing. | 100% In-Memory |
+| 🚨 **Breach Checker** | [`breach-checker.html`](tools/breach-checker.html) | Secure compromised password verification using SHA-1 prefix k-anonymity (plain password never leaves device). | k-Anonymous |
+| 🔑 **Password Analysis** | [`password-strength.html`](tools/password-strength.html) | Shannon entropy measurement, character-space collision analysis, mask identification, and realistic brute-force crack timelines. | Local Compute |
+| 🖥️ **Browser Fingerprint** | [`browser-fingerprint.html`](tools/browser-fingerprint.html) | In-depth tracker evaluation: Canvas hash, WebGL vendor, AudioContext signature, screen geometry, and entropy score. | Local Hardware |
+| 🕸️ **Dependency Visualizer** | [`subresource-scanner.html`](tools/subresource-scanner.html) | Subresource and CDN supply chain security mapper highlighting third-party script risks and tracker inclusions. | DOM Extraction |
+
+### 🔬 Category 3: Digital Forensics & Deep Analysis
+
+| Module | Access | Purpose & Features | Runtime |
+|:---|:---:|:---|:---:|
+| 📸 **Image EXIF Viewer** | [`image-exif.html`](tools/image-exif.html) | Parses embedded TIFF/EXIF tags, extracts camera hardware profiles, lens focal settings, and GPS geolocation coordinates. | Client Binary Parser |
+| 📱 **APK X-Ray Analyzer** `NEW` | [`apk-analyzer.html`](tools/apk-analyzer.html) | Client-side ZIP-decompilation of Android APKs to hunt hardcoded API keys, OAuth tokens, and backend REST endpoints. | Client-Side WASM/JS |
+| 📊 **Entropy Visualizer** `NEW` | [`entropy-visualizer.html`](tools/entropy-visualizer.html) | Byte-level Shannon entropy distribution graph to immediately distinguish compressed, encrypted, and obfuscated code blocks. | Byte Chunk Array |
+| 🕵️ **Steganography Studio** | [`steganography.html`](tools/steganography.html) | Least Significant Bit (LSB) steganographic encoder and decoder for hiding AES-encrypted secret payloads inside image pixels. | Canvas Pixel Buffer |
+| 📄 **PDF Forensic Tools** | [`pdf-tools.html`](tools/pdf-tools.html) | In-browser PDF stream inspection, metadata extraction, object tree analysis, and clean text dissociation. | Local PDF.js Engine |
+| 🏛️ **Lab Architecture** | [`lab-architecture.html`](tools/lab-architecture.html) | Deep technical architecture documentation, threat hunting workflows, and system whitepapers. | Reference Hub |
 
 ---
 
 ## 🏗️ System Architecture
 
-> How the zero-server, privacy-first architecture works:
-
 ```mermaid
-graph TB
-    subgraph CLIENT["🖥️ CLIENT BROWSER — Zero-Server Architecture"]
-        direction TB
-        UI["🎨 <b>UI Layer</b><br/>HTML5 · CSS3 · Glassmorphism<br/>Inter + Space Grotesk Fonts"]
-        ENGINE["🛡️ <b>Security Engine</b><br/>16 Client-Side Tools<br/>OSINT · Forensics · Crypto"]
-        PRIVACY["🔒 <b>Privacy Layer</b><br/>Zero-Knowledge Processing<br/>No Data Stored"]
+flowchart TD
+    subgraph CLIENT["🖥️ Client-Side Browser Engine (Zero-Server Architecture)"]
+        UI["🎨 UI Layer: HTML5, CSS3, Glassmorphism, Inter & Space Grotesk"]
+        ENGINE["🛡️ Security & OSINT Engine: 16 In-Browser Tools"]
+        PRIVACY["🔒 Zero-Knowledge Privacy Layer: In-Memory Sandboxing"]
+        UI -->|"User Target Input"| ENGINE
+        ENGINE -->|"Direct In-Memory Compute"| PRIVACY
     end
 
-    subgraph APIS["☁️ FREE EXTERNAL APIS"]
-        direction TB
-        IPAPI["📍 ipapi.co<br/><i>1K req/day free</i>"]
-        HIBP["🚨 Have I Been Pwned<br/><i>k-Anonymous API</i>"]
-        DNSAPI["🌐 DNS-over-HTTPS<br/><i>Cloudflare/Google</i>"]
-        GRAVATAR["👤 Gravatar<br/><i>Avatar lookup</i>"]
+    subgraph APIS["☁️ Free Public Threat APIs (Anonymous Endpoints)"]
+        IPAPI["📍 ipapi.co (IP Geo & ISP Data)"]
+        HIBP["🚨 Have I Been Pwned (k-Anonymous SHA-1 Hashes)"]
+        DOH["🌐 DNS-over-HTTPS (Cloudflare / Google Resolvers)"]
+        GRAVATAR["👤 Gravatar API (MD5 Hash Existence Check)"]
     end
 
-    subgraph HOSTING["🚀 HOSTING — $0.00"]
-        direction LR
-        FIREBASE["🔥 Firebase Hosting<br/><i>SSL + Global CDN</i>"]
-        GHPAGES["📄 GitHub Pages<br/><i>Backup Deploy</i>"]
+    subgraph DEPLOY["🚀 Static Edge Hosting ($0.00 Total Operating Cost)"]
+        FIREBASE["🔥 Firebase Hosting (Global CDN Edge + SSL)"]
+        GHPAGES["📄 GitHub Pages (Static Secondary Mirror)"]
     end
 
-    UI -->|"User Input"| ENGINE
-    ENGINE -->|"Local Processing"| PRIVACY
-    PRIVACY -->|"Anonymized Calls Only"| APIS
-    IPAPI -.->|"Response"| ENGINE
-    HIBP -.->|"Response"| ENGINE
-    DNSAPI -.->|"Response"| ENGINE
-    GRAVATAR -.->|"Response"| ENGINE
-    HOSTING -->|"Serves Static Files"| CLIENT
-
-    style CLIENT fill:#0d1117,stroke:#00E5FF,stroke-width:2px,color:#e6edf3
-    style APIS fill:#0d1117,stroke:#a855f7,stroke-width:2px,color:#e6edf3
-    style HOSTING fill:#0d1117,stroke:#00ff88,stroke-width:2px,color:#e6edf3
-    style UI fill:#161b22,stroke:#00E5FF,color:#e6edf3
-    style ENGINE fill:#161b22,stroke:#00E5FF,color:#e6edf3
-    style PRIVACY fill:#161b22,stroke:#00E5FF,color:#e6edf3
-    style IPAPI fill:#161b22,stroke:#a855f7,color:#e6edf3
-    style HIBP fill:#161b22,stroke:#a855f7,color:#e6edf3
-    style DNSAPI fill:#161b22,stroke:#a855f7,color:#e6edf3
-    style GRAVATAR fill:#161b22,stroke:#a855f7,color:#e6edf3
-    style FIREBASE fill:#161b22,stroke:#00ff88,color:#e6edf3
-    style GHPAGES fill:#161b22,stroke:#00ff88,color:#e6edf3
+    PRIVACY -.->|"Anonymized Hash / Query Only"| APIS
+    APIS -.->|"JSON Data Response"| ENGINE
+    DEPLOY -->|"Delivers Zero-Server Static Bundle"| CLIENT
 ```
 
 ---
 
-## 🗂️ Project Structure
-
-```mermaid
-graph LR
-    ROOT["📁 <b>Root</b>"] --> INDEX["🏠 index.html"]
-    ROOT --> TOOLS["🛠️ tools/<br/><i>16 security tools</i>"]
-    ROOT --> ASSETS["🎨 assets/"]
-    ROOT --> PROJECTS["📂 projects/<br/><i>5 case studies</i>"]
-    ROOT --> UNIVERSE["🌌 universe/<br/><i>5 life domains</i>"]
-    ROOT --> COMPONENTS["⚙️ components/"]
-    ROOT --> LEGAL["📜 legal/"]
-
-    TOOLS --> T1["🔐 cyber-forge.html"]
-    TOOLS --> T2["🌐 site-dossier.html"]
-    TOOLS --> T3["📍 ip-intel.html"]
-    TOOLS --> T4["📧 email-intel.html"]
-    TOOLS --> TN["... +12 more"]
-
-    ASSETS --> CSS["🎨 css/<br/><i>global, home, tools,<br/>about, beam, gooey</i>"]
-    ASSETS --> JS["⚡ js/<br/><i>app, sphere, decoder,<br/>terminal, beam, gooey</i>"]
-    ASSETS --> IMG["🖼️ images/"]
-    ASSETS --> DATA["📊 data/"]
-
-    COMPONENTS --> NAV["🧭 navbar.html"]
-    COMPONENTS --> FOOT["📋 footer.html"]
-    COMPONENTS --> COMPUI["🎯 ui/"]
-
-    style ROOT fill:#0d1117,stroke:#00E5FF,stroke-width:2px,color:#e6edf3
-    style TOOLS fill:#161b22,stroke:#a855f7,color:#e6edf3
-    style ASSETS fill:#161b22,stroke:#00ff88,color:#e6edf3
-    style PROJECTS fill:#161b22,stroke:#ffb800,color:#e6edf3
-    style UNIVERSE fill:#161b22,stroke:#ff6b6b,color:#e6edf3
-    style COMPONENTS fill:#161b22,stroke:#00E5FF,color:#e6edf3
-    style LEGAL fill:#161b22,stroke:#888,color:#e6edf3
-```
-
----
-
-## 🔄 User Flow — How Tools Work
-
-> Every tool follows the same privacy-first pattern:
+## 🔄 User Execution Lifecycle
 
 ```mermaid
 sequenceDiagram
-    actor User as 👤 User
-    participant Browser as 🌐 Browser
-    participant Tool as 🛡️ Tool Engine
-    participant API as ☁️ Free API
+    autonumber
+    actor User as 👤 Security Analyst / User
+    participant Browser as 🌐 Client Browser Runtime
+    participant Engine as 🛡️ Local Tool Engine
+    participant API as ☁️ Threat Intelligence API
 
-    User->>Browser: Opens Security Tool
-    Browser->>Tool: Initialize (100% Client-Side)
-    
-    User->>Tool: Inputs Data (IP, Email, File...)
+    User->>Browser: Select Tool & Provide Target (IP, Domain, File, Hash)
+    Browser->>Engine: Mount Tool Module (100% Client-Side JS)
     
     rect rgb(13, 17, 23)
-        Note over Tool: 🔒 LOCAL PROCESSING ZONE
-        Tool->>Tool: Analyze & Process Locally
-        Tool->>Tool: Apply Privacy Filters
+        Note over Engine: 🔒 ZERO-KNOWLEDGE EXECUTION ZONE
+        Engine->>Engine: Parse Input, Calculate Hashes & Run Client-Side Logic
+        Engine->>Engine: Strip Personally Identifiable Information
     end
 
-    alt 📡 Needs External Data
-        Tool->>API: Anonymized API Request
-        API-->>Tool: JSON Response
-        Note over Tool,API: Only metadata sent — never raw user data
-    else 🏠 Fully Local
-        Note over Tool: Complete analysis without any network call
+    opt Remote Threat Lookup Needed
+        Engine->>API: Dispatch Anonymized Request (e.g. SHA-1 5-char prefix)
+        API-->>Engine: Return Status Code & Public Intelligence Payload
     end
 
-    Tool-->>Browser: Render Intelligence Report
-    Browser-->>User: Display Results with Visualizations
-    
-    Note over User,API: 🔐 Zero data stored · No cookies · No tracking · No server logs
+    Engine-->>Browser: Compile Interactive Dossier & Graph Visualizations
+    Browser-->>User: Render Results (No cookies, No database, No server logs)
+```
+
+---
+
+## 🗂️ Project Directory Tree
+
+```mermaid
+flowchart LR
+    ROOT["📁 root/"] --> INDEX["🏠 index.html (Command Center)"]
+    ROOT --> TOOLS_DIR["🛠️ tools/ (16 Security Modules)"]
+    ROOT --> ASSETS_DIR["🎨 assets/ (Design & Scripts)"]
+    ROOT --> PROJECTS_DIR["📂 projects/ (Technical Demos)"]
+    ROOT --> UNIVERSE_DIR["🌌 universe/ (Multi-Domain Hub)"]
+    ROOT --> LEGAL_DIR["📜 legal/ (Privacy & Terms)"]
+
+    TOOLS_DIR --> T1["🔐 cyber-forge.html"]
+    TOOLS_DIR --> T2["🌐 site-dossier.html"]
+    TOOLS_DIR --> T3["📍 ip-intel.html"]
+    TOOLS_DIR --> T4["📱 apk-analyzer.html"]
+    TOOLS_DIR --> TN["... +12 more tools"]
+
+    ASSETS_DIR --> CSS["🎨 css/ (global, home, tools, beam, gooey)"]
+    ASSETS_DIR --> JS["⚡ js/ (app, terminal, decoder, sphere, beam)"]
+    ASSETS_DIR --> IMG["🖼️ images/ (branding & icons)"]
+
+    PROJECTS_DIR --> P1["💡 intel-dashboard.html"]
+    PROJECTS_DIR --> P2["🌐 interactive-sphere.html"]
+    PROJECTS_DIR --> P3["⚡ micro-tools.html"]
 ```
 
 ---
@@ -224,40 +231,33 @@ sequenceDiagram
 ## 🧬 Technology DNA
 
 ```mermaid
-pie showData
-    title Tech Stack Distribution
-    "JavaScript (Client-Side)" : 35
-    "HTML5 & Semantic Web" : 30
-    "CSS3 & Animations" : 25
-    "Free APIs" : 10
+pie title Technology Distribution
+    "Vanilla JavaScript (ES6+ Web APIs)" : 38
+    "Semantic HTML5 & Accessibility" : 28
+    "Modern CSS3 & Glassmorphism UI" : 24
+    "Open Threat & Recon APIs" : 10
 ```
 
 <table>
 <tr>
 <td width="50%">
 
-### 🎨 Frontend Stack
-| Technology | Purpose |
-|:---|:---|
-| HTML5 Semantic | Structure & SEO |
-| CSS3 + Glassmorphism | Visual design system |
-| Vanilla JavaScript | Tool logic & interactivity |
-| Inter + Space Grotesk | Typography (Google Fonts) |
-| Lucide Icons | Icon library |
-| CSS Animations | Gooey text, beam effects, 3D sphere |
+### 🎨 Frontend & Design System
+* **HTML5 Semantic Core**: Zero bloat, SEO optimized, full mobile responsiveness.
+* **Vanilla CSS3**: Glassmorphism token system, dynamic dark/light themes.
+* **Cyber Visuals**: Flowing SVG AI beams, gooey text animations, 3D interactive tag sphere.
+* **Typography**: Space Grotesk (HUD Headings) + Inter (Body).
+* **Icons**: Feather/Lucide vector icon suite.
 
 </td>
 <td width="50%">
 
-### ☁️ APIs & Services (All Free)
-| Service | Usage |
-|:---|:---|
-| ipapi.co | IP geolocation (1K/day) |
-| Have I Been Pwned | Breach checking (k-Anonymous) |
-| DNS-over-HTTPS | DNS record lookup |
-| Gravatar | Email avatar detection |
-| exif-js | Client-side EXIF extraction |
-| Firebase Hosting | SSL + CDN deployment |
+### 🛡️ Cryptography & APIs ($0 Tier)
+* **WebCrypto API**: Native browser cryptographic hashing (SHA-256, SHA-512).
+* **k-Anonymity Hashing**: 5-character prefix matching for leak checks.
+* **Cloudflare / Google DoH**: DNS-over-HTTPS JSON resolvers.
+* **ipapi.co**: IP Geolocation & ASN classification (1,000 req/day).
+* **exif-js & PDF.js**: Client-side binary and document parsing.
 
 </td>
 </tr>
@@ -265,209 +265,141 @@ pie showData
 
 ---
 
-## 🗺️ Project Evolution
+## 🗺️ Project Evolution & Roadmap
 
 ```mermaid
-timeline
-    title 🚀 Cyber Lab — Version History
-    V1.0 — Foundation
-        : 🛡️ Core tools launch
-        : 📍 IP Intelligence
-        : 📸 Image EXIF Viewer
-        : 🔑 Password Checker
-        : 👤 Username Checker
-    V2.0 — Advanced Suite
-        : 🌐 Site Dossier (8-Layer)
-        : 🔐 CyberForge Studio
-        : 🕵️ Steganography Engine
-        : 📊 Entropy Visualizer
-        : 🌐 Dependency Visualizer
-    V3.0 — Cyber Noir Architecture
-        : 🎨 Glassmorphism UI Overhaul
-        : 🌀 Interactive 3D Tech Sphere
-        : ⌨️ Command Palette (Ctrl+K)
-        : ✨ Gooey Text Animations
-        : 📱 APK X-Ray Analyzer
-    V4.0 — Intelligence Expansion (Planned)
-        : 🔥 Firebase Auth & Firestore
-        : 📋 Export Reports as PDF
-        : 🌊 Threat Intelligence Feed
-        : 🤖 AI-Powered Analysis
+flowchart TD
+    subgraph V1["⚡ Version 1.0 — Foundation"]
+        V1_1["📍 IP Threat Intelligence"]
+        V1_2["📸 EXIF Metadata Extractor"]
+        V1_3["🔑 Password Strength Engine"]
+        V1_4["👤 Imposter Username Scanner"]
+    end
+
+    subgraph V2["🚀 Version 2.0 — Advanced Reconnaissance"]
+        V2_1["🌐 Site Dossier 8-Layer Intelligence"]
+        V2_2["🔐 CyberForge Cryptographic Studio"]
+        V2_3["🕵️ Image Steganography Engine"]
+        V2_4["📊 Shannon Entropy Visualizer"]
+        V2_5["🕸️ Subresource & CDN Dependency Mapper"]
+    end
+
+    subgraph V3["✨ Version 3.0 — Cyber Noir Architecture (Current)"]
+        V3_1["🔮 Interactive 3D Technology Sphere"]
+        V3_2["⚡ AI-Sync Flowing Beam Visualizer"]
+        V3_3["💻 Global Command Palette (Ctrl + K)"]
+        V3_4["📱 APK X-Ray Secret Extractor"]
+        V3_5["🕶️ Glassmorphic Matrix UI Design System"]
+    end
+
+    subgraph V4["🔮 Version 4.0 — Autonomous Intelligence (Planned)"]
+        V4_1["🤖 In-Browser Local WebLLM OSINT Assistant"]
+        V4_2["📄 One-Click Exportable PDF Threat Reports"]
+        V4_3["📡 Real-Time CVE & Threat Feeds"]
+        V4_4["☁️ Optional Cloud Sync Tier (Firebase)"]
+    end
+
+    V1 --> V2 --> V3 --> V4
 ```
-
----
-
-## 🚀 Quick Start
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/Ab-aswini/Aswini--mini-security-tool-portfolio.git
-
-# 2. Navigate to the project
-cd Aswini--mini-security-tool-portfolio
-
-# 3. Open in browser (no build step needed!)
-# Simply open index.html in your browser, or use a local server:
-
-# Option A: Python
-python -m http.server 8080
-
-# Option B: Node.js
-npx serve .
-
-# Option C: VS Code
-# Install "Live Server" extension → Right-click index.html → "Open with Live Server"
-```
-
-> **💡 That's it!** No `npm install`, no build process, no dependencies to manage. Pure static files.
 
 ---
 
 ## 💰 Zero Budget Infrastructure
 
-> **Total operational cost: `$0.00/month`** — Here's how:
-
 ```mermaid
-graph LR
-    subgraph COST["💰 ZERO BUDGET STACK"]
-        direction TB
-        H["🚀 <b>Hosting</b><br/>Firebase / GitHub Pages<br/><code>$0.00</code>"]
-        D["🌐 <b>Domain</b><br/>*.web.app / *.github.io<br/><code>$0.00</code>"]
-        A["☁️ <b>APIs</b><br/>Free tiers only<br/><code>$0.00</code>"]
-        T["🛠️ <b>Dev Tools</b><br/>VS Code + GitHub<br/><code>$0.00</code>"]
+flowchart LR
+    subgraph COST["💰 Zero-Budget Production Stack ($0.00 / Month)"]
+        H["🚀 Hosting: Firebase + GitHub Pages ($0.00)"]
+        D["🌐 Domain & SSL: Free Tier Included ($0.00)"]
+        A["☁️ APIs: Free-Tier Rate Limited ($0.00)"]
+        T["🛠️ Tooling: VS Code + Git + Browser Engine ($0.00)"]
     end
-
     H --- D --- A --- T
-
-    style COST fill:#0d1117,stroke:#00ff88,stroke-width:2px,color:#e6edf3
-    style H fill:#161b22,stroke:#00ff88,color:#e6edf3
-    style D fill:#161b22,stroke:#00ff88,color:#e6edf3
-    style A fill:#161b22,stroke:#00ff88,color:#e6edf3
-    style T fill:#161b22,stroke:#00ff88,color:#e6edf3
 ```
 
 <details>
-<summary><b>📋 Detailed Cost Breakdown (Click to expand)</b></summary>
+<summary><strong>📋 Detailed Cost Breakdown Table (Click to Expand)</strong></summary>
 <br/>
 
-| Resource | Provider | Free Tier | Cost |
+| Infrastructure Layer | Service Provider | Plan Quota Included | Monthly Cost |
 |:---|:---|:---|:---:|
-| **Hosting** | Firebase Hosting (Spark Plan) | SSL, CDN, Custom Domains | `$0` |
-| **Hosting (Backup)** | GitHub Pages | Unlimited for public repos | `$0` |
-| **Domain** | `*.web.app` / `*.github.io` | Included with hosting | `$0` |
-| **IP Geolocation** | ipapi.co | 1,000 requests/day | `$0` |
-| **EXIF Extraction** | exif-js (client-side) | Unlimited (open source) | `$0` |
-| **Icons** | Lucide | Unlimited (open source CDN) | `$0` |
-| **Fonts** | Google Fonts | Unlimited | `$0` |
-| **Code Editor** | VS Code | Full featured | `$0` |
-| **Version Control** | GitHub | Free private repos | `$0` |
-| **Design Assets** | Unsplash | Free stock photos | `$0` |
-| | | **Monthly Total** | **`$0.00`** |
-
-</details>
-
-<details>
-<summary><b>🔮 Future Expansion (Still $0)</b></summary>
-<br/>
-
-| Feature | Provider | Free Tier |
-|:---|:---|:---|
-| Database | Firebase Firestore | 50K reads/day, 20K writes/day |
-| Authentication | Firebase Auth | Free for email/social login |
-| Cloud Functions | Firebase Functions | 125K invocations/month |
-| File Storage | Firebase Storage | 5 GB storage |
+| **Primary CDN Hosting** | Firebase Hosting | Spark Plan (Global CDN, SSL, Custom Domains) | `$0.00` |
+| **Mirror Hosting** | GitHub Pages | Unlimited bandwidth for public repositories | `$0.00` |
+| **Domain & DNS** | `web.app` / `github.io` / Cloudflare DNS | Free SSL Certificates & Anycast DNS | `$0.00` |
+| **IP Intelligence** | ipapi.co | 1,000 queries / 24 hours | `$0.00` |
+| **Breach Detection** | Have I Been Pwned Pwned Passwords | Unlimited k-anonymous SHA-1 prefix searches | `$0.00` |
+| **DNS Resolution** | Cloudflare / Google DoH | Unlimited JSON DNS-over-HTTPS queries | `$0.00` |
+| **Image & Binary Parsing** | Native WebAssembly & JavaScript | 100% Client-side compute | `$0.00` |
+| **Code Editor & Versioning** | VS Code & GitHub | Free open-source development environment | `$0.00` |
+| | | **TOTAL OPERATING EXPENSE** | **`$0.00`** |
 
 </details>
 
 ---
 
-## 🤝 Contributing
+## 🚀 Quick Start & Local Development
 
-Contributions are welcome! Here's the workflow:
+No complex setup, no `npm install` dependency hell, and no build configuration required.
 
-```mermaid
-graph LR
-    A["🍴 <b>Fork</b><br/>the repo"] --> B["🌿 <b>Branch</b><br/>feature/your-tool"]
-    B --> C["✏️ <b>Code</b><br/>your changes"]
-    C --> D["🧪 <b>Test</b><br/>in browser"]
-    D --> E["🔀 <b>PR</b><br/>with description"]
-    E --> F["✅ <b>Merge</b><br/>celebrate! 🎉"]
+```bash
+# 1. Clone the repository
+git clone https://github.com/Ab-aswini/Aswini--mini-security-tool-portfolio.git
 
-    style A fill:#161b22,stroke:#00E5FF,color:#e6edf3
-    style B fill:#161b22,stroke:#a855f7,color:#e6edf3
-    style C fill:#161b22,stroke:#ffb800,color:#e6edf3
-    style D fill:#161b22,stroke:#00ff88,color:#e6edf3
-    style E fill:#161b22,stroke:#ff6b6b,color:#e6edf3
-    style F fill:#161b22,stroke:#00E5FF,color:#e6edf3
+# 2. Enter the project directory
+cd Aswini--mini-security-tool-portfolio
+
+# 3. Launch a local web server (pick your preference):
+
+# Option A — Python 3
+python -m http.server 8080
+
+# Option B — Node.js npx
+npx serve .
+
+# Option C — VS Code Live Server
+# Right click on index.html -> Click 'Open with Live Server'
 ```
 
-**Guidelines:**
-- 🔒 All tools must remain **100% client-side** — no backend dependencies
-- 🎨 Follow the existing **Cyber Noir** design language
-- 📱 Ensure **responsive design** for mobile & desktop
-- 🧹 Keep code clean — no external CSS/JS frameworks
+Open `http://localhost:8080` in any modern browser.
 
 ---
 
-## 🏛️ Pages & Navigation
+## 🤝 Contribution Pipeline
 
 ```mermaid
-graph TD
-    HOME["🏠 <b>Home</b><br/>index.html"] --> TOOLS_PAGE["🛡️ <b>Tools</b><br/>16 Security Tools"]
-    HOME --> PROJECTS_PAGE["📂 <b>Projects</b><br/>Case Studies"]
-    HOME --> ABOUT_PAGE["👤 <b>About</b><br/>Background & Skills"]
-    HOME --> UNIVERSE_PAGE["🌌 <b>Universe</b><br/>Life Domains"]
-    HOME --> CONTACT_PAGE["📬 <b>Contact</b><br/>Get in Touch"]
-
-    UNIVERSE_PAGE --> TECH["💻 Tech"]
-    UNIVERSE_PAGE --> BIZ["📈 Business"]
-    UNIVERSE_PAGE --> FIT["🏋️ Lifestyle"]
-    UNIVERSE_PAGE --> GOALS["🎯 Goals"]
-    UNIVERSE_PAGE --> FAILS["📉 Failures"]
-
-    TOOLS_PAGE --> CAT1["🔍 OSINT & Recon"]
-    TOOLS_PAGE --> CAT2["🔒 Security & Privacy"]
-    TOOLS_PAGE --> CAT3["🔬 Forensics & Analysis"]
-
-    style HOME fill:#0d1117,stroke:#00E5FF,stroke-width:3px,color:#e6edf3
-    style TOOLS_PAGE fill:#161b22,stroke:#a855f7,color:#e6edf3
-    style PROJECTS_PAGE fill:#161b22,stroke:#00ff88,color:#e6edf3
-    style ABOUT_PAGE fill:#161b22,stroke:#ffb800,color:#e6edf3
-    style UNIVERSE_PAGE fill:#161b22,stroke:#ff6b6b,color:#e6edf3
-    style CONTACT_PAGE fill:#161b22,stroke:#00E5FF,color:#e6edf3
+flowchart LR
+    F["🍴 1. Fork Repository"] --> B["🌿 2. Create Feature Branch"]
+    B --> C["✏️ 3. Build Client-Side Tool"]
+    C --> T["🧪 4. Test In Browser"]
+    T --> PR["🔀 5. Submit Pull Request"]
+    PR --> M["✅ 6. Reviewed & Merged"]
 ```
 
----
-
-## 📊 Repository Stats
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/pin/?username=Ab-aswini&repo=Aswini--mini-security-tool-portfolio&theme=github_dark&border_color=00E5FF&icon_color=a855f7&title_color=00E5FF&text_color=e6edf3&bg_color=0d1117" alt="Repo Card" />
-</p>
+**Development Guidelines:**
+1. **Zero-Server Rule**: All new tools must execute entirely client-side using JavaScript or WebAssembly.
+2. **Zero-Tracking Rule**: Do not introduce analytics scripts, session cookies, or telemetry trackers.
+3. **Design Standard**: Match the cyber noir aesthetics using standard CSS variables from `assets/css/global.css`.
 
 ---
 
-<p align="center">
+## 📜 License & Acknowledgments
 
-### ⭐ Star this repo if you find it useful!
-
-</p>
+This project is open-source software licensed under the **MIT License**.
 
 <pre align="center">
 <code>
-┌──────────────────────────────────────────────────────┐
-│                                                      │
-│   Built with ❤️ by Aswini Behera                     │
-│                                                      │
-│   🌐 rouse.co.in  ·  🛡️ Zero Knowledge  ·  💰 $0   │
-│                                                      │
-│   "Explore fast, build fast, break things,           │
-│    learn, and rebuild better."                       │
-│                                                      │
-└──────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│                                                                        │
+│   Architected with passion & precision by Aswini Behera                │
+│                                                                        │
+│   🌐 rouse.co.in   •   🛡️ Zero Knowledge   •   💰 $0.00 Budget         │
+│                                                                        │
+│   "Explore fast, build fast, break things, learn, and rebuild better." │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
 </code>
 </pre>
 
 <p align="center">
-  <sub>🔒 100% Client-Side · No Server · No Tracking · No Cost · Open Source</sub>
+  <sub>🔒 Built for privacy • Made for researchers • 100% Client-Side Architecture</sub>
 </p>
