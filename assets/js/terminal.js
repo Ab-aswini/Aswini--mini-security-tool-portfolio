@@ -34,6 +34,7 @@ class Terminal {
         this.history = [];
         this.historyIndex = -1;
 
+        window.terminalInstance = this;
         this.init();
     }
 
@@ -63,10 +64,10 @@ class Terminal {
             <div class="cli-container">
                 <div class="cli-header">
                     <span>root@universe:~#</span>
-                    <span class="cli-controls">ESC to close</span>
+                    <span class="cli-controls">ESC or ~ to close</span>
                 </div>
                 <div id="cli-output">
-                    <div class="cli-line text-muted">Initialize sequence... v1.0.4 loaded.</div>
+                    <div class="cli-line text-muted">Initialize sequence... v1.0.4 loaded. (Press ~ to toggle)</div>
                     <div class="cli-line text-accent">Welcome to the Command Center. Type 'help' for instructions.</div>
                 </div>
                 <div class="cli-input-line">
@@ -79,8 +80,9 @@ class Terminal {
     }
 
     handleGlobalKey(e) {
-        // Toggle on Ctrl+K
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        // Toggle on backtick (`) or tilde (~) when not typing in an input, or Ctrl+`
+        const isEditing = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+        if ((e.key === '`' && !isEditing) || ((e.ctrlKey || e.metaKey) && (e.key === '`' || e.key === '~'))) {
             e.preventDefault();
             this.toggle();
         }

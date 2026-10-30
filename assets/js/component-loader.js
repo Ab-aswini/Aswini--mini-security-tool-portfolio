@@ -14,6 +14,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadComponent("nav-placeholder", prefix + "components/navbar.html", prefix);
     await loadComponent("footer-placeholder", prefix + "components/footer.html", prefix);
     
+    // Sync theme toggle button state
+    if (window.updateThemeButtons) {
+        window.updateThemeButtons(document.documentElement.getAttribute("data-theme") || "light");
+    }
+
     // Initialize Lucide icons after content is loaded
     if (window.lucide) {
         window.lucide.createIcons();

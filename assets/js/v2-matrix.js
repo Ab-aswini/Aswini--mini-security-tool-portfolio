@@ -3,7 +3,7 @@
  * Creates a subtle cyber grid of nodes connecting with responsive lines on hover/movement.
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+function initMatrixCanvas() {
     let canvas = document.getElementById("v2-matrix-canvas");
     if (!canvas) {
         canvas = document.createElement("canvas");
@@ -116,4 +116,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initParticles();
     animate();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initMatrixCanvas);
+} else {
+    initMatrixCanvas();
+}

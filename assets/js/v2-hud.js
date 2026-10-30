@@ -4,10 +4,16 @@
  */
 
 (function () {
-    document.addEventListener("DOMContentLoaded", () => {
+    function start() {
         initTelemetry();
         initCommandPalette();
-    });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start);
+    } else {
+        start();
+    }
 
     // -------------------------------------------------------------
     // 1. Live Telemetry HUD Ticker
@@ -83,7 +89,8 @@
         { id: "dash", title: "Real-time Intel Dashboard", category: "Security Tools", icon: "activity", url: "tools/dashboard.html" },
 
         // Actions
-        { id: "theme", title: "Toggle Light / Dark Theme", category: "Actions", icon: "moon", action: function() { if (window.toggleTheme) window.toggleTheme(); } }
+        { id: "theme", title: "Toggle Light / Dark Theme", category: "Actions", icon: "moon", action: function() { if (window.toggleTheme) window.toggleTheme(); } },
+        { id: "terminal", title: "Open Developer CLI Terminal (~)", category: "Actions", icon: "terminal", action: function() { if (window.terminalInstance) window.terminalInstance.toggle(); } }
     ];
 
     function initCommandPalette() {
@@ -246,12 +253,5 @@
                 openPalette();
             }
         });
-    }
-
-    function toggleTheme() {
-        const current = document.documentElement.getAttribute("data-theme") || "light";
-        const next = current === "dark" ? "light" : "dark";
-        document.documentElement.setAttribute("data-theme", next);
-        localStorage.setItem("theme", next);
     }
 })();

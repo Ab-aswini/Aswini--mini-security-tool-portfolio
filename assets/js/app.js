@@ -3,6 +3,27 @@
  * Includes: Theme Management, Navbar Interaction, Footer Animation
  */
 
+// -------------------------------------------------------------------------
+// 2. Global Theme Management
+// -------------------------------------------------------------------------
+window.updateThemeButtons = function (theme) {
+    const activeTheme = theme || document.documentElement.getAttribute("data-theme") || "light";
+    const buttons = document.querySelectorAll(".theme-toggle-btn");
+    buttons.forEach(btn => {
+        btn.textContent = activeTheme === "dark" ? "☀️" : "🌙";
+    });
+};
+
+window.toggleTheme = function () {
+    const root = document.documentElement;
+    const current = root.getAttribute("data-theme") || "light";
+    const next = current === "dark" ? "light" : "dark";
+
+    root.setAttribute("data-theme", next);
+    localStorage.setItem("theme", next);
+    window.updateThemeButtons(next);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------------------
     // 1. Initialize Lucide Icons
@@ -11,30 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.lucide.createIcons();
     }
 
-    // -------------------------------------------------------------------------
-    // 2. Theme Management
-    // -------------------------------------------------------------------------
-    const root = document.documentElement;
-    const currentTheme = root.getAttribute("data-theme") || "light";
-    updateThemeButtons(currentTheme);
-
-    // Ensure global access for toggle button onclick attribute
-    window.toggleTheme = function () {
-        const current = root.getAttribute("data-theme");
-        const next = current === "light" ? "dark" : "light";
-
-        root.setAttribute("data-theme", next);
-        localStorage.setItem("theme", next);
-        updateThemeButtons(next);
-    };
-
-    function updateThemeButtons(theme) {
-        const buttons = document.querySelectorAll(".theme-toggle-btn");
-        buttons.forEach(btn => {
-            btn.textContent = theme === "dark" ? "☀️" : "🌙";
-        });
-    }
-
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    window.updateThemeButtons(currentTheme);
 });
 
 // -------------------------------------------------------------------------

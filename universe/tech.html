@@ -11,15 +11,6 @@
     
     
     <link rel="stylesheet" href="../assets/css/cpu.css">
-    <style>
-        header nav {
-            display: none !important;
-        }
-
-        header {
-            justify-content: flex-start;
-        }
-    </style>
     <!-- Theme Data Script (Anti-Flicker) -->
     <script>
         (function () {
@@ -29,7 +20,13 @@
             document.documentElement.setAttribute("data-theme", theme);
         })();
     </script>
+    <!-- Deferred Scripts -->
+    <script defer src="../assets/js/lucide.min.js"></script>
     <script defer src="../assets/js/component-loader.js"></script>
+    <script defer src="../assets/js/app.js"></script>
+    <script defer src="../assets/js/decoder.js"></script>
+    <script defer src="../assets/js/terminal.js"></script>
+    <script defer src="../assets/js/cpu.js"></script>
 </head>
 
 <body>
@@ -44,12 +41,9 @@
         <div id="cpu-container" class="cpu-container-styled"></div>
     </main>
 
-    <script src="../assets/js/app.js"></script>
     
-    <script src="../assets/js/lucide.min.js"></script>
     
 
-    <script src="../assets/js/cpu.js"></script>
     
     <!-- Hover Footer -->
     
