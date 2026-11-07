@@ -172,11 +172,16 @@
             </div>
 
             <!-- B. Map (Right Side) -->
-            <div id="map-area" class="bento-card" style="padding: 0; overflow:hidden; position:relative;">
-                <div id="ipMap" style="width:100%; height:100%; min-height: 250px;"></div>
+            <div id="map-area" class="bento-card" style="padding: 0; overflow:hidden; position:relative; min-height:280px;">
+                <div id="ipMap" style="width:100%; height:100%; min-height: 280px;"></div>
+                <div style="position:absolute; top:10px; right:10px; z-index:400; display:flex; gap:6px;">
+                    <button id="toggle-map-layer" type="button" style="background:rgba(14,14,19,0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:4px 10px; border-radius:6px; font-size:0.75rem; cursor:pointer; backdrop-filter:blur(6px); transition:0.2s;" title="Toggle Dark/Street map style">
+                        🗺️ Theme: Dark
+                    </button>
+                </div>
                 <a id="gmaps-link" href="#" target="_blank" rel="noopener noreferrer"
-                    style="position:absolute; bottom:10px; right:10px; z-index:400; background:var(--background); padding:4px 8px; border-radius:4px; font-size:0.7rem; text-decoration:none; opacity:0.9;">
-                    Open in Google Maps ?
+                    style="position:absolute; bottom:10px; right:10px; z-index:400; background:rgba(14,14,19,0.85); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:5px 10px; border-radius:6px; font-size:0.75rem; text-decoration:none; backdrop-filter:blur(6px);">
+                    Open in Google Maps &rarr;
                 </a>
             </div>
 
@@ -215,6 +220,7 @@
                     <div class="bento-label">Location</div>
                     <div class="bento-val" id="d-loc">--</div>
                     <div class="bento-val" id="d-country" style="opacity: 0.7; font-size: 0.8rem;">--</div>
+                    <div class="bento-val" id="d-coords" style="opacity: 0.9; font-size: 0.75rem; color: var(--cyber-blue); margin-top: 0.35rem; font-family:'Fira Code',monospace;">--</div>
                 </div>
                 <div class="bento-card">
                     <div class="bento-label">Local Time / Cur</div>
@@ -284,52 +290,148 @@
         }
 
         let mapInstance = null;
+        let activeTileLayer = null;
+        let mapMarker = null;
 
-        // --- 2. Proxy Router ---
-        const proxyList = [
-            (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-        ];
+        // Leaflet Icon Setup
+        function setupLeafletIcons() {
+            if (typeof L !== 'undefined' && L.Icon && L.Icon.Default) {
+                delete L.Icon.Default.prototype._getIconUrl;
+                L.Icon.Default.mergeOptions({
+                    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+                    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                });
+            }
+        }
+        setupLeafletIcons();
 
-        async function fetchViaProxyRouter(targetUrl) {
-            for (const proxyFn of proxyList) {
-                const proxyUrl = proxyFn(targetUrl);
-                try {
-                    console.log(`[IP Tool] Trying proxy: ${proxyUrl}`);
-                    const response = await fetch(proxyUrl);
-                    if (response.ok) return await response.json();
-                } catch (error) {
-                    console.warn(`[IP Tool] Proxy failed: ${error.message}`);
+        // Keyboard Shortcut: Enter key triggers lookup
+        document.getElementById('ipInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('lookupBtn').click();
+            }
+        });
+
+        // --- IP Data Providers (100% HTTPS + Direct CORS Enabled) ---
+        const ipProviders = [
+            {
+                name: 'IPWhoIs',
+                fetch: async (ip) => {
+                    const url = ip ? `https://ipwho.is/${encodeURIComponent(ip)}` : `https://ipwho.is/`;
+                    const res = await fetch(url, { referrerPolicy: 'no-referrer' });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    if (data.success === false) throw new Error(data.message || 'Lookup unsuccessful');
+                    return {
+                        ip: data.ip,
+                        city: data.city || null,
+                        region: data.region || null,
+                        country: data.country || null,
+                        country_code: data.country_code || null,
+                        latitude: data.latitude ? parseFloat(data.latitude) : null,
+                        longitude: data.longitude ? parseFloat(data.longitude) : null,
+                        asn: data.connection && data.connection.asn ? String(data.connection.asn).replace(/^AS/i, '') : null,
+                        org: data.connection ? data.connection.org : null,
+                        isp: data.connection ? data.connection.isp : null,
+                        postal: data.postal || null,
+                        timeZone: data.timezone ? data.timezone.id : null,
+                        currency: data.currency ? data.currency.code : null
+                    };
+                }
+            },
+            {
+                name: 'GeoJS',
+                fetch: async (ip) => {
+                    const url = ip ? `https://get.geojs.io/v1/ip/geo/${encodeURIComponent(ip)}.json` : `https://get.geojs.io/v1/ip/geo.json`;
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    return {
+                        ip: data.ip,
+                        city: data.city || null,
+                        region: data.region || null,
+                        country: data.country || null,
+                        country_code: data.country_code || null,
+                        latitude: data.latitude ? parseFloat(data.latitude) : null,
+                        longitude: data.longitude ? parseFloat(data.longitude) : null,
+                        asn: data.asn ? String(data.asn).replace(/^AS/i, '') : null,
+                        org: data.organization_name || data.organization || null,
+                        isp: data.organization || null,
+                        postal: null,
+                        timeZone: data.timezone || null,
+                        currency: null
+                    };
+                }
+            },
+            {
+                name: 'FreeIPAPI',
+                fetch: async (ip) => {
+                    const url = ip ? `https://freeipapi.com/api/json/${encodeURIComponent(ip)}` : `https://freeipapi.com/api/json`;
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    return {
+                        ip: data.ipAddress,
+                        city: data.cityName || null,
+                        region: data.regionName || null,
+                        country: data.countryName || null,
+                        country_code: data.countryCode || null,
+                        latitude: data.latitude ? parseFloat(data.latitude) : null,
+                        longitude: data.longitude ? parseFloat(data.longitude) : null,
+                        asn: data.asn ? String(data.asn).replace(/^AS/i, '') : null,
+                        org: data.asnOrganization || null,
+                        isp: data.asnOrganization || null,
+                        postal: data.zipCode || null,
+                        timeZone: data.timeZones && data.timeZones.length > 0 ? data.timeZones[0] : null,
+                        currency: data.currencies && data.currencies.length > 0 ? data.currencies[0] : null
+                    };
+                }
+            },
+            {
+                name: 'IPInfo',
+                fetch: async (ip) => {
+                    const url = ip ? `https://ipinfo.io/${encodeURIComponent(ip)}/json` : `https://ipinfo.io/json`;
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    let lat = null, lon = null;
+                    if (data.loc) {
+                        const parts = data.loc.split(',');
+                        lat = parseFloat(parts[0]);
+                        lon = parseFloat(parts[1]);
+                    }
+                    let asn = null, org = data.org || null;
+                    if (org && org.startsWith('AS')) {
+                        const match = org.match(/^AS(\d+)\s*(.*)$/);
+                        if (match) {
+                            asn = match[1];
+                            org = match[2] || org;
+                        }
+                    }
+                    return {
+                        ip: data.ip,
+                        city: data.city || null,
+                        region: data.region || null,
+                        country: data.country || null,
+                        country_code: data.country || null,
+                        latitude: lat,
+                        longitude: lon,
+                        asn: asn,
+                        org: org,
+                        isp: org,
+                        postal: data.postal || null,
+                        timeZone: data.timezone || null,
+                        currency: null
+                    };
                 }
             }
-            throw new Error("All proxies failed.");
-        }
+        ];
 
-        // --- 3. JSONP Helper (Nuclear Option) ---
-        function jsonp(url) {
-            return new Promise((resolve, reject) => {
-                const callbackName = 'ip_jsonp_' + Math.round(100000 * Math.random());
-                const script = document.createElement('script');
-
-                window[callbackName] = function (data) {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    resolve(data);
-                };
-
-                script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
-                script.onerror = () => {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    reject(new Error('JSONP load failed'));
-                };
-
-                document.body.appendChild(script);
-            });
-        }
-
-        // --- 4. Main Logic ---
+        // --- Main Lookup Logic ---
         document.getElementById('lookupBtn').addEventListener('click', async () => {
-            const inputIp = document.getElementById('ipInput').value.trim();
+            const rawInput = document.getElementById('ipInput').value.trim();
             const resultContainer = document.getElementById('resultContainer');
             const errorContainer = document.getElementById('errorBox');
             const scanButton = document.getElementById('lookupBtn');
@@ -340,199 +442,182 @@
             errorContainer.innerText = '';
 
             const originalButtonText = scanButton.innerHTML;
-            scanButton.innerText = "Scanning...";
+            scanButton.innerText = "Analyzing...";
             scanButton.disabled = true;
 
-            const ipDataProviders = [
-                {
-                    name: 'IPWhoIs',
-                    url: inputIp ? `https://ipwho.is/${inputIp}` : `https://ipwho.is/`,
-                    map: (rawApiResponse) => ({
-                        ip: rawApiResponse.ip,
-                        city: rawApiResponse.city,
-                        region: rawApiResponse.region,
-                        country: rawApiResponse.country,
-                        country_code: rawApiResponse.country_code,
-                        latitude: rawApiResponse.latitude,
-                        longitude: rawApiResponse.longitude,
-                        asn: rawApiResponse.connection ? rawApiResponse.connection.asn : null,
-                        org: rawApiResponse.connection ? rawApiResponse.connection.org : null,
-                        isp: rawApiResponse.connection ? rawApiResponse.connection.isp : null,
-                        postal: rawApiResponse.postal,
-                        timeZone: rawApiResponse.timezone ? rawApiResponse.timezone.id : null,
-                        currency: rawApiResponse.currency ? rawApiResponse.currency.code : null
-                    })
-                },
-                {
-                    name: 'FreeIPAPI',
-                    url: inputIp ? `https://freeipapi.com/api/json/${inputIp}` : `https://freeipapi.com/api/json`,
-                    map: (rawApiResponse) => ({
-                        ip: rawApiResponse.ipAddress,
-                        city: rawApiResponse.cityName,
-                        region: rawApiResponse.regionName,
-                        country: rawApiResponse.countryName,
-                        country_code: rawApiResponse.countryCode,
-                        latitude: rawApiResponse.latitude,
-                        longitude: rawApiResponse.longitude,
-                        asn: rawApiResponse.asn,
-                        org: rawApiResponse.asnOrganization,
-                        isp: rawApiResponse.asnOrganization,
-                        postal: rawApiResponse.zipCode,
-                        timeZone: rawApiResponse.timeZones ? rawApiResponse.timeZones[0] : null,
-                        currency: rawApiResponse.currencies ? rawApiResponse.currencies[0] : null
-                    })
-                },
-                {
-                    name: 'IP-API',
-                    url: inputIp ? `http://ip-api.com/json/${inputIp}` : `http://ip-api.com/json/`,
-                    map: (rawApiResponse) => ({
-                        ip: rawApiResponse.query,
-                        city: rawApiResponse.city,
-                        region: rawApiResponse.regionName,
-                        country: rawApiResponse.country,
-                        country_code: rawApiResponse.countryCode,
-                        latitude: rawApiResponse.lat,
-                        longitude: rawApiResponse.lon,
-                        asn: rawApiResponse.as ? rawApiResponse.as.split(' ')[0].replace('AS','') : null,
-                        org: rawApiResponse.org,
-                        isp: rawApiResponse.isp,
-                        timeZone: rawApiResponse.timezone,
-                        currency: null
-                    })
-                }
-            ];
-
-            let consolidatedIpIntelligence = null;
-            let successfulProviderName = null;
-
-            async function fetchIpDataFromProvider(provider) {
-                // 1. Direct Fetch
-                try {
-                    const fetchResponse = await fetch(provider.url, { referrerPolicy: 'no-referrer' });
-                    if (fetchResponse.ok) {
-                        const parsedJson = await fetchResponse.json();
-                        if (parsedJson.ip || parsedJson.ipAddress) return provider.map(parsedJson);
-                    }
-                } catch (error) { console.warn("Direct fetch failed, trying proxy..."); }
-
-                // 2. Proxy Fetch
-                try {
-                    const proxyJson = await fetchViaProxyRouter(provider.url);
-                    if (proxyJson.ip || proxyJson.ipAddress) return provider.map(proxyJson);
-                } catch (proxyError) { return null; }
-            }
-
             try {
-                // --- GREEDY FETCH LOGIC ---
-                // Goal: Don't stop at first success if data is "sparse" (missing coords/ISP).
+                // 1. Sanitize Target
+                let cleanTarget = rawInput.replace(/^https?:\/\//i, '').split('/')[0].split(':')[0].trim();
+                let queryIp = cleanTarget;
+                let resolvedNotice = '';
 
-                // 1. Try FreeIPAPI (Primary)
-                try {
-                    const primaryProvider = ipDataProviders[0];
-                    consolidatedIpIntelligence = await fetchIpDataFromProvider(primaryProvider);
-                    if (consolidatedIpIntelligence) successfulProviderName = primaryProvider.name;
-                } catch (e) { }
-
-                // Check 1: Is the data rich enough?
-                const hasRichGeoData = (dataset) => dataset && dataset.latitude && dataset.longitude && dataset.isp;
-
-                if (!hasRichGeoData(consolidatedIpIntelligence)) {
-                    console.log("[IP Tool] Data is sparse or null. Trying secondary source...");
-                    // 2. Try DB-IP (Backup)
+                // 2. If target is a hostname/domain, resolve it to an IP first
+                const hasLetters = /[a-zA-Z]/.test(cleanTarget);
+                if (hasLetters && cleanTarget.length > 2) {
+                    scanButton.innerText = "Resolving DNS...";
                     try {
-                        const secondaryProvider = ipDataProviders[1];
-                        const secondaryData = await fetchIpDataFromProvider(secondaryProvider);
-                        if (secondaryData) {
-                            // If we had nothing, take this.
-                            if (!consolidatedIpIntelligence) {
-                                consolidatedIpIntelligence = secondaryData;
-                                successfulProviderName = secondaryProvider.name;
+                        const dnsRes = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(cleanTarget)}&type=A`);
+                        if (dnsRes.ok) {
+                            const dnsData = await dnsRes.json();
+                            const aRecords = (dnsData.Answer || []).filter(a => a.type === 1);
+                            if (aRecords.length > 0) {
+                                queryIp = aRecords[0].data;
+                                resolvedNotice = `Resolved ${cleanTarget} → ${queryIp}`;
+                                console.log(`[IP Tool] ${resolvedNotice}`);
                             }
                         }
-                    } catch (e) { }
+                    } catch (dnsErr) {
+                        console.warn("[IP Tool] DNS pre-resolution error:", dnsErr);
+                    }
                 }
 
-                // Check 2: Still not rich?
-                // 3. NUCLEAR OPTION: IPWhoIs (JSONP)
-                // Always try this if we lack critical data (Coords for Map)
-                if (!hasRichGeoData(consolidatedIpIntelligence)) {
-                    console.log("[IP Tool] Still sparse. Switching to JSONP Strategy (IPWhoIs)...");
+                // 3. Multi-Provider Greedy Fetch
+                let intel = null;
+                let successfulProvider = '';
+
+                for (const prov of ipProviders) {
+                    scanButton.innerText = `Querying ${prov.name}...`;
                     try {
-                        const fallbackProvider = ipDataProviders[2];
-                        const rawJsonpData = await jsonp(fallbackProvider.url);
-                        if (rawJsonpData && rawJsonpData.success !== false) {
-                            const fallbackData = fallbackProvider.map(rawJsonpData);
-                            console.log("[IP Tool] JSONP delivered rich data. Overwriting.");
-                            consolidatedIpIntelligence = fallbackData;
-                            successfulProviderName = fallbackProvider.name;
+                        const res = await prov.fetch(queryIp);
+                        if (res && res.ip) {
+                            if (!intel) {
+                                intel = res;
+                                successfulProvider = prov.name;
+                            } else {
+                                // Greedily fill missing fields
+                                for (const key in res) {
+                                    if ((intel[key] === null || intel[key] === undefined || intel[key] === '') && res[key] !== null) {
+                                        intel[key] = res[key];
+                                    }
+                                }
+                            }
+                            // Rich enough? Has coordinates and ASN/ISP
+                            if (intel.latitude && intel.longitude && (intel.isp || intel.org)) {
+                                break;
+                            }
                         }
-                    } catch (jsonpError) { console.error("JSONP Failed:", jsonpError); }
+                    } catch (pErr) {
+                        console.warn(`[IP Tool] Provider ${prov.name} failed:`, pErr.message);
+                    }
                 }
 
-                if (!consolidatedIpIntelligence) throw new Error("All data providers failed. Please check your internet connection.");
+                // 4. Proxy Backup if direct queries failed (e.g. strict client network)
+                if (!intel) {
+                    scanButton.innerText = "Connecting via Backup...";
+                    try {
+                        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://ipwho.is/' + (queryIp || ''))}`;
+                        const pres = await fetch(proxyUrl);
+                        if (pres.ok) {
+                            const pdata = await pres.json();
+                            if (pdata.ip) {
+                                intel = {
+                                    ip: pdata.ip,
+                                    city: pdata.city || null,
+                                    region: pdata.region || null,
+                                    country: pdata.country || null,
+                                    country_code: pdata.country_code || null,
+                                    latitude: pdata.latitude ? parseFloat(pdata.latitude) : null,
+                                    longitude: pdata.longitude ? parseFloat(pdata.longitude) : null,
+                                    asn: pdata.connection && pdata.connection.asn ? String(pdata.connection.asn).replace(/^AS/i, '') : null,
+                                    org: pdata.connection ? pdata.connection.org : null,
+                                    isp: pdata.connection ? pdata.connection.isp : null,
+                                    postal: pdata.postal || null,
+                                    timeZone: pdata.timezone ? pdata.timezone.id : null,
+                                    currency: pdata.currency ? pdata.currency.code : null
+                                };
+                                successfulProvider = 'IPWhoIs (Proxy)';
+                            }
+                        }
+                    } catch (proxyErr) {
+                        console.warn("[IP Tool] Proxy fallback failed:", proxyErr);
+                    }
+                }
 
-                console.log(`[IP Tool] Success via ${successfulProviderName}`, consolidatedIpIntelligence);
+                if (!intel || !intel.ip) {
+                    throw new Error("Unable to retrieve IP intelligence from any source. Please verify the IP address or your network connection.");
+                }
+
+                // If input was empty, update input field with detected IP
+                if (!rawInput && intel.ip) {
+                    document.getElementById('ipInput').value = intel.ip;
+                }
+
+                console.log(`[IP Tool] Success via ${successfulProvider}:`, intel);
 
                 // --- UI POPULATION ---
-                document.getElementById('data-source-badge').innerText = `Source: ${successfulProviderName}`;
-                document.getElementById('footer-provider').innerText = successfulProviderName;
-                document.getElementById('d-ip').innerText = consolidatedIpIntelligence.ip;
-                document.getElementById('d-loc').innerText = consolidatedIpIntelligence.city || 'Unknown';
-                document.getElementById('d-country').innerText = `${consolidatedIpIntelligence.region || ''}, ${consolidatedIpIntelligence.country}`;
+                const sourceBadge = document.getElementById('data-source-badge');
+                sourceBadge.innerText = resolvedNotice ? `${resolvedNotice} (${successfulProvider})` : `Source: ${successfulProvider}`;
+                document.getElementById('footer-provider').innerText = successfulProvider;
 
-                const gmapsEl = document.getElementById('gmaps-link');
-                if (gmapsEl && consolidatedIpIntelligence.latitude && consolidatedIpIntelligence.longitude) {
-                    gmapsEl.href = `https://www.google.com/maps?q=${consolidatedIpIntelligence.latitude},${consolidatedIpIntelligence.longitude}`;
+                document.getElementById('d-ip').innerText = intel.ip;
+                document.getElementById('d-loc').innerText = intel.city || 'Unknown City';
+                document.getElementById('d-country').innerText = [intel.region, intel.country].filter(Boolean).join(', ') || 'Unknown Country';
+
+                // Display exact GPS Coordinates in Location card
+                const coordsEl = document.getElementById('d-coords');
+                if (coordsEl) {
+                    if (intel.latitude !== null && intel.longitude !== null && !isNaN(intel.latitude) && !isNaN(intel.longitude)) {
+                        coordsEl.innerText = `📍 Lat: ${intel.latitude.toFixed(4)}, Lon: ${intel.longitude.toFixed(4)}`;
+                        coordsEl.style.display = 'block';
+                    } else {
+                        coordsEl.style.display = 'none';
+                    }
                 }
 
-                document.getElementById('d-isp').innerText = consolidatedIpIntelligence.isp || 'N/A';
-                document.getElementById('d-org').innerText = consolidatedIpIntelligence.org || 'N/A';
+                document.getElementById('d-isp').innerText = intel.isp || intel.org || 'N/A';
+                document.getElementById('d-org').innerText = intel.org || intel.isp || 'N/A';
 
-                document.getElementById('d-asn').innerText = consolidatedIpIntelligence.asn ? `AS${consolidatedIpIntelligence.asn}` : 'N/A';
+                document.getElementById('d-asn').innerText = intel.asn ? `AS${intel.asn}` : 'N/A';
                 const asnLinksContainer = document.getElementById('asn-links');
-                if (consolidatedIpIntelligence.asn) {
-                    const asnClean = String(consolidatedIpIntelligence.asn).replace("AS", "");
+                if (intel.asn) {
+                    const cleanAsn = String(intel.asn).replace(/\D/g, '');
                     asnLinksContainer.style.display = 'flex';
-                    document.getElementById('bgp-link').href = `https://bgp.he.net/AS${asnClean}`;
-                    document.getElementById('peering-link').href = `https://www.peeringdb.com/search?q=AS${asnClean}`;
+                    document.getElementById('bgp-link').href = `https://bgp.he.net/AS${cleanAsn}`;
+                    document.getElementById('peering-link').href = `https://www.peeringdb.com/search?q=AS${cleanAsn}`;
                 } else {
                     asnLinksContainer.style.display = 'none';
                 }
 
-                if (consolidatedIpIntelligence.timeZone) {
+                if (intel.timeZone) {
                     try {
-                        const timeString = new Date().toLocaleTimeString('en-US', { timeZone: consolidatedIpIntelligence.timeZone, hour: '2-digit', minute: '2-digit' });
+                        const timeString = new Date().toLocaleTimeString('en-US', {
+                            timeZone: intel.timeZone,
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
                         document.getElementById('d-time').innerText = "🕒 " + timeString;
-                    } catch (e) { document.getElementById('d-time').innerText = consolidatedIpIntelligence.timeZone; }
+                    } catch (e) {
+                        document.getElementById('d-time').innerText = intel.timeZone;
+                    }
                 } else {
                     document.getElementById('d-time').innerText = "--:--";
                 }
-                document.getElementById('d-currency').innerText = consolidatedIpIntelligence.currency ? `Currency: ${consolidatedIpIntelligence.currency}` : '';
+                document.getElementById('d-currency').innerText = intel.currency ? `Currency: ${intel.currency}` : '';
 
-                // Risk Heuristics
-                const combinedInfo = (consolidatedIpIntelligence.org || "") + " " + (consolidatedIpIntelligence.isp || "");
-                const orgUpper = combinedInfo.toUpperCase();
-                const hostingKeywords = ["AMAZON", "AWS", "GOOGLE CLOUD", "AZURE", "DIGITALOCEAN", "HETZNER", "OVH", "LINODE", "VULTR", "DATACENTER", "HOSTING", "VPN", "PROXY", "CLOUDFLARE", "AKAMAI", "FASTLY", "DATACAMP"];
-                const cellularKeywords = ["JIO", "AIRTEL", "VODAFONE", "VERIZON", "AT&T", "T-MOBILE", "ORANGE", "TELEFONICA", "MOBILE", "CELLULAR", "GSM", "LTE"];
+                // Risk & Connection Heuristics
+                const combinedInfo = ((intel.org || "") + " " + (intel.isp || "")).toUpperCase();
+                const hostingKeywords = ["AMAZON", "AWS", "GOOGLE CLOUD", "AZURE", "DIGITALOCEAN", "HETZNER", "OVH", "LINODE", "VULTR", "DATACENTER", "HOSTING", "VPN", "PROXY", "CLOUDFLARE", "AKAMAI", "FASTLY", "DATACAMP", "LEASeweb"];
+                const cellularKeywords = ["JIO", "AIRTEL", "VODAFONE", "VERIZON", "AT&T", "T-MOBILE", "ORANGE", "TELEFONICA", "MOBILE", "CELLULAR", "GSM", "LTE", "WIRELESS"];
 
                 const riskCard = document.getElementById('risk-area');
                 const typeElement = document.getElementById('d-type');
                 const descElement = document.getElementById('d-risk-desc');
 
-                let isHosting = hostingKeywords.some(keyword => orgUpper.includes(keyword));
-                let isCellular = cellularKeywords.some(keyword => orgUpper.includes(keyword));
+                const isHosting = hostingKeywords.some(k => combinedInfo.includes(k));
+                const isCellular = cellularKeywords.some(k => combinedInfo.includes(k));
 
                 if (isHosting) {
-                    typeElement.innerText = "🛡️ Hosting / VPN";
-                    descElement.innerText = "Potential Masked Location";
+                    typeElement.innerText = "🛡️ Hosting / VPN / Cloud";
+                    descElement.innerText = "Datacenter or Proxied Infrastructure";
                     riskCard.style.cssText = "background: rgba(239, 68, 68, 0.1); border-color: var(--status-error); color: var(--status-error); grid-area: risk;";
                 } else if (isCellular) {
                     typeElement.innerText = "📱 Mobile / Cellular";
-                    descElement.innerText = "Low Location Accuracy";
+                    descElement.innerText = "Dynamic Wireless Subscriber Pool";
                     riskCard.style.cssText = "background: rgba(245, 158, 11, 0.1); border-color: var(--status-warn); color: var(--status-warn); grid-area: risk;";
                 } else {
-                    typeElement.innerText = "🏠 Residential";
-                    descElement.innerText = "Standard Connection";
+                    typeElement.innerText = "🏠 Residential / ISP";
+                    descElement.innerText = "Standard Broadband Connection";
+                    riskCard.style.cssText = "background: rgba(16, 185, 129, 0.1); border-color: var(--status-success); color: var(--status-success); grid-area: risk;";
                 }
 
                 // V2 Action Bar Export & Copy Buttons
@@ -542,53 +627,143 @@
                     v2ActionBar.id = 'v2-ip-action-bar';
                     v2ActionBar.style.cssText = "grid-column: 1 / -1; display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;";
                     v2ActionBar.innerHTML = `
-                        <button id="btn-copy-ip" class="v2-cmd-btn" style="background: var(--card); border: 1px solid var(--glass-border);"><i data-lucide="copy" style="width:14px;"></i> Copy JSON</button>
-                        <button id="btn-export-ip" class="v2-cmd-btn" style="background: var(--cyber-blue); color: #000; font-weight: 600;"><i data-lucide="download" style="width:14px;"></i> Export Intel Report</button>
+                        <button id="btn-copy-ip" class="v2-cmd-btn" style="background: var(--card); border: 1px solid var(--glass-border); cursor:pointer;"><i data-lucide="copy" style="width:14px;"></i> Copy JSON</button>
+                        <button id="btn-export-ip" class="v2-cmd-btn" style="background: var(--cyber-blue); color: #000; font-weight: 600; cursor:pointer;"><i data-lucide="download" style="width:14px;"></i> Export Intel Report</button>
                     `;
                     resultContainer.appendChild(v2ActionBar);
 
                     document.getElementById('btn-copy-ip').addEventListener('click', () => {
+                        const jsonStr = JSON.stringify(intel, null, 2);
                         if (window.copyToClipboard) {
-                            window.copyToClipboard(JSON.stringify(consolidatedIpIntelligence, null, 2), 'IP Intelligence JSON copied to clipboard!');
+                            window.copyToClipboard(jsonStr, 'IP Intelligence JSON copied to clipboard!');
                         } else {
-                            navigator.clipboard.writeText(JSON.stringify(consolidatedIpIntelligence, null, 2));
+                            navigator.clipboard.writeText(jsonStr);
                         }
                     });
 
                     document.getElementById('btn-export-ip').addEventListener('click', () => {
-                        const blob = new Blob([JSON.stringify(consolidatedIpIntelligence, null, 2)], { type: 'application/json' });
+                        const blob = new Blob([JSON.stringify(intel, null, 2)], { type: 'application/json' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = `IP_Intel_Report_${consolidatedIpIntelligence.ip}.json`;
+                        a.download = `IP_Intel_Report_${intel.ip}.json`;
                         a.click();
                         URL.revokeObjectURL(url);
                     });
                 }
 
+                // Unhide Bento Grid
                 resultContainer.style.display = 'grid';
 
-                // Map Logic
-                if (typeof L !== 'undefined' && consolidatedIpIntelligence.latitude && consolidatedIpIntelligence.longitude) {
-                    document.getElementById('map-area').style.display = 'block';
-                    document.getElementById('gmaps-link').href = `https://www.google.com/maps?q=${consolidatedIpIntelligence.latitude},${consolidatedIpIntelligence.longitude}`;
+                // --- MAP VIEW ENGINE ---
+                const mapArea = document.getElementById('map-area');
+                const lat = intel.latitude;
+                const lon = intel.longitude;
 
-                    if (mapInstance) mapInstance.remove();
-                    mapInstance = L.map('ipMap').setView([consolidatedIpIntelligence.latitude, consolidatedIpIntelligence.longitude], 13);
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                        attribution: '&copy; OSM &copy; CARTO',
-                        subdomains: 'abcd',
-                        maxZoom: 19
-                    }).addTo(mapInstance);
-                    L.marker([consolidatedIpIntelligence.latitude, consolidatedIpIntelligence.longitude]).addTo(mapInstance);
+                if (lat !== null && lon !== null && !isNaN(lat) && !isNaN(lon)) {
+                    mapArea.style.display = 'block';
+
+                    const gmapsEl = document.getElementById('gmaps-link');
+                    if (gmapsEl) {
+                        gmapsEl.href = `https://www.google.com/maps?q=${lat},${lon}`;
+                    }
+
+                    if (typeof L !== 'undefined') {
+                        setupLeafletIcons();
+
+                        const mapContainerEl = document.getElementById('ipMap');
+
+                        // Clean initialization: if instance exists, just reposition
+                        if (!mapInstance) {
+                            mapInstance = L.map('ipMap', {
+                                zoomControl: true,
+                                scrollWheelZoom: false
+                            }).setView([lat, lon], 12);
+
+                            activeTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+                                subdomains: 'abcd',
+                                maxZoom: 19
+                            }).addTo(mapInstance);
+
+                            // Tile error fallback: switch to OpenStreetMap if CARTO is blocked
+                            activeTileLayer.on('tileerror', function() {
+                                if (!window._cartoFallbackDone) {
+                                    window._cartoFallbackDone = true;
+                                    console.warn("[IP Map] CARTO tile error, falling back to OpenStreetMap");
+                                    mapInstance.removeLayer(activeTileLayer);
+                                    activeTileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        attribution: '&copy; OpenStreetMap contributors',
+                                        maxZoom: 19
+                                    }).addTo(mapInstance);
+                                }
+                            });
+                        } else {
+                            mapInstance.setView([lat, lon], 12);
+                        }
+
+                        // Update Marker
+                        if (mapMarker) {
+                            mapInstance.removeLayer(mapMarker);
+                        }
+                        const locText = [intel.city, intel.region, intel.country].filter(Boolean).join(', ');
+                        mapMarker = L.marker([lat, lon]).addTo(mapInstance)
+                            .bindPopup(`
+                                <div style="color:#09090b; font-family:var(--font-main, sans-serif); font-size:0.8rem; line-height:1.4;">
+                                    <strong style="color:#000;">${intel.ip}</strong><br>
+                                    ${locText}<br>
+                                    <span style="color:#666; font-size:0.75rem;">📍 ${lat.toFixed(4)}, ${lon.toFixed(4)}</span>
+                                </div>
+                            `)
+                            .openPopup();
+
+                        // Leaflet resize invalidation to fix grey/collapsed tile issues
+                        setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 150);
+                        setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); }, 450);
+
+                        // Map Layer Toggle (Dark vs Street)
+                        const toggleBtn = document.getElementById('toggle-map-layer');
+                        if (toggleBtn && !toggleBtn._hasListener) {
+                            toggleBtn._hasListener = true;
+                            let isStreet = false;
+                            toggleBtn.addEventListener('click', () => {
+                                if (!mapInstance || !activeTileLayer) return;
+                                mapInstance.removeLayer(activeTileLayer);
+                                isStreet = !isStreet;
+                                if (isStreet) {
+                                    activeTileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                        attribution: '&copy; OpenStreetMap contributors',
+                                        maxZoom: 19
+                                    }).addTo(mapInstance);
+                                    toggleBtn.innerText = "🗺️ Theme: Street";
+                                } else {
+                                    activeTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                                        attribution: '&copy; OSM &copy; CARTO',
+                                        subdomains: 'abcd',
+                                        maxZoom: 19
+                                    }).addTo(mapInstance);
+                                    toggleBtn.innerText = "🗺️ Theme: Dark";
+                                }
+                            });
+                        }
+                    } else {
+                        // Fallback: Embed interactive OpenStreetMap iframe if Leaflet JS failed to load
+                        const mapContainer = document.getElementById('ipMap');
+                        mapContainer.innerHTML = `
+                            <iframe width="100%" height="100%" frameborder="0" scrolling="no"
+                                src="https://www.openstreetmap.org/export/embed.html?bbox=${lon-0.08}%2C${lat-0.08}%2C${lon+0.08}%2C${lat+0.08}&amp;layer=mapnik&amp;marker=${lat}%2C${lon}"
+                                style="border:0; border-radius:8px;">
+                            </iframe>
+                        `;
+                    }
                 } else {
-                    document.getElementById('map-area').style.display = 'none';
+                    mapArea.style.display = 'none';
                 }
 
             } catch (fatalError) {
                 console.error("IP Tool Fatal Error:", fatalError);
                 errorContainer.style.display = 'block';
-                errorContainer.innerHTML = `<strong>Scan Failed:</strong> ${fatalError.message}<br><small>We tried multiple sources but all failed. Please check your connection.</small>`;
+                errorContainer.innerHTML = `<strong>Scan Failed:</strong> ${fatalError.message}<br><small>All geolocation providers returned an error. Please check the IP address or your network connection.</small>`;
             } finally {
                 scanButton.innerHTML = originalButtonText;
                 scanButton.disabled = false;
