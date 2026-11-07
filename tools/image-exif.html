@@ -306,7 +306,7 @@
                         const cleanUrl = canvas.toDataURL('image/jpeg', 0.95);
                         const a = document.createElement('a');
                         a.href = cleanUrl;
-                        a.download = `sanitized_${file.name.replace(/\.[^/.]+$/, "")}.jpg`;
+                        a.download = `sanitized_${selectedFile.name.replace(/\.[^/.]+$/, "")}.jpg`;
                         a.click();
                         alert('Metadata sanitized! Downloaded clean JPEG.');
                     });

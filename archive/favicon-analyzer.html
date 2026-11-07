@@ -481,7 +481,6 @@
 
         async function fetchFaviconViaProxy(targetUrl) {
             const proxies = [
-                (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
                 (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`
             ];
 
@@ -511,7 +510,6 @@
 
         async function analyzeHeaders(url) {
             const proxies = [
-                { url: (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`, name: 'corsproxy.io' },
                 { url: (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`, name: 'allorigins.win' }
             ];
 
@@ -553,7 +551,7 @@
         async function checkManifest(domain) {
             try {
                 const url = `https://${domain}/manifest.json`;
-                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+                const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
                 if (res.ok) {
                     const json = await res.json();
                     document.getElementById('manifestStatus').innerText = "FOUND";
@@ -571,7 +569,7 @@
         async function checkSecurityTxt(domain) {
             try {
                 const url = `https://${domain}/.well-known/security.txt`;
-                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+                const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
                 if (res.ok) {
                     document.getElementById('securityStatus').innerText = "FOUND";
                     document.getElementById('securityStatus').className = "asset-val found";

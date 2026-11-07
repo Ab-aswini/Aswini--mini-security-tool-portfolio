@@ -287,9 +287,7 @@
 
         // --- 2. Proxy Router ---
         const proxyList = [
-            (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-            (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-            (url) => `https://thingproxy.freeboard.io/fetch/${url}`
+            (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
         ];
 
         async function fetchViaProxyRouter(targetUrl) {
@@ -385,20 +383,20 @@
                     })
                 },
                 {
-                    name: 'DB-IP',
-                    url: inputIp ? `https://api.db-ip.com/v2/free/${inputIp}` : `https://api.db-ip.com/v2/free/self`,
+                    name: 'IP-API',
+                    url: inputIp ? `http://ip-api.com/json/${inputIp}` : `http://ip-api.com/json/`,
                     map: (rawApiResponse) => ({
-                        ip: rawApiResponse.ipAddress,
+                        ip: rawApiResponse.query,
                         city: rawApiResponse.city,
-                        region: rawApiResponse.stateProv,
-                        country: rawApiResponse.countryName,
+                        region: rawApiResponse.regionName,
+                        country: rawApiResponse.country,
                         country_code: rawApiResponse.countryCode,
-                        latitude: null, // Not provided free
-                        longitude: null,
-                        asn: null,
-                        org: null,
-                        isp: null,
-                        timeZone: null,
+                        latitude: rawApiResponse.lat,
+                        longitude: rawApiResponse.lon,
+                        asn: rawApiResponse.as ? rawApiResponse.as.split(' ')[0].replace('AS','') : null,
+                        org: rawApiResponse.org,
+                        isp: rawApiResponse.isp,
+                        timeZone: rawApiResponse.timezone,
                         currency: null
                     })
                 }
@@ -535,6 +533,8 @@
                 } else {
                     typeElement.innerText = "🏠 Residential";
                     descElement.innerText = "Standard Connection";
+                }
+
                 // V2 Action Bar Export & Copy Buttons
                 let v2ActionBar = document.getElementById('v2-ip-action-bar');
                 if (!v2ActionBar) {

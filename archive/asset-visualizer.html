@@ -500,9 +500,19 @@
             setStatus(`CONNECTING TO ${targetUrl.toUpperCase()}...`);
 
             try {
-                // Public CORS proxy
+                // Public CORS proxy with timeout
                 const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-                const response = await fetch(proxyUrl);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                let response;
+                try {
+                    response = await fetch(proxyUrl, { signal: controller.signal });
+                } catch (e) {
+                    clearTimeout(timeoutId);
+                    if (e.name === 'AbortError') throw new Error("Request timed out (15s). The proxy or target may be slow. Try using Local Mode with a saved HTML file instead.");
+                    throw e;
+                }
+                clearTimeout(timeoutId);
                 const data = await response.json();
 
                 if (!data.contents) throw new Error("No content received");

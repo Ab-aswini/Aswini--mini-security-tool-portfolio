@@ -266,7 +266,7 @@
                     ctx.fillStyle = "#f60";
                     ctx.fillRect(125, 1, 62, 20);
                     ctx.fillStyle = "#069";
-                    ctx.fillText("Fingerprint v2.0 <ðŸ˜>", 2, 15);
+                    ctx.fillText("Fingerprint v2.0 <😁>", 2, 15);
                     return simpleHash(canvas.toDataURL());
                 } catch (e) { return "Blocked"; }
             };
@@ -309,7 +309,7 @@
 
             // --- Hardware ---
             const battery = navigator.getBattery ? await navigator.getBattery() : null;
-            const batText = battery ? `${(battery.level * 100).toFixed(0)}% ${battery.charging ? 'âš¡' : ''}` : 'Unknown';
+            const batText = battery ? `${(battery.level * 100).toFixed(0)}% ${battery.charging ? '⚡' : ''}` : 'Unknown';
 
             // --- Network (IPWho.is) ---
             let netHTML = `<div style="color:var(--status-error)">Connection Failed</div>`;
@@ -344,7 +344,7 @@
             // Bot Check
             const isBot = navigator.webdriver || window.callPhantom || window._phantom;
             document.getElementById('botStatus').innerHTML = isBot
-                ? `<span class="error">ðŸ¤– ROBOT DETECTED</span>`
+                ? `<span class="error">🤖 ROBOT DETECTED</span>`
                 : `<span class="success">👤 HUMAN</span>`;
 
             document.getElementById('uaString').innerText = navigator.userAgent;

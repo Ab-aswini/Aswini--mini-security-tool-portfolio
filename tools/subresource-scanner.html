@@ -104,9 +104,7 @@
         let chartInstance = null;
 
         const corsProxyServices = [
-            (targetUrl) => `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-            (targetUrl) => `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`,
-            (targetUrl) => `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(targetUrl)}`
+            (targetUrl) => `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
         ];
 
         const logContainer = document.getElementById('processLog');
@@ -224,18 +222,22 @@
             const resultsContainer = document.getElementById('resultsArea');
             const selfHostname = new URL(baseUrl).hostname;
 
-            // --- CSP ANALYSIS (New) ---
+            // --- CSP ANALYSIS (Note: When fetched via proxy, headers belong to the proxy, not the target) ---
             const cspHeader = headers['content-security-policy'] || headers['Content-Security-Policy'] || "";
             let cspScore = 0;
             let cspIssues = [];
+            const usedProxy = headers['server'] && (headers['server'].includes('cloudflare') || headers['server'].includes('allorigins'));
 
-            if (cspHeader) {
+            if (usedProxy) {
+                cspIssues.push("⚠️ CSP data unavailable — headers belong to the CORS proxy, not the target site. For accurate CSP analysis, use the browser DevTools Network tab.");
+                cspScore = -1; // Flag as unknown
+            } else if (cspHeader) {
                 cspScore = 100;
                 if (cspHeader.includes("'unsafe-inline'")) { cspScore -= 30; cspIssues.push("Unsafe Inline Scripts allowed"); }
                 if (cspHeader.includes("'unsafe-eval'")) { cspScore -= 20; cspIssues.push("Unsafe Eval allowed"); }
                 if (cspHeader.includes("data:")) { cspScore -= 10; cspIssues.push("Data URI schemes allowed"); }
                 if (!cspHeader.includes("default-src") && !cspHeader.includes("script-src")) { cspScore -= 20; cspIssues.push("Missing default/script-src"); }
-            } else {
+            } else if (cspScore !== -1) {
                 cspIssues.push("No CSP Header Found (Critical Risk)");
             }
 
@@ -350,7 +352,7 @@
             
             <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                    <h3 style="margin:0;">ðŸ“‹ Scan Report</h3>
+                    <h3 style="margin:0;">📋 Scan Report</h3>
                     <button onclick="copyReport()" class="tool-btn" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
                         <i data-lucide="copy" style="height:14px; margin-right:5px;"></i> Copy Report
                     </button>

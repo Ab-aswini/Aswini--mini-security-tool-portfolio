@@ -73,6 +73,13 @@
                 <button class="v2-cat-btn" data-cat="security" style="padding: 0.4rem 1rem; border-radius: 9999px; background: var(--glass-bg); color: var(--text); border: 1px solid var(--glass-border); font-size: 0.8rem; cursor: pointer;">Security & Privacy</button>
                 <button class="v2-cat-btn" data-cat="forensics" style="padding: 0.4rem 1rem; border-radius: 9999px; background: var(--glass-bg); color: var(--text); border: 1px solid var(--glass-border); font-size: 0.8rem; cursor: pointer;">Forensics & Analysis</button>
             </div>
+
+            <!-- Status Legend -->
+            <div style="display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; font-size: 0.75rem; color: var(--text-dim);">
+                <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%;"></span> Client-side</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="display:inline-block; width:6px; height:6px; background:#42a5f5; border-radius:50%;"></span> API-powered</span>
+                <span style="display: inline-flex; align-items: center; gap: 5px;"><span style="display:inline-block; width:6px; height:6px; background:#ffca28; border-radius:50%;"></span> Proxy-dependent</span>
+            </div>
         </section>
 
         <div class="tools-grid" id="v2-tools-grid">
@@ -83,6 +90,7 @@
                 <div class="tool-name">
                     CyberForge Studio
                     <span class="badge" style="background: var(--cyber-blue); color: #000; font-weight: 700;">V3 NEW</span>
+                    <span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span>
                 </div>
                 <div class="tool-desc">Multi-format payload encoder, JWT inspector, ROT13 cipher & Web Crypto hashing engine.</div>
             </a>
@@ -93,76 +101,77 @@
                 <div class="tool-name">
                     Site Dossier
                     <span class="badge">V3.0</span>
+                    <span style="display:inline-block; width:6px; height:6px; background:#ffca28; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Proxy-dependent — may be slow"></span>
                 </div>
                 <div class="tool-desc">Full 8-Layer Domain Intelligence: DNS, Infra, Supply Chain Graph, and Risk
                     Scoring.</div>
             </a>
             <a href="tools/dashboard.html" class="tool-card">
                 <i data-lucide="scan-face" class="tool-icon"></i>
-                <div class="tool-name">Imposter Scanner</div>
+                <div class="tool-name">Imposter Scanner<span style="display:inline-block; width:6px; height:6px; background:#42a5f5; border-radius:50%; margin-left:6px; vertical-align:middle;" title="API-powered — requires internet"></span></div>
                 <div class="tool-desc">Hunt down a username across 50+ social platforms to find hidden profiles.</div>
             </a>
 
             <!-- 2. Email Intelligence -->
             <a href="tools/email-intel.html" class="tool-card">
                 <i data-lucide="mail-check" class="tool-icon"></i>
-                <div class="tool-name">Email Intelligence</div>
+                <div class="tool-name">Email Intelligence<span style="display:inline-block; width:6px; height:6px; background:#42a5f5; border-radius:50%; margin-left:6px; vertical-align:middle;" title="API-powered — requires internet"></span></div>
                 <div class="tool-desc">Analyze email format, domain MX records, and Gravatar presence.</div>
             </a>
 
             <!-- 3. IP Intelligence -->
             <a href="tools/ip-intel.html" class="tool-card">
                 <i data-lucide="map-pin" class="tool-icon"></i>
-                <div class="tool-name">IP Intelligence</div>
+                <div class="tool-name">IP Intelligence<span style="display:inline-block; width:6px; height:6px; background:#42a5f5; border-radius:50%; margin-left:6px; vertical-align:middle;" title="API-powered — requires internet"></span></div>
                 <div class="tool-desc">Geolocation and ISP data for any IP address.</div>
             </a>
 
             <!-- 4. DNS & WHOIS -->
             <a href="tools/dns-whois.html" class="tool-card">
                 <i data-lucide="server" class="tool-icon"></i>
-                <div class="tool-name">DNS & WHOIS</div>
+                <div class="tool-name">DNS & WHOIS<span style="display:inline-block; width:6px; height:6px; background:#42a5f5; border-radius:50%; margin-left:6px; vertical-align:middle;" title="API-powered — requires internet"></span></div>
                 <div class="tool-desc">Lookup A, MX, NS records and domain registration details.</div>
             </a>
 
             <!-- 5. Public Search Generator -->
             <a href="tools/public-search.html" class="tool-card">
                 <i data-lucide="search" class="tool-icon"></i>
-                <div class="tool-name">Public Search Dorks</div>
+                <div class="tool-name">Public Search Dorks<span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span></div>
                 <div class="tool-desc">Generate advanced legal Google Dorks for OSINT research.</div>
             </a>
 
             <!-- 6. Breach Checker -->
             <a href="tools/breach-checker.html" class="tool-card">
                 <i data-lucide="shield-alert" class="tool-icon"></i>
-                <div class="tool-name">Breach Checker</div>
+                <div class="tool-name">Breach Checker<span style="display:inline-block; width:6px; height:6px; background:#42a5f5; border-radius:50%; margin-left:6px; vertical-align:middle;" title="API-powered — requires internet"></span></div>
                 <div class="tool-desc">Check if a password has been exposed (k-Anonymous / Safe).</div>
             </a>
 
             <!-- 7. Image Metadata -->
             <a href="tools/image-exif.html" class="tool-card">
                 <i data-lucide="image" class="tool-icon"></i>
-                <div class="tool-name">Image EXIF Viewer</div>
+                <div class="tool-name">Image EXIF Viewer<span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span></div>
                 <div class="tool-desc">Extract hidden metadata, GPS, and device info from images client-side.</div>
             </a>
 
             <!-- 8. PDF Utilites -->
             <a href="tools/pdf-tools.html" class="tool-card">
                 <i data-lucide="file-text" class="tool-icon"></i>
-                <div class="tool-name">PDF Utilities</div>
+                <div class="tool-name">PDF Utilities<span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span></div>
                 <div class="tool-desc">Analyze, render, and extract text from PDFs in the browser.</div>
             </a>
 
             <!-- 9. Browser Fingerprint -->
             <a href="tools/browser-fingerprint.html" class="tool-card">
                 <i data-lucide="fingerprint" class="tool-icon"></i>
-                <div class="tool-name">Browser Fingerprint</div>
+                <div class="tool-name">Browser Fingerprint<span style="display:inline-block; width:6px; height:6px; background:#42a5f5; border-radius:50%; margin-left:6px; vertical-align:middle;" title="API-powered — requires internet"></span></div>
                 <div class="tool-desc">Analyze your browser's unique fingerprint and tracking potential.</div>
             </a>
 
             <!-- 10. Steganography -->
             <a href="tools/steganography.html" class="tool-card">
                 <i data-lucide="eye-off" class="tool-icon"></i>
-                <div class="tool-name">Steganography</div>
+                <div class="tool-name">Steganography<span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span></div>
                 <div class="tool-desc">Hide secret messages inside images or extract them.</div>
             </a>
 
@@ -174,13 +183,10 @@
                 <div class="tool-name">
                     Entropy Visualizer
                     <span class="badge">New</span>
+                    <span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span>
                 </div>
                 <div class="tool-desc">Visualize Shannon entropy and randomness patterns in files.</div>
             </a>
-
-
-
-
 
             <!-- 12. Subresource Scanner (New Phase 2) -->
             <a href="tools/subresource-scanner.html" class="tool-card">
@@ -188,6 +194,7 @@
                 <div class="tool-name">
                     Dependency Visualizer
                     <span class="badge">New</span>
+                    <span style="display:inline-block; width:6px; height:6px; background:#ffca28; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Proxy-dependent — may be slow"></span>
                 </div>
                 <div class="tool-desc">Map external domains, CDNs, and scripts embedded in any webpage.</div>
             </a>
@@ -195,12 +202,10 @@
             <!-- 13. Password Analysis (Upgraded) -->
             <a href="tools/password-strength.html" class="tool-card">
                 <i data-lucide="key" class="tool-icon"></i>
-                <div class="tool-name">Password Analysis</div>
+                <div class="tool-name">Password Analysis<span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span></div>
                 <div class="tool-desc">Entropy calculation, structure masking, and realistic crack-time estimation.
                 </div>
             </a>
-
-
 
             <!-- 14. APK X-Ray (New) -->
             <a href="tools/apk-analyzer.html" class="tool-card">
@@ -208,6 +213,7 @@
                 <div class="tool-name">
                     APK X-Ray
                     <span class="badge">New</span>
+                    <span style="display:inline-block; width:6px; height:6px; background:#00e676; border-radius:50%; margin-left:6px; vertical-align:middle;" title="Client-side — works offline"></span>
                 </div>
                 <div class="tool-desc">Extract backend API URLs and secrets from Android App files.</div>
             </a>
@@ -245,7 +251,7 @@
                     <div class="tool-name">
                         Lab Architecture
                         <span
-                            style="display:inline-block; width:6px; height:6px; background:var(--tool-accent); border-radius:50%; margin-left:6px; box-shadow: 0 0 5px var(--tool-accent); animation: pulse 1.5s infinite;"></span>
+                            style="display:inline-block; width:6px; height:6px; background:var(--tool-accent); border-radius:50%; margin-left:6px; box-shadow: 0 0 5px var(--tool-accent); animation: pulse 1.5s infinite;" title="Documentation & Deep Search Archives"></span>
                     </div>
                     <div class="tool-desc">Deep Search Archives & Technical Documentation.</div>
                 </div>

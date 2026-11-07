@@ -393,7 +393,7 @@
         <!-- Asset Manifest -->
         <div class="manifest-box" id="manifestBox">
             <div class="manifest-title">
-                <span>ðŸ“¦ Scan Manifest</span>
+                <span>📦 Scan Manifest</span>
                 <span style="font-size:0.8rem; color:#71717a;" id="manifestStats">0 Assets Scanned</span>
             </div>
             <table class="asset-table">
@@ -455,7 +455,7 @@
 
             // UI Reset
             resetUI();
-            log('info', `ðŸš€ Initializing Deep Scan on: ${domain}`);
+            log('info', `🚀 Initializing Deep Scan on: ${domain}`);
 
             try {
                 updateProgress(10, 'Fetching HTML source...');
@@ -473,13 +473,9 @@
                     throw new Error("Proxy returned invalid JSON (likely a block page or rate limit).");
                 }
 
-                // Fallback proxy if empty
+                // Validate proxy response
                 if (!data.contents || data.contents.length < 50) {
-                    log('warn', 'Primary proxy failed. Trying backup proxy (corsproxy)...');
-                    proxyUrl = `https://corsproxy.io/?` + encodeURIComponent('https://' + domain);
-                    res = await fetch(proxyUrl);
-                    const text = await res.text();
-                    data = { contents: text };
+                    throw new Error("Proxy returned empty or blocked content. The target site may be protected.");
                 }
 
                 if (!data.contents || data.contents.length < 50) throw new Error("Could not fetch target content. Protection active?");
@@ -630,7 +626,7 @@
                     const basePath = url.substring(0, url.lastIndexOf('/') + 1);
                     if (!mapUrl.startsWith('http')) mapUrl = basePath + mapUrl;
 
-                    log('warn', `ðŸ—ºï¸ Map Detected: ${mapUrl.split('/').pop()}`);
+                    log('warn', `🗺️ Map Detected: ${mapUrl.split('/').pop()}`);
                     status += " + Source Map";
                     await analyzeSourceMap(mapUrl, url.split('/').pop());
                 }
@@ -717,7 +713,7 @@
                     const key = `${lib.name}@${match[1]}`;
                     if (!foundLibs.has(key)) {
                         foundLibs.set(key, { name: lib.name, version: match[1], source: sourceLabel });
-                        log('success', `âœ¨ Detected ${lib.name} v${match[1]}`);
+                        log('success', `✨ Detected ${lib.name} v${match[1]}`);
                         hits.push(lib.name);
                     }
                 }
@@ -737,7 +733,7 @@
                             });
                             currentScore -= 10;
                             scoreLog.push({ text: `Unknown Version (${lib.name})`, pts: -10 });
-                            log('warn', `âš ï¸ Fuzzy Match: ${lib.name} (Version Unknown)`);
+                            log('warn', `⚠️ Fuzzy Match: ${lib.name} (Version Unknown)`);
                             hits.push(lib.name + "(?)");
                         }
                     }

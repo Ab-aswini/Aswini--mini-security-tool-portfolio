@@ -395,89 +395,18 @@
         }
 
         async function fetchObservatory(domain) {
-            // OFFICIAL API Endpoint
-            const apiUrl = `https://http-observatory.security.mozilla.org/api/v1/analyze?host=${domain}`;
-
-            try {
-                // Step 1: Check for existing scan (GET)
-                let obs = await fetchViaProxy(apiUrl, 'GET');
-
-                // Step 2: If no scan or very old, Initiate Scan (POST)
-                if (!obs || obs.error === 'measurements-not-found' || obs.state === 'FAILED') {
-                    console.log("No existing scan found. Initiating...");
-                    // POST requires 'hidden=true' to avoid indexing or just simple POST
-                    // Note: Basic POST to analyze starts it.
-                    obs = await fetchViaProxy(apiUrl, 'POST', 'rescan=true&hidden=true'); // Attempt to start
-                }
-
-                if (!obs) throw new Error("Connection to Mozilla API failed.");
-
-                // Step 3: Polling Loop (Wait for PENDING/STARTING)
-                let attempts = 0;
-                while ((obs.state === 'PENDING' || obs.state === 'STARTING') && attempts < 5) {
-                    await new Promise(r => setTimeout(r, 2000)); // Wait 2s
-                    obs = await fetchViaProxy(apiUrl, 'GET'); // Re-check
-                    attempts++;
-                }
-
-                // If still pending, we might have partial data or just have to show "Pending"
-                // But usually 10s is enough for a cached check or quick update.
-                if (obs.state === 'PENDING') throw new Error("Scan is pending. Please try again in 30 seconds.");
-
-                // Check for valid grade
-                if (!obs.grade) {
-                    // Sometimes score is null if failed.
-                    if (obs.error) throw new Error(obs.error);
-                    throw new Error("No grade available.");
-                }
-
-                // Success: Render Mozilla Data
-                renderGrade(obs.grade, obs.score, 'Mozilla Observatory');
-
-                updateMetric('hstsVal', obs.tests?.strict_transport_security?.pass ? 'Active' : 'Missing');
-                updateMetric('httpsVal', obs.tests?.redirection?.pass ? 'Active' : 'Missing');
-                updateMetric('xframeVal', obs.tests?.x_frame_options?.pass ? 'Active' : 'Missing');
-                updateMetric('xcontentVal', obs.tests?.content_security_policy?.pass ? 'Active' : 'Missing');
-
-                renderHeadersList([
-                    { name: "Content Security Policy", pass: obs.tests?.content_security_policy?.pass },
-                    { name: "Strict Transport Security", pass: obs.tests?.strict_transport_security?.pass },
-                    { name: "X-Content-Type", pass: obs.tests?.x_content_type_options?.pass },
-                    { name: "X-Frame-Options", pass: obs.tests?.x_frame_options?.pass }
-                ]);
-
-                // Keep persistent footer even on official success
-                renderResultsFooter(domain);
-
-            } catch (e) {
-                console.warn("Mozilla API failed/busy:", e);
-                // FALLBACK: Auto-Run Native Audit
-                await runNativeAudit(domain);
-            }
+            // NOTE: Mozilla Observatory API v1 has been deprecated (returns 502).
+            // We skip the API call and go directly to the native audit engine.
+            // Users can manually check at https://developer.mozilla.org/en-US/observatory
+            console.warn("Mozilla Observatory API v1 is deprecated. Using native audit engine.");
+            await runNativeAudit(domain);
         }
 
         async function fetchViaProxy(url, method = 'GET', body = null) {
             // Helper to try multiple proxies
             const proxies = [
-                // 1. CorsProxy.io (Supports Method/Body often?) - actually strictly GET usually.
-                // But we can try passing method via query if supported, or just rely on simple GET for analysis.
-                // Mozilla API triggers scan on POST. CorsProxy.io is a simple tunnel.
-                // If method is POST, we might need a specific proxy or just rely on the API triggering on GET with parameters?
-                // Actually Mozilla Observatory triggers scan on POST.
-                // Let's try to use a proxy that supports custom methods if possible, 
-                // OR just accept that we can only view Cached results (GET).
-                // If we can't POST, we can't start new scans.
-                // "corsproxy.io" proxies the request. Let's try to fetch normally.
-                // If we are strictly client-side, POSTing to Mozilla via proxy is hard.
-                // Fallback: We will treat it as "View Only". 
-
-                // For this implementation, let's treat it as View Only (GET) to be safe/stable.
-                // 1. CodeTabs (Reliable for GET)
-                { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}` },
-                // 2. AllOrigins (Backup)
-                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}` },
-                // 3. CorsProxy.io (Often blocks, keep as tertiary)
-                { url: `https://corsproxy.io/?${encodeURIComponent(url)}` }
+                // AllOrigins (only semi-functional free proxy remaining)
+                { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}` }
             ];
 
             for (let p of proxies) {
@@ -533,8 +462,9 @@
                 // Given the constraints, we might depend on headers exposed by `corsproxy.io` (it essentially tunnels).
 
                 const proxies = [
-                    { url: `https://corsproxy.io/?${target}`, method: 'HEAD' },
-                    { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(target)}`, method: 'GET' }
+                    // Note: Free CORS proxies cannot reliably forward target security headers.
+                    // Headers we read here belong to the proxy, not the target site.
+                    { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`, method: 'GET' }
                 ];
 
                 for (let p of proxies) {

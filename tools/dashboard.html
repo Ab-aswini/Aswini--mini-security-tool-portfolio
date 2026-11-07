@@ -160,6 +160,14 @@
                     </div>
                 </div>
 
+                <div style="margin-top:0.75rem; display:flex; align-items:center; gap:0.5rem;">
+                    <label style="font-size:0.8rem; color:#888; cursor:pointer; display:flex; align-items:center; gap:0.4rem;">
+                        <input type="checkbox" id="nsfwToggle" checked
+                            style="accent-color:var(--tool-accent); cursor:pointer;">
+                        Hide NSFW / Adult Platforms
+                    </label>
+                </div>
+
                 <div id="gridContainer" class="scanner-grid">
                     <!-- Cards injected here -->
                 </div>
@@ -240,10 +248,17 @@
         document.getElementById('usernameInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') runScan();
         });
+        document.getElementById('nsfwToggle').addEventListener('change', () => {
+            // Re-run scan if results are visible
+            if (document.getElementById('resultsArea').style.display === 'block') runScan();
+        });
 
         async function runScan() {
             const username = document.getElementById('usernameInput').value.trim();
             if (!username) { alert("Please enter a username."); return; }
+
+            const hideNSFW = document.getElementById('nsfwToggle').checked;
+            const filteredSites = hideNSFW ? sites.filter(s => s.cat !== 'NSFW') : sites;
 
             const grid = document.getElementById('gridContainer');
             grid.innerHTML = "";
@@ -252,9 +267,9 @@
             let currentCat = "";
 
             // Sort by Category
-            sites.sort((a, b) => a.cat.localeCompare(b.cat));
+            filteredSites.sort((a, b) => a.cat.localeCompare(b.cat));
 
-            sites.forEach(site => {
+            filteredSites.forEach(site => {
                 // Header if new category
                 if (site.cat !== currentCat) {
                     currentCat = site.cat;
@@ -316,14 +331,27 @@
         }
 
         function openAllMatches() {
-            const cards = document.querySelectorAll('.site-card');
-            if (confirm(`This will open ${cards.length} tabs. Are you sure?`)) {
-                cards.forEach(c => {
-                    const win = window.open(c.href, '_blank');
-                    if (win) win.blur();
-                });
-                window.focus();
+            const cards = Array.from(document.querySelectorAll('.site-card'));
+            const batchSize = 5;
+            const delayMs = 600;
+
+            if (cards.length > 15) {
+                if (!confirm(`This will open ${cards.length} tabs in batches of ${batchSize}. Continue?`)) return;
             }
+
+            let batch = 0;
+            function openBatch() {
+                const start = batch * batchSize;
+                const end = Math.min(start + batchSize, cards.length);
+                for (let i = start; i < end; i++) {
+                    window.open(cards[i].href, '_blank');
+                }
+                batch++;
+                if (end < cards.length) {
+                    setTimeout(openBatch, delayMs);
+                }
+            }
+            openBatch();
         }
     </script>
 

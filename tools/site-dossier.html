@@ -502,12 +502,17 @@
         async function fetchSource(domain) {
             try {
                 const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://' + domain)}`;
-                const res = await fetch(proxy);
-                if (!res.ok) throw new Error("Target unreachable");
-                state.intel.headers = Object.fromEntries(res.headers.entries()); // Capture headers if possible (basic)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 12000);
+                const res = await fetch(proxy, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!res.ok) throw new Error("Target unreachable (HTTP " + res.status + ")");
+                // Note: Headers from proxy response belong to allorigins, NOT the target
+                // We skip capturing proxy headers to avoid false server identification
+                log("Source fetched (note: security headers belong to proxy, not target)");
                 return await res.text();
             } catch (e) {
-                log("Source Fetch Error: " + e.message);
+                log("Source Fetch Error: " + e.message + " — try again or check if allorigins.win is online");
                 return "";
             }
         }
@@ -544,7 +549,10 @@
 
         async function fetchSubdomains(domain) {
             try {
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://crt.sh/?q=%.${domain}&output=json`)}`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://crt.sh/?q=%.${domain}&output=json`)}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
                 const json = await res.json();
                 const data = JSON.parse(json.contents);
                 const subs = [...new Set(data.map(d => d.name_value))];
@@ -557,7 +565,9 @@
                     if (sub !== domain) addToGraph(sub, 4, domain);
                 });
                 renderGraph();
-            } catch (e) { log("Subdomain Error (non-fatal)"); }
+            } catch (e) {
+                log("Subdomain Error (crt.sh may be slow/down — non-fatal): " + e.message);
+            }
         }
 
         async function runActiveRecon(domain) {
@@ -770,10 +780,10 @@
         }
 
         function detectProvider(headers) {
-            if (!headers) return 'Unknown';
-            if (headers['server'] && headers['server'].includes('cloudflare')) return 'Cloudflare';
-            if (headers['via'] && headers['via'].includes('cloudfront')) return 'AWS CloudFront';
-            return 'Generic Hosting';
+            // Since we fetch via allorigins proxy, headers are from the proxy
+            // We can't reliably detect the target's hosting provider from proxy headers
+            // Instead, analyze DNS records and HTML content for clues
+            return 'Detection via proxy unavailable';
         }
 
         function exportData() {

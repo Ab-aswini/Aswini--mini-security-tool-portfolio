@@ -95,17 +95,7 @@
             {
                 name: 'Reddit',
                 urlBuilder: (u) => `https://www.reddit.com/user/${u}`,
-                checkType: 'api',
-                checkFn: async (u) => {
-                    // Reddit's public JSON API. Note: Likely blocked by CORS on local file, but might work on localhost/production.
-                    // Fallback to manual if fetch fails.
-                    try {
-                        const res = await fetch(`https://www.reddit.com/user/${u}/about.json`);
-                        if (res.ok) return 'taken';
-                        if (res.status === 404) return 'available';
-                        return 'error';
-                    } catch (e) { return 'manual'; }
-                }
+                checkType: 'manual' // Reddit API blocks CORS — manual check only
             },
             { name: 'Instagram', urlBuilder: (u) => `https://www.instagram.com/${u}/`, checkType: 'manual' },
             { name: 'Twitter / X', urlBuilder: (u) => `https://twitter.com/${u}`, checkType: 'manual' },
@@ -157,7 +147,7 @@
             // Advanced Search
             html += `
                 <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid #333;">
-                    <div style="margin-bottom:0.5rem; font-size:0.9rem;">ðŸ” Deep Search (Google Dork):</div>
+                    <div style="margin-bottom:0.5rem; font-size:0.9rem;">🔍 Deep Search (Google Dork):</div>
                     <a href="https://www.google.com/search?q=%22${username}%22" target="_blank" class="tool-btn" style="text-decoration:none; font-size:0.9rem; padding:0.5rem 1rem;" rel="noopener noreferrer">Search "${username}" Everywhere</a>
                 </div>
                 
@@ -180,10 +170,10 @@
                     const result = await site.checkFn(username);
 
                     if (result === 'taken') {
-                        statusEl.innerHTML = '<span style="color:var(--status-error)">â— Taken (Found)</span>';
+                        statusEl.innerHTML = '<span style="color:var(--status-error)">● Taken (Found)</span>';
                         cardEl.style.borderColor = 'var(--status-error)';
                     } else if (result === 'available') {
-                        statusEl.innerHTML = '<span style="color:var(--status-success)">â— Available</span>';
+                        statusEl.innerHTML = '<span style="color:var(--status-success)">● Available</span>';
                         cardEl.style.borderColor = 'var(--status-success)';
                     } else {
                         statusEl.innerHTML = '<span>Check Manually</span>';

@@ -403,22 +403,38 @@
                     }
                 }
 
-                // 2. Primary Recon (IPAPI)
-                const ipRes = await fetch(`https://ipapi.co/${targetIp}/json/`);
+                // 2. Primary Recon (ipwho.is - free, reliable, CORS-enabled)
+                const ipRes = await fetch(`https://ipwho.is/${targetIp}`);
                 if (!ipRes.ok) throw new Error(`IP Lookup Failed (${ipRes.status})`);
-                const ipData = await ipRes.json();
+                const rawData = await ipRes.json();
 
-                if (ipData.error) throw new Error(ipData.reason || "IP Lookup Failed");
+                if (rawData.success === false) throw new Error(rawData.message || "IP Lookup Failed");
+
+                // Normalize ipwho.is response
+                const ipData = {
+                    ip: rawData.ip,
+                    city: rawData.city,
+                    region: rawData.region,
+                    country_name: rawData.country,
+                    country_code: rawData.country_code,
+                    latitude: rawData.latitude,
+                    longitude: rawData.longitude,
+                    org: rawData.connection ? rawData.connection.org : 'N/A',
+                    asn: rawData.connection ? rawData.connection.asn : null,
+                    asn_org: rawData.connection ? rawData.connection.isp : 'N/A',
+                    timezone: rawData.timezone ? rawData.timezone.id : 'UTC',
+                    type: rawData.type || 'Unknown'
+                };
 
                 // Render Primary Data
                 document.getElementById('ipDisp').innerText = ipData.ip;
-                document.getElementById('hostDisp').innerText = input; // Best guess
+                document.getElementById('hostDisp').innerText = input;
                 document.getElementById('orgDisp').innerText = ipData.org || ipData.asn_org || 'N/A';
-                document.getElementById('asnDisp').innerText = ipData.asn || 'N/A';
+                document.getElementById('asnDisp').innerText = ipData.asn ? `AS${String(ipData.asn).replace('AS','')}` : 'N/A';
                 document.getElementById('locDisp').innerText = `${ipData.city}, ${ipData.region}, ${ipData.country_name}`;
                 document.getElementById('tzDisp').innerText = ipData.timezone || 'UTC';
-                document.getElementById('netTypeDisp').innerText = "Hosting/Business"; // Placeholder heuristic
-                document.getElementById('rirDisp').innerText = "ARIN/RIPE"; // Placeholder until RIPEstat
+                document.getElementById('netTypeDisp').innerText = ipData.type || "Unknown";
+                document.getElementById('rirDisp').innerText = "ARIN/RIPE";
 
                 // 3. Render Map
                 if (!map) {
@@ -479,12 +495,14 @@
                 // UI Error Display
                 document.getElementById('loading').style.display = 'none';
                 const dashboard = document.getElementById('dashboard');
-                dashboard.style.display = 'block'; // Show dashboard to insert error, or better use a separate error container
+                dashboard.style.display = 'block';
 
-                // We'll replace the dashboard content with an error message temporarily or inject it on top
+                // Clear any previous error messages first
+                document.querySelectorAll('.intel-card.error-card').forEach(el => el.remove());
+
                 const container = document.querySelector('.tool-container');
                 const errBox = document.createElement('div');
-                errBox.className = 'intel-card';
+                errBox.className = 'intel-card error-card';
                 errBox.style.borderColor = '#ef4444';
                 errBox.style.color = '#ef4444';
                 errBox.style.textAlign = 'center';
